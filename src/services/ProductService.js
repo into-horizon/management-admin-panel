@@ -4,7 +4,7 @@ import ApiService from "./ApiService";
 class ProductService extends ApiService {
     constructor() {
         super();
-        this.path = "api/v1/product";
+        this.path = "api/admin/product";
     }
 
     async addProduct(data) {
@@ -15,12 +15,21 @@ class ProductService extends ApiService {
             throw new Error(error.message);
         }
     }
-    async getProductsByStatus(data) {
+    async getProducts(data) {
         try {
-            let res = await this.get(`${this.path}/store/${data.status}?limit=${data.limit}&offset=${data.offset}`, null)
+            let res = await this.get(this.path, data)
             return res
         } catch (error) {
             throw new Error(error.message);
+        }
+    }
+
+    async updateProductStatus(data){
+        try {
+            let result =  await this.patch( this.path, data)
+            return result
+        } catch (error) {
+            return error
         }
     }
 
@@ -43,7 +52,7 @@ class ProductService extends ApiService {
 
     async updateSizeAndQuantity(data) {
         try {
-            let res = await this.update(`${this.path}/quantityandsize`, data)
+            let res = await this.patch(`${this.path}/quantityandsize`, data)
             return res;
         } catch (error) {
             throw new Error(error.message);
@@ -51,7 +60,7 @@ class ProductService extends ApiService {
     }
     async updateDiscount(data) {
         try {
-            let res = await this.update(`${this.path}/discount`, data)
+            let res = await this.patch(`${this.path}/discount`, data)
             return res;
         } catch (error) {
             throw new Error(error.message);
@@ -84,7 +93,7 @@ class ProductService extends ApiService {
     }
     async deleteProduct(data) {
         try {
-            let res = await this.delete(`${this.path}`, {id:data})
+            let res = await this.delete(`${this.path}`, data)
             return res
         } catch (error) {
             throw new Error(error.message);

@@ -83,7 +83,7 @@ const Login = (props) => {
     <div className="bg-light min-vh-100 d-flex flex-row align-items-center">
       <CContainer>
         <CRow className="justify-content-center">
-          <CCol md={8}>
+          <CCol xs={12} sm={8} md={8} lg={6} xl={4}>
             <CCardGroup>
               <CCard className="p-4">
                 <CCardBody>
@@ -107,33 +107,28 @@ const Login = (props) => {
                         name="password"
                       />
                     </CInputGroup>
-                    <CRow>
-                      <CCol xs={6}>
-                            <CButton color="primary" className="px-4" type="submit" disabled={load}> 
-                              {load? <CSpinner color="light" size="sm"/>: t('login') }
-                            </CButton>
-                        {/* <If condition={load}>
-                          <Then>
-                            <CSpinner color="primary" />
-                          </Then>
-                          <Else>
-
-                          </Else>
-                        </If> */}
+                    <CRow className="justify-content-between">
+                      <CCol xs='auto'>
+                        <CButton color="primary" className="px-4" type="submit" disabled={load}>
+                          {load ? <CSpinner color="light" size="sm" /> : t('login')}
+                        </CButton>
                       </CCol>
-                      <CCol xs={6} className="text-right">
-                        <CButton color="link" className="px-0" onClick={() =>navigate('/reference')}> 
+                      <CCol xs='auto' className="text-right">
+                        <CButton color="link" className="px-0" onClick={() => navigate('/reference')}>
                           {t('forgotPassword')}
                         </CButton>
                       </CCol>
                     </CRow>
-                    <CRow>
-                        <CButton color='link' onClick={() => i18n.changeLanguage(i18n.language === 'en' ? 'ar' : 'en')}>{i18n.language === 'en' ? 'عربي' : 'English'}</CButton>
+                    <CRow className="justify-content-center">
+                     <CCol xs='auto'>
+
+                      <CButton color='link' onClick={() => i18n.changeLanguage(i18n.language === 'en' ? 'ar' : 'en')}>{i18n.language === 'en' ? 'عربي' : 'English'}</CButton>
+                     </CCol>
                     </CRow>
                   </CForm>
                 </CCardBody>
               </CCard>
-              <CCard className="text-white bg-primary py-5" style={{ width: '44%' }}>
+              {/* <CCard className="text-white bg-primary py-5" style={{ width: '44%' }}>
                 <CCardBody className="text-center">
                   <div>
                     <h2>{t('signup')}</h2>
@@ -147,7 +142,7 @@ const Login = (props) => {
                     </Link>
                   </div>
                 </CCardBody>
-              </CCard>
+              </CCard> */}
             </CCardGroup>
           </CCol>
         </CRow>

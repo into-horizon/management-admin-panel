@@ -12,7 +12,7 @@ const AppBreadcrumb = () => {
 
   const getRouteName = (pathname, routes) => {
     cookie.save(`current_path${sessionStorage.tabID}`, pathname, {path: '/'})
-    const currentRoute = routes.find((route) => route.path === pathname)
+    const currentRoute = routes.find((route) => route.path === pathname) ?? routes.find((route) => route.path === "*")
     return currentRoute.name
   }
 
@@ -31,18 +31,17 @@ const AppBreadcrumb = () => {
   }
 
   const breadcrumbs = getBreadcrumbs(currentLocation)
-  const { t } = useTranslation('translation', { keyPrefix: 'routes' });
 
   return (
     <CBreadcrumb className="m-0 ms-2">
-      <CBreadcrumbItem href="/">{t('Home')}</CBreadcrumbItem>
+      <CBreadcrumbItem href="/">{'Home'}</CBreadcrumbItem>
       {breadcrumbs.map((breadcrumb, index) => {
         return (
           <CBreadcrumbItem
             {...(breadcrumb.active ? { active: true } : { href: breadcrumb.pathname })}
             key={index}
           >
-            {t(breadcrumb.name)}
+            {breadcrumb.name}
           </CBreadcrumbItem>
         )
       })}

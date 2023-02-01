@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState,forwardRef } from 'react';
 import colors from '../services/colors'
 import {CFormSelect} from '@coreui/react'
 import { useTranslation } from 'react-i18next';
 
-const ColorSelector = props => {
+const ColorSelector = (props, ref) => {
     const { t, i18n } = useTranslation('translation', { keyPrefix: 'colors' });
     const [color, setColor] = useState()
     let props2 = {...props}
@@ -12,10 +12,11 @@ const ColorSelector = props => {
         setColor(e.target.value)
        props.onChange && props.onChange(e)
     }
+    
     useEffect(() => setColor(props.value), [props.value])
     const secondaryColors = ['Black', 'Blue', 'Maroon', 'Navy']
     return (
-        <CFormSelect style={{ backgroundColor: color, color: secondaryColors.includes(color)? 'White': 'Black' }} onChange={onChange} {...props2}  >
+        <CFormSelect style={{ backgroundColor: color, color: secondaryColors.includes(color)? 'White': 'Black' }} onChange={onChange} ref={ref} {...props2}  >
             {props.selectstatement && <option value='' disabled>select color</option>}
             {colors.map((color, i) => <option value={color} style={{ backgroundColor: color,color: secondaryColors.includes(color)? 'White': 'Black' }} key={`${i}color`} >{t(color)}</option>)}
 
@@ -23,5 +24,5 @@ const ColorSelector = props => {
     )
 }
 
-export default ColorSelector
+export default forwardRef(ColorSelector)
 

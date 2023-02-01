@@ -27,7 +27,7 @@ export const loginHandler = payload => async dispatch => {
         if (response.status === 200) {
             cookie.save('access_token', response.access_token, { path: '/' })
             cookie.save('refresh_token', response.refresh_token, { path: '/' })
-            cookie.save('session_id', response.session_id, { path: '/' })
+            // cookie.save('session_id', response.session_id, { path: '/' })
             let user = await NewAuth.getStore()
             dispatch(loginAction({ loggedIn: true, user: { ...user } }));
         } else {
@@ -43,8 +43,6 @@ export const getUser = () => async (dispatch) => {
         if (user?.id) {
             dispatch(loginAction({ loggedIn: true, user: { ...user } }))
         } else {
-           
-
             dispatch(logout())
         }
     } catch (error) {
@@ -61,7 +59,7 @@ export const logout = () => async dispatch => {
         cookie.remove(key,{ path: '/' })
     })
     console.log(cookie.loadAll())
-    setTimeout(dispatch(loginAction({ loggedIn: false, user: {} })), 1000)
+    dispatch(loginAction({ loggedIn: false, user: {} }))
 
 
 
