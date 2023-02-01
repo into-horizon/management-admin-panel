@@ -8,7 +8,6 @@ import { useTranslation } from 'react-i18next';
 import {useSelector} from 'react-redux'
 
 const AppContent = () => {
-  const {status} = useSelector((state) => state.login.user)
 const navigate = useNavigate()
 const { t } = useTranslation('translation', { keyPrefix: 'routes' });
 t('addProduct')
@@ -27,9 +26,8 @@ useEffect(()=>{
         <Routes>
           {routes.map((route, idx) => {
             const Item = route.component
-            const name = t(route.name) || route.name
             return (
-              route.component && (route.approved? route.approved && status ==='approved': true) && (
+              route.component && (
                 <Route
                   key={idx}
                   path={route.path}
@@ -41,7 +39,6 @@ useEffect(()=>{
             )
           })}
         </Routes>
-          {/* <Navigate from="/" to="/dashboard" /> */}
       </Suspense>
     </CContainer>
   )

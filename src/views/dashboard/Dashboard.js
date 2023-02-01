@@ -64,8 +64,6 @@ const WidgetsBrand = lazy(() => import('../widgets/WidgetsBrand.js'))
 
 const Dashboard = () => {
   const { message, user: { rejected_reason, status, ontime_orders, overall_orders, fulfilled_orders, performance_rate, sales_rate }, loggedIn } = useSelector((state) => state.login)
-  console.log("🚀 ~ file: Dashboard.js ~ line 67 ~ Dashboard ~ overall_orders", overall_orders)
-  console.log("🚀 ~ file: Dashboard.js ~ line 67 ~ Dashboard ~ rejected_reason", rejected_reason)
   const { t } = useTranslation('translation', { keyPrefix: 'dashboard' });
   const random = (min, max) => {
     return Math.floor(Math.random() * (max - min + 1) + min)
@@ -201,7 +199,7 @@ const Dashboard = () => {
 
   return (
     <>
-      {status !== 'approved' && <CAccordion flush>
+      {/* {status !== 'approved' && <CAccordion flush>
         <CAccordionItem itemKey={1}>
           <CAccordionHeader>
             <CIcon icon={cilWarning} />
@@ -219,7 +217,6 @@ const Dashboard = () => {
 
       </CAccordion>}
       <br />
-      {/* <WidgetsDropdown /> */}
       <CRow>
         <CCol xs={12}>
           <CWidgetStatsB
@@ -244,15 +241,7 @@ const Dashboard = () => {
       </CRow>
       <CRow>
 
-        {/* <CCol xs={4}>
-          <CWidgetStatsB
-            className="mb-3"
-            progress={{ color: 'success', value: 100 }}
-            text="total item purchased"
-            title="placed order items"
-            value={overall_orders}
-          />
-        </CCol> */}
+       
         <CCol xs={4}>
           <CWidgetStatsB
             className="mb-3"
@@ -330,7 +319,7 @@ const Dashboard = () => {
             value={overall_orders - fulfilled_orders}
           />
         </CCol>
-      </CRow>
+      </CRow> */}
       <CCard className="mb-4">
         <CCardBody>
           <CRow>

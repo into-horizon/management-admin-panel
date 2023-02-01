@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {lazy} from 'react'
 import Summary from './components/Summary'
 
 const Dashboard = React.lazy(() => import('./views/dashboard/Dashboard'))
@@ -59,7 +59,15 @@ const PendingOrders = React.lazy(() => import('./components/PendingOrders'))
 const OrdersOverview = React.lazy(() => import('./components/OrderOverView'))
 const Pdf = React.lazy(() => import('./components/PdfView'))
 const Statement = React.lazy(() => import('./components/Statement'))
-
+const Parent = React.lazy(()=> import('./views/category/Parent') )
+const Child = lazy(()=> import('./views/category/Child'))
+const Grandchild = lazy(()=> import('./views/category/Grandchild'))
+const UsersOverview = lazy(()=> import('./views/users/UsersOverview'))
+const Error404 = lazy(()=> import('./views/pages/page404/Page404'))
+const NewSellers = lazy(()=> import('./views/store/NewStores'))
+const SellersOverview = lazy(() => import('./views/store/OverviewStores'))
+const PromoCodes =  lazy(()=> import('./views/promoCodes/PromoCodes'))
+const PendingProducts = lazy(()=> import('./views/product/PendingProducts'))
 const routes = [
   { path: '/', exact: true, name: 'Home' },
   { path: '/dashboard', name: 'Dashboard', component: Dashboard },
@@ -107,9 +115,10 @@ const routes = [
   { path: '/widgets', name: 'Widgets', component: Widgets },
   { path: '/profile', name: 'Profile', component: Profile },
   { path: '/product', name: 'Products', component: Products , exact: true},
-  { path: '/product/add', name: 'addProduct', component: AddProduct , approved: true },
-  { path: '/product/products', name: 'myProducts', component: Products , approved: true},
-  { path: '/product/updateProduct', name: 'updateProduct', component: UpdateProduct , role: 'storeOwner', approved: true},
+  { path: '/product/add', name: 'addProduct', component: AddProduct  },
+  { path: '/product/products', name: 'myProducts', component: Products },
+  { path: '/product/updateProduct', name: 'updateProduct', component: UpdateProduct , role: 'storeOwner'},
+  { path: '/product/pending', name: 'Pending Products', component: PendingProducts  },
   { path: '/settings', name: 'Settings', component: Settings , exact: true},
   { path: '/order', name: 'Order', component: PendingOrders, exact: true},
   { path: '/order/pendingOrders', name: 'Pending Orders', component: PendingOrders},
@@ -117,8 +126,18 @@ const routes = [
   { path: '/pdf', name: 'pdf', component: Pdf},
   { path: '/finance', name: 'Finance', component: Statement},
   { path: '/finance/statement', name: 'Statements', component: Statement},
-  { path: '/finance/summary', name: 'Summary', component: Summary}
- 
+  { path: '/finance/summary', name: 'Summary', component: Summary},
+  { path: '/category', name: 'Category', component: Parent},
+  { path: '/category/parent', name: 'Parent', component: Parent},
+  { path: '/category/child', name: 'Child', component: Child},
+  { path: '/category/grandchild', name: 'Grandchild', component: Grandchild },
+  { path: '/users', name: 'Users', component: UsersOverview},
+  { path: '/users/overview', name: 'Users Overview', component: UsersOverview},
+  { path: '/seller/overview', name: 'Sellers Overview', component: SellersOverview},
+  { path: '/seller/new', name: 'Users Overview', component: NewSellers},
+  { path: '/seller', name: 'Sellers', component: SellersOverview},
+  { path: '/promo', name: 'Promo Codes', component: PromoCodes},
+  { path: '*', name: 'Error 404', component: Error404},
 
 ]
 
