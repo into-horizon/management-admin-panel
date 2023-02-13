@@ -3,7 +3,7 @@ import Paginator from './Paginator'
 import { CTable, CTableHead, CTableRow, CTableHeaderCell, CTableBody, CTableDataCell, CFormCheck, CSpinner } from '@coreui/react'
 
 
-export const Table = ({ params, count, columns=[], data= [], changeData, cookieName, style, emptyMessage, checkbox,onSelect,updateParams, loading }) => {
+export const Table = ({updateLoading, params, count, columns=[], data= [], changeData, cookieName, style, emptyMessage, checkbox,onSelect,updateParams, loading }) => {
     const [selected, setSelected] = useState([])
     const onChange = e =>{
         if(e.target.checked) {
@@ -24,7 +24,7 @@ export const Table = ({ params, count, columns=[], data= [], changeData, cookieN
     },[selected])
     return (
         <>
-        <div >
+        <div className='overflow-x'>
 
             <CTable style={style} striped>
                 <CTableHead>
@@ -48,7 +48,7 @@ export const Table = ({ params, count, columns=[], data= [], changeData, cookieN
                 </CTableBody>
             </CTable>
             {loading? <CSpinner color='primary'/>:  data.length === 0 ? <span  >{emptyMessage ?? `there's no data`}</span> :
-                <Paginator params={params} count={count} changeData={changeData} cookieName={cookieName} updateParams={updateParams}/>
+                <Paginator params={params} count={count} changeData={changeData} cookieName={cookieName} updateParams={updateParams} updateLoading={updateLoading}/>
             }
         </div>
 

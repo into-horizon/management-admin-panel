@@ -70,16 +70,16 @@ export const getPendingProducts = payload => async (dispatch) => {
     }
 }
 
-export const updateProductStatus = payload => async (dispatch, state) =>{
+export const updateProductStatus = (payload, type = 'pending') => async (dispatch, state) =>{
     try {
         let {status, data, message} =  await Product.updateProductStatus(payload)
         if(status === 200) {
-            let {data:products, count} =  state().products.pending
+            let {data:products, count} =  state().products[type]
             let newState = products.map(product =>{
                     if (product.id === data.id) return {...product, ...data}
                     return product
             })  
-            dispatch(addData({pending:{data:newState, count:count}}))
+            dispatch(addData({[type]:{data:newState, count:count}}))
             dispatch(updateToast({status: status, message: message, type: 'update'}))
              } else dispatch(updateToast({status: status, message: message, type: 'error'}))
     } catch (error) {

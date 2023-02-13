@@ -10,17 +10,18 @@ import ColorSelector from 'src/components/ColorSelector';
 import Colors from '../../services/colors'
 import CIcon from '@coreui/icons-react';
 import { cilTrash, cilPlus } from '@coreui/icons';
+import { getParentCategoriesHandler, getChildCategoriesHandler, getGrandChildCategoriesHandler } from "src/store/category";
 
 
-const AddProduct = props => {
+const AddProduct = ({addProductHandler,getParentCategoriesHandler, getChildCategoriesHandler, getGrandChildCategoriesHandler}) => {
 
     const dispatch = useDispatch()
     const { showOptionDialog, showToast, showAlert } = usePopup();
     const { t, i18n } = useTranslation('translation', { keyPrefix: 'addProduct' });
     const color = useTranslation('translation', { keyPrefix: 'colors' })
-    const category = useSelector(state => state.category)
+    const {parentCategories:{data:parentCategories}, childCategories:{data:childCategories},grandChildCategories:{data:grandChildCategories}} = useSelector(state=>state.category)
     const products = useSelector(state => state.products)
-    const { addProductHandler } = props
+  
 
     let sizeSymbols = ['XXS', 'XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL'];
     let sizeNumbers = []
@@ -171,15 +172,14 @@ const AddProduct = props => {
     }
 
     const categoryVisibility = e => {
-        let w = category.childCategories.filter(val => val.parent_id === e.target.value)
-        let x = { ...secondCategory, visible: true, data: w }
-        setSecondCategory(x)
-        setThirdCategory(initialState.thirdCategory)
+        // let w = category.childCategories.filter(val => val.parent_id === e.target.value)
+        // let x = { ...secondCategory, visible: true, data: w }
+        // setSecondCategory(x)
+        // setThirdCategory(initialState.thirdCategory)
+        getChildCategoriesHandler({parent_id: e.target.value})
     }
     const categoryVisibility2 = e => {
-        let w = category.grandChildCategories.filter(val => val.parent_id === e.target.value)
-        let x = { ...thirdCategory, visible: true, data: w }
-        setThirdCategory(x)
+       getGrandChildCategoriesHandler({parent_id: e.target.value})
     }
 
     const addSizes = e => {
@@ -190,39 +190,39 @@ const AddProduct = props => {
 
     }
 
-    useEffect(() => {
-        let productForm = document.getElementById('productForm');
-        if (products.message.includes('successfully')) {
-            showToast({
-                type: DialogType.SUCCESS,
-                text: t('doneSuccessfully'),
-                timeoutDuration: 3000,
-                showProgress: true,
-                position: ToastPosition[t('position')]
-            })
-            productForm.reset()
-            setSecondCategory({ ...secondCategory, ...initialState.secondCategory })
-            setThirdCategory({ ...thirdCategory, ...initialState.thirdCategory })
-            setSizes({ ...sizes, ...initialState.sizes })
-            setDiscount({ ...discount, ...initialState.discount })
-            setColorsAndSizes(initialState.colorsAndSizes)
-        } else if (products.message.includes('something')) {
-            showAlert({
-                type: DialogType.DANGER,
-                text: t('somethingWentWrong'),
-                timeoutDuration: 3000,
-                showProgress: true,
-            })
-        } else if (products.message) {
-            showAlert({
-                type: DialogType.ALERT,
-                text: products.message,
-                timeoutDuration: 3000,
-                showProgress: true,
-            })
-        }
-        dispatch(errorMessage({ message: '' }))
-    }, [products.message])
+    // useEffect(() => {
+    //     let productForm = document.getElementById('productForm');
+    //     if (products.message.includes('successfully')) {
+    //         showToast({
+    //             type: DialogType.SUCCESS,
+    //             text: t('doneSuccessfully'),
+    //             timeoutDuration: 3000,
+    //             showProgress: true,
+    //             position: ToastPosition[t('position')]
+    //         })
+    //         productForm.reset()
+    //         setSecondCategory({ ...secondCategory, ...initialState.secondCategory })
+    //         setThirdCategory({ ...thirdCategory, ...initialState.thirdCategory })
+    //         setSizes({ ...sizes, ...initialState.sizes })
+    //         setDiscount({ ...discount, ...initialState.discount })
+    //         setColorsAndSizes(initialState.colorsAndSizes)
+    //     } else if (products.message.includes('something')) {
+    //         showAlert({
+    //             type: DialogType.DANGER,
+    //             text: t('somethingWentWrong'),
+    //             timeoutDuration: 3000,
+    //             showProgress: true,
+    //         })
+    //     } else if (products.message) {
+    //         showAlert({
+    //             type: DialogType.ALERT,
+    //             text: products.message,
+    //             timeoutDuration: 3000,
+    //             showProgress: true,
+    //         })
+    //     }
+    //     dispatch(errorMessage({ message: '' }))
+    // }, [products.message])
 
     useEffect(() => {
         let labels = document.querySelectorAll('#label')
@@ -251,81 +251,90 @@ const AddProduct = props => {
             <form id='productForm' className="productForm" onSubmit={submitHandler}>
                 <section className="productInputs">
                 </section>
-                <CRow xs={{ cols: 'auto' }}>
-                    <div className="row justify-content-md-center mrgn50">
-                        <CCol  >
-                            <CCol>
+                <CRow >
+                    <div className="row justify-content-center mrgn50">
+                        <CCol  xl={3} lg={4} sm={6} xs={12}>
+                            <CCol >
 
                                 <label>{t('englishTitle')}*</label>
                             </CCol>
                             <CCol>
-                                <input type="text" id="entitle" placeholder={t('englishTitle')} required />
+                                <CFormInput type="text" id="entitle" placeholder={t('englishTitle')} required />
 
                             </CCol>
 
                         </CCol>
-                        <CCol   >
+                        <CCol   xl={3} lg={4} sm={6} xs={12}>
                             <CCol>
                                 <label >{t('arabicTitle')}*</label>
 
                             </CCol>
                             <CCol>
-                                <input type="text" id="artitle" placeholder={t('arabicTitle')} required />
+                                <CFormInput type="text" id="artitle" placeholder={t('arabicTitle')} required />
 
                             </CCol>
                         </CCol>
-                        <CCol >
+                        <CCol xl={3} lg={4} sm={6} xs={12}>
                             <CCol>
 
                                 <label >{t('metaTitle')}</label>
                             </CCol>
                             <CCol>
-                                < input type="text" id="metatitle" placeholder={t('metaTitle')} />
+                                < CFormInput type="text" id="metatitle" placeholder={t('metaTitle')} />
 
                             </CCol>
                         </CCol>
-                        <CCol >
+                        <CCol xl={3} lg={4} sm={6} xs={12}>
                             <CCol>
                                 <label >SKU</label>
 
                             </CCol>
                             <CCol>
 
-                                < input type="text" id="sku" placeholder="SKU" />
+                                < CFormInput type="text" id="sku" placeholder="SKU" />
                             </CCol>
                         </CCol>
-                        <CCol >
+                        <CCol xl={3} lg={4} sm={6} xs={12}>
                             <CCol>
                                 <label >{t('price')}*</label>
 
                             </CCol>
                             <CCol>
-                                < input type="number" className={`no${i18n.language}`} id="price" placeholder={t('price')} step='0.01' required />
+                                < CFormInput type="number" className={`no${i18n.language}`} id="price" placeholder={t('price')} step='0.01' required />
 
                             </CCol>
                         </CCol>
-                        <CCol  >
+                        <CCol  xl={3} lg={4} sm={6} xs={12}>
                             <CCol>
                                 <label >{t('brandName')}</label>
 
                             </CCol>
                             <CCol>
-                                <input type="text" id="brandName" placeholder={t('brandName')} />
+                                <CFormInput type="text" id="brandName" placeholder={t('brandName')} />
 
                             </CCol>
                         </CCol>
-                        {!colorsAndSizes.colorsOrSizes && <CCol sm="auto" >
+                        {!colorsAndSizes.colorsOrSizes && <CCol xs={12} >
 
-                            <CRow>
+                            <CRow className='justify-content-center'>
+                                <CCol xs='auto'>
 
                                 <label>{t('quantity')}*</label>
-                            </CRow>
-                            <CRow>
+                                </CCol>
 
-                                <input type="number" id="quantity" className={`no${i18n.language}`} placeholder={t('quantity')} />
                             </CRow>
-                            <CRow>
+                            <CRow className='justify-content-center'>
+                                <CCol xs='auto'>
+
+                                <CFormInput type="number" id="quantity" className={`no${i18n.language}`} placeholder={t('quantity')} />
+                                </CCol>
+
+                            </CRow>
+                            <CRow className='justify-content-center'>
+                                <CCol xs='auto'>
+
                                 <label>{t('quantityLabel')}</label>
+                                </CCol>
 
                             </CRow>
 
@@ -366,19 +375,19 @@ const AddProduct = props => {
                 <div className='marginDiv'>
                     <CFormSelect aria-label="Default select example" required onChange={categoryVisibility} id='parentCategory'>
                         <option value='default'>{t('parentCategory')}</option>
-                        {category ? category.parentCategories.map((val, idx) =>
+                        {parentCategories.map((val, idx) =>
                             <option value={val.id} key={`parent_Category_${idx}`}>{val[`${i18n.language}title`]}</option>
                         )
 
-                            : null}
+                            }
 
                     </CFormSelect>
                 </div>
                 <div className='marginDiv'>
-                    <CFormSelect aria-label="Default select example" disabled={!secondCategory.visible} onChange={categoryVisibility2} id='childCategory'>
+                    <CFormSelect aria-label="Default select example" disabled={childCategories.length === 0} onChange={categoryVisibility2} id='childCategory'>
                         <option value='default'>{t('childCategory')}</option>
 
-                        {secondCategory.data.map((val, idx) =>
+                        {childCategories.map((val, idx) =>
                             <option value={val.id} key={`child_Category_${idx}`}>{val[`${i18n.language}title`]}</option>
                         )
 
@@ -386,7 +395,7 @@ const AddProduct = props => {
                     </CFormSelect>
                 </div>
 
-                {thirdCategory.data.length > 0 && <section className="TCS" >
+                {grandChildCategories.length > 0 && <section className="TCS" >
                     <section>
                         <CFormCheck id="flexCheckDefault" label={t('selectOrAdd')} onChange={e => setThirdCategory({ ...thirdCategory, selected: e.target.checked })} />
                     </section>
@@ -400,14 +409,14 @@ const AddProduct = props => {
                             <CFormCheck type="radio" name="TC" id="TC2" label={t('addOwn')} onChange={e => setThirdCategory({ ...thirdCategory, select: !thirdCategory.select, add: !thirdCategory.add })} disabled />
                         </section>
 
-                        <CFormSelect aria-label="Default select example" id='grandChildCategory' disabled={!thirdCategory.visible} style={{ display: thirdCategory.select ? 'inherit' : 'none' }} >
+                        <CFormSelect aria-label="Default select example" id='grandChildCategory' disabled={grandChildCategories.length ===0} style={{ display: thirdCategory.select ? 'inherit' : 'none' }} >
                             <option value='default'>{t('grandChildCategory')}</option>
 
-                            {category ? thirdCategory.data.map((val, idx) =>
+                            {grandChildCategories.map((val, idx) =>
                                 <option value={val.id} key={`grand_child_Category_${idx}`}>{val[`${i18n.language}title`]}</option>
                             )
 
-                                : null}
+                               }
                         </CFormSelect>
 
 
@@ -546,5 +555,5 @@ const mapStateToProps = (state) => ({
 
 })
 
-const mapDispatchToProps = { addProductHandler }
+const mapDispatchToProps = { addProductHandler,getParentCategoriesHandler, getChildCategoriesHandler, getGrandChildCategoriesHandler }
 export default connect(mapStateToProps, mapDispatchToProps)(AddProduct);

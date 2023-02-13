@@ -19,17 +19,17 @@ const Page500 = () => {
           <CCol md={6}>
             <span className="clearfix">
               <h1 className="float-start display-3 me-4">500</h1>
-              <h4 className="pt-3">Houston, we have a problem!</h4>
+              <h4 className="pt-3">Internal Service Error!</h4>
               <p className="text-medium-emphasis float-start">
-                The page you are looking for is temporarily unavailable.
+                The page you are looking for is temporarily unavailable, try reload the page, if the issue persists please contact the administrator.
               </p>
             </span>
             <CInputGroup className="input-prepend">
-              <CInputGroupText>
+              <CButton color="info" onClick={()=> window.location.reload(false)}>Reload</CButton>
+              {/* <CInputGroupText>
                 <CIcon icon={cilMagnifyingGlass} />
               </CInputGroupText>
-              <CFormInput type="text" placeholder="What are you looking for?" />
-              <CButton color="info">Search</CButton>
+              <CFormInput type="text" placeholder="What are you looking for?" /> */}
             </CInputGroup>
           </CCol>
         </CRow>

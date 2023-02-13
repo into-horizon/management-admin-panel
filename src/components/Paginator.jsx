@@ -2,7 +2,7 @@ import React, { useState, useEffect }from 'react'
 import { CPagination, CPaginationItem } from '@coreui/react'
 import cookie from 'react-cookies'
 
-const  Paginator = ({count, changeData,cookieName, params,updateParams}) =>  {
+const  Paginator = ({count, changeData,cookieName, params,updateParams,updateLoading}) =>  {
     const [pages, setPages] = useState([])
     const {limit,offset} = params
     const [selectedPage, setSelectedPage] = useState(Number(cookie.load(cookieName)) || 1)
@@ -46,8 +46,9 @@ const  Paginator = ({count, changeData,cookieName, params,updateParams}) =>  {
     const changePage = n => {
         setSelectedPage(n)
         cookie.save(cookieName, n)
-        changeData({...params , limit: limit?? 5, offset: (limit?? 5) * (n - 1)})
-        updateParams && updateParams({...params , limit: limit?? 5, offset: (limit?? 5) * (n - 1)})
+        updateLoading?.(true)
+        changeData({...params , limit: limit?? 5, offset: (limit?? 5) * (n - 1)}).then(()=>updateLoading?.(false))
+        updateParams?.({...params , limit: limit?? 5, offset: (limit?? 5) * (n - 1)})
     }
     return (
         <CPagination aria-label="Page navigation example">

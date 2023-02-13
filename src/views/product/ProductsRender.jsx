@@ -1,20 +1,14 @@
-import React, { useState, useEffect, Fragment } from "react";
+import React, { useState, useEffect, Fragment, Children } from "react";
 import { useSelector, connect, useDispatch } from "react-redux";
 import {
-  CPaginationItem,
-  CPagination,
   CButton,
   CSpinner,
-  CFormCheck,
-  CFormInput,
   CFormLabel,
   CRow,
   CCol,
-  CModal,
-  CModalHeader,
-  CModalTitle,
-  CModalFooter,
+  CAlert,
   CForm,
+  CFormInput,
   CFormSelect,
 } from "@coreui/react";
 import {
@@ -25,18 +19,10 @@ import {
 } from "src/store/product";
 import { useTranslation } from "react-i18next";
 import cookie from "react-cookies";
-import Multiselect from "multiselect-react-dropdown";
 import { useNavigate } from "react-router-dom";
 import { updateSizeAndQuantity, updateDiscount } from "../../store/product";
-import {
-  AnimationType,
-  DialogType,
-  OutAnimationType,
-  usePopup,
-} from "react-custom-popup";
 import Export from "../../components/Export";
-import ColorSelector from "../../components/ColorSelector";
-import colors from "../../services/colors";
+
 import CIcon from "@coreui/icons-react";
 import {
   cilPlus,
@@ -45,62 +31,44 @@ import {
   cilTrash,
   cilCash,
   cilImagePlus,
+  cilWarning,
 } from "@coreui/icons";
 import Paginator from "../../components/Paginator";
 import DiscountModal from "./DiscountModal";
 import SizeAndColorModal from "./SizeAndColorModal";
 import DeleteProductModal from "./DeleteProductModal";
-
+import StatusModal from "./StatusModal";
+import Product from "src/services/ProductService";
+import FilterCard from "src/components/FilterCard";
+import FormButtons from "src/components/FormButtons";
+import FormBody from "./FormBody";
 const ProductsRender = (props) => {
-  const { showAlert, showOptionDialog, showInputDialog, showToast } =
-    usePopup();
-
   const { updateSizeAndQuantity, updateDiscount, deleteProductHandler } = props;
-  let sizeSymbols = ["XXS", "XS", "S", "M", "L", "XL", "XXL", "XXXL"];
-  let sizeNumbers = [];
-  if (sizeNumbers.length === 0) {
-    for (let i = 30; i <= 50; i++) {
-      sizeNumbers.push(i);
-    }
-  }
+  // let sizeSymbols = ["XXS", "XS", "S", "M", "L", "XL", "XXL", "XXXL"];
+  // let sizeNumbers = [];
+  // if (sizeNumbers.length === 0) {
+  //   for (let i = 30; i <= 50; i++) {
+  //     sizeNumbers.push(i);
+  //   }
+  // }
+  
   const navigate = useNavigate();
   const {
-    message,
     overview: { count, data: products },
   } = useSelector((state) => state.products);
-  const dispatch = useDispatch();
-  const initialState = {
-    discount: { visible: "", discount: false, discountRate: 0 },
-    sizes: { original: [], updated: [] },
-  };
-  const selectedPage = Number(cookie.load(props.status)) || 1;
+
+  
   const [params, setParams] = useState({
     status: props.status,
     limit: 5,
-    offset: 5 * (selectedPage - 1),
+    offset: 0,
   });
   const { t, i18n } = useTranslation("translation", {
     keyPrefix: "addProduct",
   });
   const [loading, setLoading] = useState(true);
-  const [sizes, setSizes] = useState(initialState.sizes);
-  const [sizesType, setSizesType] = useState({
-    add: false,
-    data: [...sizeSymbols],
-  });
-  const [values, setValues] = useState([]);
-  const [SQLoad, setSQLoad] = useState(false);
-  const [disabledBtn, setDisabledBtn] = useState({
-    SQBtn: false,
-    discountBtn: false,
-  });
-  const [discountForm, setDiscountForm] = useState({
-    ...initialState.discount,
-  });
-  const [sizeForm, setSizeForm] = useState({ visible: "" });
-  const [product, setProduct] = useState({ color: false, size: false });
-  const [colorAndSize, setColorAndSize] = useState({ color: "", size: "" });
-  const { size: productSize, color: productColor } = product;
+  
+  
   useEffect(() => {
     props.getProductsByStatus(params).then(() => setLoading(false));
   }, []);
@@ -148,181 +116,6 @@ const ProductsRender = (props) => {
     }
   };
 
-  const updateSQ = (id, s) => {
-    setSizeForm((x) => {
-      return { ...x, visible: id };
-    });
-    if (s) {
-      setSizes({ ...sizes, original: JSON.parse(s), updated: JSON.parse(s) });
-      JSON.parse(s)
-        .map((val) => val.color)
-        .filter((val) => val).length > 0 &&
-        setProduct((x) => {
-          return { ...x, color: true };
-        });
-      JSON.parse(s)
-        .map((val) => val.size)
-        .filter((val) => val).length > 0 &&
-        setProduct((x) => {
-          return { ...x, size: true };
-        });
-    }
-  };
-
-  const selectColors = (e) => {
-    let x = {
-      ...sizes,
-      updated: [
-        ...sizes.original,
-        ...e.map((val, i) => {
-          return {
-            id: sizes.updated.length + i + 1,
-            size: null,
-            color: val.name,
-            quantity: 0,
-          };
-        }),
-      ],
-    };
-    x.updated = x.updated.filter(
-      (value, index, self) =>
-        index ===
-        self.findIndex((t) => t.size === value.size && t.color === value.color)
-    );
-    setSizes(x);
-  };
-  const removeColors = (e) => {
-    let x = {
-      ...sizes,
-      updated: [
-        ...sizes.original,
-        ...e.map((val, i) => {
-          return {
-            id: sizes.original.length + i,
-            size: null,
-            color: val.name,
-            quantity: 0,
-          };
-        }),
-      ],
-    };
-    setSizes(x);
-  };
-
-  const select = (e) => {
-    let x = {
-      ...sizes,
-      updated: [
-        ...sizes.original,
-        ...e.map((val) => {
-          return { size: val.name, quantity: 0 };
-        }),
-      ],
-    };
-    x.updated = x.updated.filter(
-      (value, index, self) =>
-        index ===
-        self.findIndex((t) => t.size === value.size && t.color === value.color)
-    );
-    setSizes(x);
-  };
-  const remove = (e) => {
-    let x = {
-      ...sizes,
-      updated: [
-        ...sizes.original,
-        ...e.map((val) => {
-          return { size: val.name, quantity: 0 };
-        }),
-      ],
-    };
-    setSizes(x);
-  };
-  const updateQuantity = (e) => {
-    let x = sizes.updated.map((val) => {
-      if (val.id === Number(e.target.id)) {
-        return {
-          ...val,
-          quantity:
-            Number(e.target.value) === 0 ? null : Number(e.target.value),
-        };
-      } else {
-        return val;
-      }
-    });
-    setSizes({ ...sizes, updated: x });
-  };
-  const addSizes = (e) => {
-    setValues(() => [...e.target.value.split(",")]);
-  };
-
-  const removeSize = (size) => {
-    let newSizes = sizes.updated.filter((val) => val.id !== size);
-    let newOriginal = sizes.original.filter((val) => val.id !== size);
-    setSizes({ ...sizes, original: newOriginal, updated: newSizes });
-  };
-
-  const updateSQHandler = (e, id) => {
-    setSQLoad(true);
-    e.preventDefault();
-    updateSizeAndQuantity({
-      id: id,
-      quantity:
-        sizes.updated.reduce((p, c) => p + Number(c.quantity), 0) ||
-        e.target.quantityInput.value,
-      size_and_color:
-        sizes.updated.length > 0 ? JSON.stringify(sizes.updated) : null,
-    });
-    closeQuantityModal();
-  };
-
-  const deleteHandler = (id) => {
-    showOptionDialog({
-      containerStyle: { width: 350 },
-      text: t("deleteText"),
-      title: t("deleteTitle"),
-      options: [
-        {
-          name: t("cancel"),
-          type: "cancel",
-        },
-        {
-          name: t("delete"),
-          type: "confirm",
-          style: { background: "lightcoral" },
-        },
-      ],
-      onConfirm: () => {
-        deleteProductHandler(id);
-        showToast({
-          type: DialogType.SUCCESS,
-          text: t("successDelete"),
-          timeoutDuration: 3000,
-          showProgress: true,
-        });
-      },
-    });
-  };
-
-  const addOwnSizes = () => {
-    let x = {
-      ...sizes,
-      updated: [
-        ...sizes.updated,
-        ...values.map((val) => {
-          return { size: val, quantity: 0 };
-        }),
-      ],
-    };
-    x.updated = x.updated.filter(
-      (value, index, self) =>
-        index ===
-        self.findIndex((t) => t.size === value.size && t.color === value.color)
-    );
-    setSizes(x);
-    document.getElementById("sizesInput").value = null;
-  };
-
   useEffect(() => {
     reverseTitles();
     changeBtnAlign();
@@ -333,85 +126,86 @@ const ProductsRender = (props) => {
     reverseTitles();
   }, [document.querySelectorAll(".deleteBtn")]);
 
-  const downloadableData = (data) => {
-    return data?.map((product) => {
-      let p = { ...product };
-      delete p.pictures;
-      delete p.size_and_color;
-      return p;
-    });
+  const getProducts = async (params) => {
+    let {
+      data: { data },
+    } = await Product.getProducts(params);
+    return data;
   };
-  const closeQuantityModal = () => {
-    setSizeForm({ visible: "" });
-    setSizes(initialState.sizes);
-    setProduct({ color: false, size: false });
-  };
+  const submitHandler = e =>{
+    e.preventDefault()
+    setLoading(true);
+    let queries = ['key', 'parent_category_id', 'child_category_id', 'grandchild_category_id', 'discount']
+    let data ={...params}
+    queries.forEach(query =>{
+      if(e.target[query].value && e.target[query].value !== ''){
+        data[query] = e.target[query].value
+      }
+    })
+    setParams(data)
+    props.getProductsByStatus(data).then(()=> setLoading(false))
 
-  const addSizeAndColor = () => {
-    let x = {
-      ...sizes,
-      updated: [
-        ...sizes.updated,
-        {
-          id: sizes.updated.length + 1,
-          color: colorAndSize.color,
-          size: colorAndSize.size,
-          quantity: 0,
-        },
-      ],
-    };
-    x.updated = x.updated.filter(
-      (value, index, self) =>
-        index ===
-        self.findIndex((t) => t.size === value.size && t.color === value.color)
-    );
-    setSizes(x);
-  };
-
-  const AddOwnComponent = ({ onClick }) => {
-    return (
-      <React.Fragment>
-        {sizesType.add && (
-          <div className="addOwnSizes">
-            <CFormLabel htmlFor="validationServer05">{t("sizes")}</CFormLabel>
-            <CFormInput
-              type="text"
-              value={values.join(",")}
-              id="sizesInput"
-              placeholder={t("inserSizes")}
-              required
-              onChange={addSizes}
-            />
-            <CButton color="secondary" type="button" onClick={onClick}>
-              {t("add")}
-            </CButton>
-          </div>
-        )}
-      </React.Fragment>
-    );
-  };
-
-  const addNewSizes = () => {
-    setSizesType((d) => {
-      return { ...d, data: [...d.data, ...values] };
-    });
-    setValues([]);
-  };
+  }
+  const onReset = e=>{
+    e.target.reset()
+    setParams({
+      status: props.status,
+      limit: 5,
+      offset: 0,
+    })
+  }
   return (
     <>
-      <div className="productsRender">
-        <Export
-          data={downloadableData(products ?? [])}
-          title="download products"
-          fileName="products"
-        />
-        {loading && <CSpinner />}
+      <CRow xs={{ gutterY: 10 }} className="justify-content-end">
+        <CCol xs="auto">
+          <Export
+            data={getProducts}
+            // onClick={Product.getProducts}
+            params={{ status: props.status }}
+            title="download products"
+            fileName="products"
+          />
+        </CCol>
+        <CCol xs={12}>
+          <FilterCard>
+            <CForm onSubmit={submitHandler} onReset={onReset}>
+              <CRow
+                className="justify-content-center align-items-center"
+                xs={{ gutterY: 5 }}
+              >
+                <CCol xs="auto">
+                  <CFormInput placeholder="product name" id="key"/>
+                </CCol>
+                <FormBody/>
+                <CCol xs="auto">
+                  <CFormLabel htmlFor="discount" >discount</CFormLabel>
+                  <CFormSelect name="discount" id="discount">
+                    <option value="">All</option>
+                    <option value={true}>true</option>
+                    <option value={false}>false</option>
+                  </CFormSelect>
+                </CCol>
+                <CCol xs={12}></CCol>
+                <FormButtons />
+              </CRow>
+            </CForm>
+          </FilterCard>
+        </CCol>
+        {loading && (
+          <CCol xs={12}>
+            <CSpinner />
+          </CCol>
+        )}
         {!loading && products.length === 0 && (
           <h4 className="productStatusHead">{t(`no${props.status}`)}</h4>
         )}
         {!loading &&
           products?.map((product, idx) => (
-            <div className="productRender" key={product.entitle + idx}>
+            <CRow
+              className="productRender"
+              xs={{ gutterY: 2 }}
+              key={product.entitle + idx}
+            >
               <div className="productTitles">
                 <h3 className="productTitle">{`${t("englishTitle")}: ${
                   product.entitle
@@ -484,6 +278,23 @@ const ProductsRender = (props) => {
                   )
                 )}
               </div>
+              <CAlert
+                color="danger"
+                className="d-flex align-items-center"
+                visible={!!product.rejection_reason}
+                style={{ marginTop: "1rem" }}
+              >
+                <CIcon
+                  icon={cilWarning}
+                  className="flex-shrink-0 me-2"
+                  width={24}
+                  height={24}
+                />
+                <div>
+                  <strong>Rejection reason: </strong>
+                  {`${product.rejection_reason}`}
+                </div>
+              </CAlert>
               <div className="productTitles">
                 <div>
                   <h4>{t("englishDescrition")}</h4>
@@ -494,6 +305,12 @@ const ProductsRender = (props) => {
                   <p style={{ textAlign: "right" }}>{product.ardescription}</p>
                 </div>
               </div>
+              {product.store_name && (
+                <h5>
+                  <strong>Store: </strong>
+                  {product.store_name}
+                </h5>
+              )}
               {product.metatitle && (
                 <h5>
                   <strong>{t("metatitle")}: </strong>
@@ -540,6 +357,12 @@ const ProductsRender = (props) => {
                 <h6>
                   <strong>{`${t("brandName")}: `}</strong>
                   {product.brand_name}
+                </h6>
+              ) : null}
+              {product.rate ? (
+                <h6>
+                  <strong>{`Rate: `}</strong>
+                  {Number(product.rate).toFixed(2)}
                 </h6>
               ) : null}
               <h6>
@@ -607,11 +430,20 @@ const ProductsRender = (props) => {
                       <CIcon icon={cilTrash}></CIcon>
                       {t("delete")}
                     </CButton> */}
-                    <DeleteProductModal deleteHandler={deleteProductHandler} product={product}/>
+                    <DeleteProductModal
+                      deleteHandler={deleteProductHandler}
+                      product={product}
+                    />
                   </CCol>
-                  
+
                   <CCol xs="auto">
-                    <SizeAndColorModal product={product} updateSizeAndQuantity={updateSizeAndQuantity}/>
+                    <SizeAndColorModal
+                      product={product}
+                      updateSizeAndQuantity={updateSizeAndQuantity}
+                    />
+                  </CCol>
+                  <CCol xs="auto">
+                    <StatusModal product={product} />
                   </CCol>
                   <CCol xs="auto">
                     <CButton
@@ -626,7 +458,7 @@ const ProductsRender = (props) => {
                   </CCol>
                 </CRow>
               )}
-            </div>
+            </CRow>
           ))}
         <Paginator
           count={count}
@@ -635,7 +467,7 @@ const ProductsRender = (props) => {
           changeData={props.getProductsByStatus}
           cookieName={props.status}
         />
-      </div>
+      </CRow>
     </>
   );
 };

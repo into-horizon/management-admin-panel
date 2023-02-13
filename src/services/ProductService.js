@@ -103,5 +103,4 @@ class ProductService extends ApiService {
 
 }
 
-let Product = new ProductService();
-export default Product;
+export default new ProductService();

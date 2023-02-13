@@ -63,9 +63,9 @@ const EditableCell = ({ data, action, field, type='text', options=[] }) => {
               <CButton
                 onClick={() => setEdit(true)}
                 size="sm"
-                color="secondary"
+                color="info"
               >
-                <CIcon icon={cilPencil} />
+                <CIcon icon={cilPencil} size='sm'/>
               </CButton>
             </CTooltip>
           </CCol>
