@@ -1,4 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { save, load, remove } from "react-cookies";
 import Store from "../services/Stores";
 import { updateToast } from "./globalToasts";
 
@@ -7,6 +8,8 @@ const store = createSlice({
   initialState: {
     pending: { data: [], count: 0 },
     overview: { data: [], count: 0 },
+    searched: [], 
+    populatedStore: load('populated-store', {path: '/'})?JSON.parse(load('populated-store', {path: '/'})):{}
   },
   reducers: {
     addData(state, action) {
@@ -25,7 +28,9 @@ export const getPendingStores = (payload) => async (dispatch) => {
       dispatch(addData({ pending: data }));
     }
   } catch (e) {
-    console.error(e);
+    dispatch(
+      updateToast({ status: 403, message: e.message, type: "error" })
+    );
   }
 };
 
@@ -64,7 +69,9 @@ export const getStoresHandler = (payload) => async (dispatch) => {
       dispatch(addData({ overview: data }));
     }
   } catch (e) {
-    console.error(e);
+    dispatch(
+      updateToast({ status: 403, message: e.message, type: "error" })
+    );
   }
 };
 
@@ -117,6 +124,23 @@ export const updateStoreNameHandler = payload => async(dispatch,state)=>{
       updateToast({ status: 403, message: e.message, type: "update" })
     );
   }
+}
+
+export const searchForStore = payload => async (dispatch) =>{
+  try {
+    let {status, data, message} = await Store.getStores(payload)
+    if(status === 200){
+      dispatch(addData({searched: data.data}))
+    } else dispatch(updateToast({status: status, message:message, type: 'error'}))
+  } catch (error) {
+    dispatch(updateToast({status: 403, message:error, type: 'error'}))
+  }
+}
+
+export const populateStore = (payload = {}) => dispatch =>{
+    payload.id ? save('populated-store', payload,{path:'/'}) : remove('populated-store', {path:'/'})
+    window.location.reload(false)
+    dispatch(addData({populatedStore: payload}))
 }
 
 export default store.reducer;

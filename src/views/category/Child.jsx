@@ -31,8 +31,11 @@ export const Child = ({
   const [visible, setVisible] = useState(false);
   const [parentData, setParentData] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [tableLoading, setTableLoading ] =  useState(true)
   const [selectedValue,setSelectedValue] = useState({})
-
+  useEffect(()=>{
+    getChildCategoriesHandler(params).then(()=> setTableLoading(false))
+  },[])  
   const DeleteButton = ({ id }) => {
     return (
       <React.Fragment>
@@ -86,8 +89,6 @@ export const Child = ({
       data: { data },
     } = await Category.getAllParentCategoires({
       title: title,
-      limit: 100000,
-      offset: 0,
     });
     setLoading(false);
     setParentData(data);
@@ -164,6 +165,8 @@ export const Child = ({
         columns={columns}
         params={params}
         checkbox={true}
+        loading={tableLoading}
+        updateLoading={setTableLoading}
         updateParams={setParams}
       />
     </>

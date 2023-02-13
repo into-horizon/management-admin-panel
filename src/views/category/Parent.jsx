@@ -37,6 +37,10 @@ export const Parent = ({
   } = useSelector((state) => state.category);
   const [params, setParams] = useState({ limit: 10, offset: 0 });
   const [visible, setVisible] =  useState(false)
+  const [loading, setLoading] = useState(true)
+  useEffect(()=>{
+    getParentCategoriesHandler(params).then(()=> setLoading(false))
+  },[])
   const DeleteButton = ({id}) =>{
     return(
       <React.Fragment>
@@ -96,7 +100,7 @@ export const Parent = ({
         columns={columns}
         params={params}
         checkbox={true}
-        
+        loading={loading}
         updateParams={setParams}
       />
     </>

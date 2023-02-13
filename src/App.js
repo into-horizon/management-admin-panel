@@ -26,6 +26,7 @@ const loading = (
   </div>
 );
 import Toaster from "./components/Toaster";
+import { CCol, CRow } from "@coreui/react";
 
 // Containers
 const DefaultLayout = React.lazy(() => import("./layout/DefaultLayout"));
@@ -99,8 +100,8 @@ const App = ({
 
     if (loggedIn) {
       getParentCategoriesHandler();
-      getChildCategoriesHandler();
-      getGrandChildCategoriesHandler();
+      // getChildCategoriesHandler();
+      // getGrandChildCategoriesHandler();
       navigate(checkUnAuth(currentPath) ? "/" : currentPath);
       setLoad(false);
     } else if (!loggedIn && !token) {
@@ -126,15 +127,17 @@ const App = ({
       <React.Suspense fallback={loading}>
         <Toaster />
         {load && (
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-            }}
+          <CRow className="justify-content-center align-items-center"
+          // style={{
+          //   display: "flex",
+          //   justifyContent: "center",
+          //   alignItems: "center",
+          // }}
           >
-            <Rings height="35rem" width="150" />
-          </div>
+            <CCol xs='auto'>
+             <Rings height="35rem" width="150" color="blue"/>
+            </CCol>
+          </CRow>
         )}
 
         {!load && (

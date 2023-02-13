@@ -269,9 +269,9 @@ button::first-letter {
 .productRender {
     border: 3px solid #fff;
 
-    /* box-shadow: 1px 5px lightblue; */
-    margin: 1rem 0;
-    padding: 1rem;
+     /* box-shadow: 1px 5px lightblue;  */
+     /* margin: 1rem 0; */
+    padding: 1rem; 
 }
 
 .productTitles {
@@ -470,3 +470,32 @@ button::first-letter {
 
 
 
+.filter{
+    position: fixed;
+    right: 0;
+    top: 50%;
+    z-index: 20;
+    opacity: 0.5;
+    padding: 1rem;
+}
+.filter:hover{
+    opacity: 1;
+    background-color: #fff;
+    border: black solid 1px;
+
+}
+
+.search-dropdown{
+    position: relative;
+  
+    right: 0
+}
+
+.overflow-x{
+    overflow-x: scroll;
+    max-width: 100%;
+}
+
+.search-dropdown{
+    position: relative;
+}

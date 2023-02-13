@@ -22,6 +22,7 @@ import AddCategoryModal from "src/components/AddCategoryModal";
 import DeleteModal from "src/components/DeleteModal";
 import SelectSearch from "react-select-search";
 import Category from "src/services/CategoryService";
+import SearchDropdown from "src/components/SearchDropdown";
 
 
 export const Grandchild = ({
@@ -36,6 +37,12 @@ export const Grandchild = ({
   const [params, setParams] = useState({ limit: 10, offset: 0 });
   const [visible, setVisible] = useState(false);
   const [childData, setChildData] = useState([]);
+  const [value, setValue] = useState({})
+  const [loading, setLoading] = useState(true);
+  const [searchLoading, setSearchLoading] =  useState(false)
+  useEffect(()=>{
+    getGrandChildCategoriesHandler(params).then(()=> setLoading(false))
+  },[])
   const DeleteButton = ({ id }) => {
     return (
       <React.Fragment>
@@ -92,24 +99,30 @@ export const Grandchild = ({
     },
     { header: "actions", body: DeleteButton },
   ];
-  useEffect(async () => {
+
+  const getChild = async (title) =>{
     let {
-      data: { data },
-    } = await Category.getAllChildCategoires({limit: 1000000, offset: 0});
-    setChildData(data);
-  }, []);
+          data: { data },
+        } = await Category.getAllChildCategoires({title : title});
+        setChildData(data);
+        setSearchLoading(false)
+  }
   const submitHandler = e => {
     e.preventDefault();
-    getGrandChildCategoriesHandler(params)
-  }
-  const onChange = e => {
     let data = {}
-    data[e.target.id] = e.target.value;
-    setParams(x=> {return{...x,...data }})
+    e.target.title.value&& (data.title=  e.target.title.value)
+    value.id && (data.parent_id = value.id)
+    getGrandChildCategoriesHandler({...params,...data})
   }
+
   const clearFilter = ()=>{
     getGrandChildCategoriesHandler()
+    setValue({})
   }
+  const onChange = (e) => {
+    setSearchLoading(true)
+    setTimeout(() => getChild(e), 1000);
+  };
   return (
     <>
       <AddCategoryModal
@@ -120,13 +133,13 @@ export const Grandchild = ({
       <div className="card padding mrgn25">
         <CForm onSubmit={submitHandler}>
           <CRow
-            className="justify-content-center align-items-center"
+            className="justify-content-center align-items-end"
             xs={{ gutter: 1 }}
           >
             <CCol xs="auto">
-              <CFormInput id="title" placeholder="title" onChange={onChange}/>
+              <CFormInput id="title" placeholder="title"/>
             </CCol>
-            <CCol xs="auto">
+            {/* <CCol xs="auto">
               {Children.toArray(
                 <SelectSearch
                   options={childData.map((val) => {
@@ -139,7 +152,24 @@ export const Grandchild = ({
                   search={true}
                   placeholder="select child category"
                   value={params.parent_id}
-                  onChange={e=> setParams(x=> {return {...x,parent_id : e}})}
+                  onChange={onChange}
+                />
+              )}
+            </CCol> */}
+            <CCol xs="auto">
+              {Children.toArray(
+                <SearchDropdown
+                  options={childData.map((val) => {
+                    return {
+                      title: `${val.entitle} - ${val.artitle}`,
+                      id: val.id,
+                    };
+                  })}
+                  placeholder="select child category"
+                  onChange={onChange}
+                  reset={!value.id}
+                  onSelect={e=> setValue(e)}
+                  loading={searchLoading}
                 />
               )}
             </CCol>
@@ -168,6 +198,8 @@ export const Grandchild = ({
         columns={columns}
         params={params}
         checkbox={true}
+        loading={loading}
+        updateLoading={setLoading}
         updateParams={setParams}
       />
     </>
