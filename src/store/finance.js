@@ -1,10 +1,11 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 import Finance from "../services/Finance";
+import { updateToast } from "./globalToasts";
 
 const finance = createSlice({
     name: 'finance',
-    initialState: {transactions: {data:[], count: 0},message:'' ,pending: 0, refunded:0, released:0, transferred: 0, withdrawn: 0, canceledWithdrawn: 0},
+    initialState: {transactions: {data:[], count: 0},message:'' ,pending: 0, refunded:0, released:0, transferred: 0, withdrawn: 0, canceledWithdrawn: 0, commission: 0, delivery: 0},
     reducers: {
         addData(state, action){
             return {...state, ...action.payload}
@@ -19,14 +20,28 @@ const finance = createSlice({
 })
 
 
+export const getAmounts = payload => async (dispatch) =>{
+    try {
+        let {status, data, message}  = await Finance.getAmounts(payload)
+        const getData = (data,type, description, status) =>{
+            return data.find(val => val.type === type && val.description === description && val.status === status)?.sum.toFixed(2) ?? 0
+        }
+        if(status ===  200) {
+            dispatch(addData({commission: getData(data,'credit', 'commission', 'released'), delivery:getData(data,'credit', 'delivery', 'released'), transferred: getData(data, 'debit', 'withdrawal', 'transferred') }))
+        }
+    } catch (error) {
+    dispatch(updateToast({status: 403, message: error.message, type: 'error'}))        
+    }
+}
+
 export const getTransactions = payload => async (dispatch, state) => {
     try {
-        let {status, result, message, count} = await Finance.getTransactions(payload)
+        let {status, data, message, count} = await Finance.getTransactions(payload)
         if(status === 200){
-            dispatch(addData({transactions: {data:result, count:count}}))
-        } else dispatch(errorMessage(message))
+            dispatch(addData({transactions: data}))
+        } else  dispatch(updateToast({status: status, message: message, type: 'error'}))
     } catch (error) {
-        dispatch(errorMessage(error))
+        dispatch(updateToast({status: 403, message: error, type: 'error'}))
     }
 }
 

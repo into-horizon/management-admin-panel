@@ -188,6 +188,7 @@ export const UsersOverview = ({
         columns={columns}
         loading={loading}
         updateParams={setParams}
+        cookieName='users'
       />
     </>
   );

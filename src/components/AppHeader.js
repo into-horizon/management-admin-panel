@@ -19,13 +19,12 @@ import { cilBell, cilEnvelopeOpen, cilList, cilMenu } from "@coreui/icons";
 import { AppBreadcrumb } from "./index";
 import { AppHeaderDropdown } from "./header/index";
 import { logo } from "src/assets/brand/logo";
-import { useTranslation } from "react-i18next";
-import { populateStore } from "src/store/store";
+import { populateStore } from "src/store/filter";
+
 const AppHeader = ({populateStore}) => {
   const dispatch = useDispatch();
   const sidebarShow = useSelector((state) => state.changeState.sidebarShow);
-  const { t, i18n } = useTranslation();
-  const { populatedStore } = useSelector((state) => state.stores);
+  const { store } = useSelector((state) => state.filter);
   const onClose = ()=>{
     populateStore()
   }
@@ -55,8 +54,8 @@ const AppHeader = ({populateStore}) => {
           </CNavItem>
         </CHeaderNav>
        
-          <CAlert color="success" dismissible  style={{ margin: "auto" }} visible={!!populatedStore.id} onClose={onClose}>
-            {`Populated store: ${populatedStore.title}`}
+          <CAlert color="info" dismissible  style={{ margin: "auto" }} visible={!!store.id} onClose={onClose}>
+            {`Populated store: ${store.title??'store'}`}
           </CAlert>
         
         {/* <CButton

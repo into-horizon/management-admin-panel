@@ -1,6 +1,9 @@
 import React, { useState, useEffect }from 'react'
 import { CPagination, CPaginationItem } from '@coreui/react'
 import cookie from 'react-cookies'
+import _ from 'lodash'
+import PropTypes from 'prop-types'
+
 
 const  Paginator = ({count, changeData,cookieName, params,updateParams,updateLoading}) =>  {
     const [pages, setPages] = useState([])
@@ -9,11 +12,13 @@ const  Paginator = ({count, changeData,cookieName, params,updateParams,updateLoa
     const siblingCount = 5
     let pagesCount = Math.ceil(count / (limit??5) || 1)
     useEffect(() => {
+        pagesCount =Math.ceil(count / (limit??5) || 1)
         let p = []
+        if(pagesCount < selectedPage){
+            setSelectedPage(1)
+        }
         if(pagesCount < siblingCount){
-            for (let i = 1; i <= pagesCount; i++) {
-                p.push(i)
-            }
+            p = _.range(1,pagesCount+1)
 
         } else {
             let firstPages = [1,2,3]
@@ -41,8 +46,8 @@ const  Paginator = ({count, changeData,cookieName, params,updateParams,updateLoa
         }
         
         setPages(() => new Set(p))
-    }, [count,selectedPage])
-    
+    }, [count,selectedPage,params])
+   
     const changePage = n => {
         setSelectedPage(n)
         cookie.save(cookieName, n)
@@ -51,7 +56,7 @@ const  Paginator = ({count, changeData,cookieName, params,updateParams,updateLoa
         updateParams?.({...params , limit: limit?? 5, offset: (limit?? 5) * (n - 1)})
     }
     return (
-        <CPagination aria-label="Page navigation example">
+        <CPagination aria-label="Page navigation example" className='paginator'>
             <CPaginationItem aria-label="Previous" onClick={() => changePage(selectedPage - 1 < 1 ? 1 : selectedPage - 1)} disabled={selectedPage === 1}>
                 <span aria-hidden="true">&laquo;</span>
             </CPaginationItem>
@@ -63,6 +68,15 @@ const  Paginator = ({count, changeData,cookieName, params,updateParams,updateLoa
             </CPaginationItem>
         </CPagination>
     )
+}
+
+Paginator.propTypes = {
+    count:PropTypes.number.isRequired ,
+    changeData:  PropTypes.func.isRequired,
+    updateLoading: PropTypes.func,
+    updateParams: PropTypes.func,
+    params: PropTypes.object,
+    cookieName:  PropTypes.string.isRequired,
 }
 
 export default Paginator

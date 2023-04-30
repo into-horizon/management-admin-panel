@@ -2,7 +2,6 @@ import React from 'react';
 import ReactPDF from '@react-pdf/renderer';
 
 import Pdf from './Pdf';
-import { connect } from 'react-redux'
 
 ReactPDF.render(<Pdf />, `${__dirname}/example.pdf`);
 

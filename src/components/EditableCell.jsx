@@ -12,7 +12,7 @@ import {
 
 const EditableCell = ({ data, action, field, type='text', options=[] }) => {
   const [edit, setEdit] = useState(false);
-  const [cell, setCell] = useState(data[field]);
+  const [cell, setCell] = useState(data[field]?? '');
   const onChange = (e) => setCell(e.target.value);
   const submit = () => {
     let _data = { ...data };

@@ -9,7 +9,7 @@ class ProductService extends ApiService {
 
     async addProduct(data) {
         try {
-            let res = await this.post(`${this.path}`, data, { 'Content-Type': 'multipart/form-data', ...this.bearer(await this.token()) });
+            let res = await this.post(this.path, data);
             return res;
         } catch (error) {
             throw new Error(error.message);
@@ -97,6 +97,14 @@ class ProductService extends ApiService {
             return res
         } catch (error) {
             throw new Error(error.message);
+        }
+    }
+    async getProductReviews (data){
+        try {
+            let res = await this.get(`${this.path}/reviews/${data.id}`, data)
+            return res
+        } catch (error) {
+            throw new Error(error);
         }
     }
     

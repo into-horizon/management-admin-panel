@@ -9,16 +9,19 @@ import cookie from 'react-cookies'
 
 const AppBreadcrumb = () => {
   const currentLocation = useLocation().pathname
-
+ 
   const getRouteName = (pathname, routes) => {
     cookie.save(`current_path${sessionStorage.tabID}`, pathname, {path: '/'})
-    const currentRoute = routes.find((route) => route.path === pathname) ?? routes.find((route) => route.path === "*")
+    const currentRoute = routes.find((route) => route.path === pathname)??routes.find((route) => route.path.startsWith(pathname )) ?? routes.find((route) => route.path === "*")
     return currentRoute.name
   }
 
   const getBreadcrumbs = (location) => {
+    
     const breadcrumbs = []
     location.split('/').reduce((prev, curr, index, array) => {
+      const regexExp = /^[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$/gi;
+      if(regexExp.test(curr)) return 
       const currentPathname = `${prev}/${curr}`
       breadcrumbs.push({
         pathname: currentPathname,

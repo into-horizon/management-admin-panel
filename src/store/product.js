@@ -7,7 +7,7 @@ import { updateToast } from "./globalToasts";
 
 const products = createSlice({
     name: 'products',
-    initialState : {pending: {data: [], count: 0}, overview: {data: [], count: 0}, searched:{}},
+    initialState : {pending: {data: [], count: 0}, overview: {data: [], count: 0}, searched:{}, reviews: {data:[], count:0}},
     reducers: {
         addProduct(state, action){
             return {...state, message: action.payload.message, products: [...state.product, action.payload.result]}
@@ -46,14 +46,14 @@ const products = createSlice({
 
 export const addProductHandler = payload => async (dispatch, state) => {
     try {
-       let result = await Product.addProduct(payload)
-       if(result.status === 201){
-           dispatch(addProduct(result))
+       let {result, status, message} = await Product.addProduct(payload)
+       if(status === 201){
+           dispatch(updateToast({status: 200, message: message, type: 'create'})) 
        } else{
-        dispatch(errorMessage({message: result}))
+        dispatch(updateToast({status: status, message: message, type: 'error'})) 
        }
     } catch (error) {
-        dispatch(errorMessage(() =>{return{message: 'something went wrong'}}))
+        dispatch(updateToast({status: 403, message: error, type: 'error'})) 
     }
 }
 
@@ -244,6 +244,18 @@ export const deleteProductHandler = payload => async (dispatch, state) => {
             dispatch(updateToast({status: status, message: message, type: 'update'}))
         } else  dispatch(updateToast({status: status, message: error, type: 'error'}))
     } catch (error) {
+        dispatch(updateToast({status: 403, message: error, type: 'error'}))
+    }
+}
+
+export const getProductReviews = payload => async (dispatch, state) =>{
+    try {
+        let {message, status, data} = await Product.getProductReviews(payload)
+        if(status === 200){
+            dispatch(addData({reviews: data}))
+        }
+    } catch (error) {
+        console.log("🚀 ~ file: product.js:258 ~ getProductReviews ~ error", error)
         dispatch(updateToast({status: 403, message: error, type: 'error'}))
     }
 }

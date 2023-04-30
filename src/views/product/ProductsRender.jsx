@@ -32,6 +32,8 @@ import {
   cilCash,
   cilImagePlus,
   cilWarning,
+  cilExternalLink,
+
 } from "@coreui/icons";
 import Paginator from "../../components/Paginator";
 import DiscountModal from "./DiscountModal";
@@ -353,6 +355,10 @@ const ProductsRender = (props) => {
                 <strong>{`${t("price")}:`}</strong>{" "}
                 {product.price + " " + t(`${product.currency}`)}
               </h6>
+              <h6>
+                <strong>Commission per sold item</strong>{" "}
+                {(product.price * product.commission).toFixed(2) + " " + t(`${product.currency}`)}
+              </h6>
               {product.brand_name ? (
                 <h6>
                   <strong>{`${t("brandName")}: `}</strong>
@@ -363,6 +369,10 @@ const ProductsRender = (props) => {
                 <h6>
                   <strong>{`Rate: `}</strong>
                   {Number(product.rate).toFixed(2)}
+                  <CButton color="link" onClick={()=> navigate(`/product/reviews/${product.id}`)}>
+                    <CIcon icon={cilExternalLink}/>
+                    Reviews
+                    </CButton>
                 </h6>
               ) : null}
               <h6>
@@ -423,13 +433,6 @@ const ProductsRender = (props) => {
                     />
                   </CCol>
                   <CCol xs="auto">
-                    {/* <CButton
-                      color="danger"
-                      onClick={() => deleteHandler(product.id)}
-                    >
-                      <CIcon icon={cilTrash}></CIcon>
-                      {t("delete")}
-                    </CButton> */}
                     <DeleteProductModal
                       deleteHandler={deleteProductHandler}
                       product={product}
@@ -482,3 +485,6 @@ const mapDispatchToProps = {
   deleteProductHandler,
 };
 export default connect(mapStateToProps, mapDispatchToProps)(ProductsRender);
+
+
+

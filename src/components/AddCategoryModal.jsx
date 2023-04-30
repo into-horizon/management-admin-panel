@@ -13,7 +13,7 @@ import {
   CFormTextarea,
   CTooltip,
 } from "@coreui/react";
-import Category from "src/services/CategoryService";
+import Category, {getAllParentCategoires} from "src/services/CategoryService";
 import SelectSearch from "react-select-search";
 import CIcon from "@coreui/icons-react";
 import { cilPlus } from "@coreui/icons";
@@ -23,30 +23,39 @@ import { connect,useSelector } from "react-redux";
 const AddCategoryModal = ({ action, type, params,getParentCategoriesHandler, getChildCategoriesHandler  }) => {
   const {parentCategories:{data:parentCategories}, childCategories:{data:childCategories},grandChildCategories:{data:grandChildCategories}} = useSelector(state=>state.category)
   const [visible, setVisible] = useState(false);
-  const [parentData, setParentData] = useState([parentCategories]);
+  const [parentData, setParentData] = useState([]);
   const [parentId, setParentId] = useState("");
   const [childData, setChildData] = useState([]);
   const [childId, setChildId] = useState("");
   const [loading, setLoading] = useState(false);
-  useEffect(async () => {
-    getParentCategoriesHandler()
+
+    const callParentData = async () =>{
+      const {data:{data}} = await Category.getAllParentCategoires()
+      return data
+    }
+    const callChildData = async (id) =>{
+      const {data:{data}} = await Category.getAllChildCategoires({parent_id: id})
+      setParentId(id)
+     setChildData(data)
+    }
+  useEffect( () => {
+    callParentData() .then(data => setParentData(data))
   }, []);
-useEffect(()=>  setParentData(parentCategories), [parentCategories])
   const onChange = e =>{
    setChildData(childCategories.filter(x => x.entitle.toLowerCase().includes(e.toLowerCase())|| x.artitle.toLowerCase().includes(e.toLowerCase())))
   }
-  useEffect(()=>{
-    if(!!parentId){
-      setLoading(true)
-      getChildCategoriesHandler({ parent_id: parentId}).then(()=> {
+  // useEffect(()=>{
+  //   if(!!parentId){
+  //     setLoading(true)
+  //     getChildCategoriesHandler({ parent_id: parentId}).then(()=> {
         
-        setLoading(false)
-      }) 
-    }
-  },[parentId])
-  useEffect(()=>{
-    setChildData(childCategories)
-  },[childCategories])
+  //       setLoading(false)
+  //     }) 
+  //   }
+  // },[parentId])
+  // useEffect(()=>{
+  //   setChildData(childCategories)
+  // },[childCategories])
 
   const onChangeParent = e =>{
     setParentData(parentCategories.filter(x => x.entitle.includes(e)|| x.artitle.includes(e)))
@@ -101,10 +110,11 @@ useEffect(()=>  setParentData(parentCategories), [parentCategories])
                     
                     onChange={onChangeParent}
                     placeholder="select parent category"
-                    onSelect={e=> setParentId(e.id)}
+                    onSelect={e=> callChildData(e.id)}
                     />
             </CCol>
             )}
+            {type === 'child' && <CCol xs={5}><CFormInput type="number" placeholder="commission" max='.99' min='.01' step='.01' required/></CCol>}
             {type === "grandchild" && (
               <CCol xs='auto'>
               <SearchDropdown options={childData.map((val) => {

@@ -2,11 +2,10 @@ import React, { Component, useEffect, useState } from "react";
 import { HashRouter, Route, Routes, useParams } from "react-router-dom";
 import "./scss/style.scss";
 import { PopupProvider } from "react-custom-popup";
-import { getUser } from "./store/auth";
+import { getUser, logout } from "./store/auth";
 import { useNavigate } from "react-router-dom";
 import { connect, useSelector } from "react-redux";
 import cookie from "react-cookies";
-import { If, Then, Else } from "react-if";
 import { useTranslation } from "react-i18next";
 import { Rings } from "react-loader-spinner";
 import {
@@ -17,8 +16,8 @@ import {
 import { getAddress } from "./store/address";
 import "react-select-search/style.css";
 import Auth from "./services/Auth";
-import * as buffer from "buffer";
-window.Buffer = buffer.Buffer;
+// import * as buffer from "buffer";
+// window.Buffer = buffer.Buffer;
 
 const loading = (
   <div className="pt-3 text-center">
@@ -44,9 +43,8 @@ const ResetPassword = React.lazy(() =>
 
 const App = ({
   getParentCategoriesHandler,
-  getChildCategoriesHandler,
-  getGrandChildCategoriesHandler,
   getUser,
+  logout
 }) => {
   const {
     loggedIn,
@@ -86,7 +84,12 @@ const App = ({
       }
   
       if (!id && token) {
-        getUser();
+        try {
+          getUser();
+          
+        } catch (error) {
+          logout()
+        }
       }
 
     }).catch(()=> {
@@ -175,5 +178,6 @@ const mapDispatchToProps = {
   getChildCategoriesHandler,
   getGrandChildCategoriesHandler,
   getAddress,
+  logout
 };
 export default connect(mapStateToProps, mapDispatchToProps)(App);

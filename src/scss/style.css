@@ -8,9 +8,14 @@ strong,
 span,
 th,
 td,
+label,
 input::first-letter,
 button::first-letter {
     text-transform: capitalize;
+}
+
+input[type=number]:out-of-range {
+   color: orangered;
 }
 
 /* label{
@@ -123,8 +128,9 @@ button::first-letter {
     margin: 1rem 0;
 }
 
-.productForm div select {
-    width: 25%;
+.productForm select {
+    /* width: 25%; */
+    margin: .5rem 0;
 }
 
 .thirdCategory {
@@ -498,4 +504,30 @@ button::first-letter {
 
 .search-dropdown{
     position: relative;
+}
+
+.move{
+    cursor: move;
+}
+
+/* .paginator{
+    position: absolute;
+    bottom: 2rem;
+}
+.body{
+    position: relative;
+} */
+
+.document{
+    margin: auto;
+    background-color: blueviolet;
+    padding: .5rem;
+    border-radius: 7px;
+    color: #fff !important;
+    cursor: pointer;
+    
+
+}
+.document:hover{
+    background-color: aqua;
 }

@@ -4,11 +4,20 @@ import ApiService from "./ApiService";
 class Finance extends ApiService {
     constructor() {
         super();
-        this.path = "api/v1/store"
+        this.path = "api/admin"
     }
-    async getTransactions ({limit, offset}) {
+
+    async getAmounts  () {
         try {
-            let result = await this.get(`${this.path}/transactions`, {limit: limit, offset: offset })
+            let result = await this.get(`${this.path}/amounts`)
+            return result
+        } catch (error) {
+            throw new Error(error)
+        }
+    }
+    async getTransactions (data) {
+        try {
+            let result = await this.get(`${this.path}/transactions`, data)
             return result
         } catch (error) {
             throw new Error(error.message);

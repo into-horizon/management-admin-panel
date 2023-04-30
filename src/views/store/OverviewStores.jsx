@@ -25,7 +25,7 @@ const OverviewStores = ({ getStoresHandler,updateStoreStatusHandler,updateStoreH
   const [loading, setLoading] = useState(true);
   const [params, setParams] = useState({ limit: 10, offset: 0 });
   useEffect(() => {
-    Promise.all([getStoresHandler()]).then(() => setLoading(false));
+    Promise.all([getStoresHandler(params)]).then(() => setLoading(false));
   }, []);
   const TooltipText = (data) => {
     return (
@@ -158,6 +158,7 @@ const OverviewStores = ({ getStoresHandler,updateStoreStatusHandler,updateStoreH
         params={params}
         changeData={getStoresHandler}
         updateParams={setParams}
+        cookieName='stores'
       />
     </>
   );

@@ -115,8 +115,9 @@ export const Grandchild = ({
     getGrandChildCategoriesHandler({...params,...data})
   }
 
-  const clearFilter = ()=>{
-    getGrandChildCategoriesHandler()
+  const clearFilter = (e)=>{
+    e.target.reset()
+    getGrandChildCategoriesHandler(params)
     setValue({})
   }
   const onChange = (e) => {
@@ -131,7 +132,7 @@ export const Grandchild = ({
         params={params}
       />
       <div className="card padding mrgn25">
-        <CForm onSubmit={submitHandler}>
+        <CForm onSubmit={submitHandler} onReset={clearFilter}>
           <CRow
             className="justify-content-center align-items-end"
             xs={{ gutter: 1 }}
@@ -139,23 +140,6 @@ export const Grandchild = ({
             <CCol xs="auto">
               <CFormInput id="title" placeholder="title"/>
             </CCol>
-            {/* <CCol xs="auto">
-              {Children.toArray(
-                <SelectSearch
-                  options={childData.map((val) => {
-                    return {
-                      name: `${val.entitle} - ${val.artitle}`,
-                      value: val.id,
-                    };
-                  })}
-                  id='parent_id'
-                  search={true}
-                  placeholder="select child category"
-                  value={params.parent_id}
-                  onChange={onChange}
-                />
-              )}
-            </CCol> */}
             <CCol xs="auto">
               {Children.toArray(
                 <SearchDropdown
@@ -182,7 +166,7 @@ export const Grandchild = ({
             </CCol>
             <CCol xs="auto">
               <CTooltip content="clear filter">
-                <CButton color="secondary"  onClick={clearFilter}>
+                <CButton color="secondary"  type="reset">
                   <CIcon icon={cilFilterX} />
                 </CButton>
               </CTooltip>

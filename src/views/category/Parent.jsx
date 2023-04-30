@@ -102,6 +102,7 @@ export const Parent = ({
         checkbox={true}
         loading={loading}
         updateParams={setParams}
+        updateLoading={setLoading}
       />
     </>
   );

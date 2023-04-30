@@ -71,7 +71,7 @@ const DiscountModal = ({ data, updateDiscount }) => {
                     onChange={e=> setDiscountValue(e)}
                   
                   id="discount"
-                  checked={discountValue}
+                  checked={!!discountValue}
                   name="discount"
                 />
               </CCol>

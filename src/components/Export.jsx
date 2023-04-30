@@ -5,7 +5,7 @@ import CIcon from "@coreui/icons-react";
 import { cilCloudDownload } from "@coreui/icons";
 
 
-const Export = ({ title, data, fileName, sheetName, style, onClick, params }) => {
+const Export = ({ title, data, fileName, sheetName, style, onClick, params,color }) => {
   const [loading, setLoading] = useState(false)
   const exportExcelHandler = async () => {
     try{
@@ -24,9 +24,9 @@ const Export = ({ title, data, fileName, sheetName, style, onClick, params }) =>
   return (
     <CTooltip content={`${title?? 'download'}`}>
 
-    <CButton onClick={exportExcelHandler} color="secondary" style={style} disabled={loading}>
+    <CButton onClick={exportExcelHandler} color={color??"secondary"} style={style} disabled={loading}>
      {loading? <CSpinner size="sm" color="primary"/>:
-      <CIcon icon={cilCloudDownload} size="lg" />}
+      <CIcon icon={cilCloudDownload}  />}
      
     </CButton>
     </CTooltip>

@@ -166,6 +166,8 @@ export const PromoCodes = ({
         columns={columns}
         data={data}
         count={count}
+        cookieName="codes"
+        changeData={getDiscountCodesHandler}
       />
     </>
   );

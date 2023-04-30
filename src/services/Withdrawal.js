@@ -4,7 +4,7 @@ import ApiService from "./ApiService";
 class Withdrawal extends ApiService {
     constructor() {
         super();
-        this.path = "api/v1/withdrawal/store"
+        this.path = "api/admin/withdrawal"
     }
 
     async getWithdrawals(payload) {
@@ -18,6 +18,15 @@ class Withdrawal extends ApiService {
     async addWithdrawal(data) {
         try {
             let result = await this.post(this.path, data)
+            return result
+        } catch (error) {
+            return error
+        }
+
+    }
+    async updateWithdrawal(data) {
+        try {
+            let result = await this.update(this.path, data)
             return result
         } catch (error) {
             return error

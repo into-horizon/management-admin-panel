@@ -18,15 +18,20 @@ export default class ApiService {
     return res.data
   }
   async post(path, data, header, params = null) {
-    let res = await axios({
-      method: 'post',
-      url: path.management?`${managementAPI}/${path.endpoint}`: `${api}/${path}`, 
-      data: data,
-      headers: header|| this.bearer(await this.token()),
-      params: params,
-
-    });
-    return res.data
+    try {
+      let res = await axios({
+        method: 'post',
+        url: path.management?`${managementAPI}/${path.endpoint}`: `${api}/${path}`, 
+        data: data,
+        headers: header|| this.bearer(await this.token()),
+        params: params,
+  
+      });
+      return res.data
+      
+    } catch (error) {
+      throw new Error(error)
+    }
   }
 
   async update(path, data, header, params = null) {
@@ -69,11 +74,12 @@ export default class ApiService {
   basic(data) {
     return { Authorization: ` Basic ${btoa(`${data.email}:${data.password}`)}` }
   }
-  getPopulatedStore(data){
+  getPopulatedStore(data ={}){
     const store =cookie.load('populated-store', {path: '/'})
-    if(store){
-      return data? {...data, store_id:JSON.parse(store).id}:{ store_id:JSON.parse(store).id}
-    } else return data
+    const duration = cookie.load('duration', {path: '/'})
+    store && (data.store_id = JSON.parse(store).id)
+    duration && (data.duration = duration)
+     return data
   }
   async token() {
     let token = cookie.load('access_token', { path: '/' })

@@ -12,7 +12,7 @@ import AddCategoryModal from "src/components/AddCategoryModal";
 import DeleteModal from "src/components/DeleteModal";
 import { CButton, CCol, CForm, CFormInput, CRow, CTooltip } from "@coreui/react";
 import CIcon from "@coreui/icons-react";
-import { cilTrash, cilSearch,cilFilterX  } from "@coreui/icons";
+import { cilTrash, cilSearch, cilFilterX } from "@coreui/icons";
 import Category from "src/services/CategoryService";
 import SearchDropdown from "src/components/SearchDropdown";
 import FilterCard from "src/components/FilterCard";
@@ -25,17 +25,17 @@ export const Child = ({
   deleteChildCategoryHandler,
 }) => {
   const {
-    childCategories: { data, count }, parentCategories : {data: parentCategories,}
+    childCategories: { data, count }, parentCategories: { data: parentCategories, }
   } = useSelector((state) => state.category);
   const [params, setParams] = useState({ limit: 10, offset: 0 });
   const [visible, setVisible] = useState(false);
   const [parentData, setParentData] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [tableLoading, setTableLoading ] =  useState(true)
-  const [selectedValue,setSelectedValue] = useState({})
-  useEffect(()=>{
-    getChildCategoriesHandler(params).then(()=> setTableLoading(false))
-  },[])  
+  const [tableLoading, setTableLoading] = useState(true)
+  const [selectedValue, setSelectedValue] = useState({})
+  useEffect(() => {
+    Promise.all([getChildCategoriesHandler(params)]).then(() => setTableLoading(false))
+  }, [])
   const DeleteButton = ({ id }) => {
     return (
       <React.Fragment>
@@ -98,22 +98,22 @@ export const Child = ({
   };
 
 
-  const submitHandler = e=>{
+  const submitHandler = e => {
     e.preventDefault()
-    
-    let data= {}
+
+    let data = {}
     selectedValue.id && (data['parent_id'] = selectedValue.id)
     e.target.title.value && (data['title'] = e.target.title.value)
     getChildCategoriesHandler(data)
   }
-  const resetFilter= ()=>{
+  const resetFilter = (e) => {
     setSelectedValue({})
-    document.getElementById('title').value = ''
-    getChildCategoriesHandler()
+    e.target.reset()
+    getChildCategoriesHandler(params)
   }
-  useEffect(()=>{
+  useEffect(() => {
     setParentData(parentCategories)
-  },[])
+  }, [])
   return (
     <>
       <AddCategoryModal
@@ -122,10 +122,10 @@ export const Child = ({
         params={params}
       />
       <FilterCard>
-      <CForm onSubmit={submitHandler}>
+        <CForm onSubmit={submitHandler} onReset={resetFilter}>
           <CRow className="justify-content-center align-items-end">
             <CCol xs='auto'>
-              <CFormInput id="title" placeholder="title"/>
+              <CFormInput id="title" placeholder="title" />
             </CCol>
             <CCol xs='auto'>
               <SearchDropdown
@@ -148,7 +148,7 @@ export const Child = ({
             </CCol>
             <CCol xs="auto">
               <CTooltip content="clear filter">
-                <CButton color="secondary"  onClick={resetFilter}>
+                <CButton color="secondary" type='reset'>
                   <CIcon icon={cilFilterX} />
                 </CButton>
               </CTooltip>
@@ -156,7 +156,7 @@ export const Child = ({
 
           </CRow>
         </CForm>
-      </FilterCard> 
+      </FilterCard>
       <Table
         data={data}
         count={count}
