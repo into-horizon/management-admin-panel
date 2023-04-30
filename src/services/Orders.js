@@ -4,7 +4,7 @@ import ApiService from "./ApiService";
 class Orders extends ApiService {
     constructor() {
         super();
-        this.path = "api/v1/order";
+        this.path = "api/admin/order";
         this.path2 = "api/v1/update/order_item"
     }
 
@@ -26,7 +26,7 @@ class Orders extends ApiService {
     }
     async updateOrderItem(data){
         try {
-            let result = await this.update(this.path2, data)
+            let result = await this.patch(`${this.path}/item`, data)
             return result
         } catch (error) {
             throw new Error(error.message);
@@ -38,6 +38,14 @@ class Orders extends ApiService {
             return result
         } catch (error) {
             throw new Error(error.message);
+        }
+    }
+    async bulkStatusUpdate(data){
+        try {
+            let result = await this.patch(`${this.path}/bulk`, data)
+            return result
+        } catch (error) {
+            throw new Error(error)
         }
     }
 }

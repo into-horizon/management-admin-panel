@@ -1,14 +1,14 @@
 import ApiService from "./ApiService";
-import cookie from 'react-cookies'
+
 export default class Auth extends ApiService {
     constructor() {
         super();
-        this.path = "api/v1/store";
+        this.path = "employee";
     }
 
     async basicAuth(data) {
         try {
-            let response = await this.post(`${this.path}/signin`, null, this.basic(data))
+            let response = await this.post({management:true,endpoint:`signin`}, null, this.basic(data))
             return response
         } catch (error) {
             return error;
@@ -16,8 +16,8 @@ export default class Auth extends ApiService {
     }
     async getStore() {
         try {
-            let response = await this.get(this.path, null, this.bearer(await this.token()))
-            return response.data
+            let response = await this.get({management:true,endpoint:this.path})
+            return response
 
         } catch (error) {
             return error
@@ -26,7 +26,7 @@ export default class Auth extends ApiService {
 
     async logout() {
         try {
-            let response = await this.post('auth/signout', null,  this.bearer(await this.token()))
+            let response = await this.post({management:true,endpoint:'logout'})
 
             return response
         } catch (error) {
@@ -84,5 +84,19 @@ export default class Auth extends ApiService {
         } catch (error) {
             throw new Error(error.message);
         }
+    }
+    async checkAPI(){
+        try {
+          return await this.get('')
+        } catch (error) {
+            throw new Error(error)
+        }
+    }
+    async checkManagementAPI (){
+        try {
+            return await this.get({management: true, endpoint: ''})
+          } catch (error) {
+              throw new Error(error)
+          }
     }
 }

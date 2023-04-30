@@ -2,11 +2,12 @@ import { createSlice } from "@reduxjs/toolkit";
 import cookie from 'react-cookies';
 
 import Product from '../services/ProductService';
+import { updateToast } from "./globalToasts";
 
 
 const products = createSlice({
     name: 'products',
-    initialState : {message: '', product: [], currentProducts: {count: 0, products: [], searchData: [], searched: {}}},
+    initialState : {pending: {data: [], count: 0}, overview: {data: [], count: 0}, searched:{}, reviews: {data:[], count:0}},
     reducers: {
         addProduct(state, action){
             return {...state, message: action.payload.message, products: [...state.product, action.payload.result]}
@@ -35,98 +36,132 @@ const products = createSlice({
         },
         deleteProduct(state, action){
             return {...state, message: action.payload.message, currentProducts:{...state.currentProducts, products: action.payload.result, count: action.payload.count}}
+        },
+        addData(state, {payload}){
+            return {...state, ...payload}
         }
+
     }
 })
 
 export const addProductHandler = payload => async (dispatch, state) => {
     try {
-       let result = await Product.addProduct(payload)
-       if(result.status === 201){
-           dispatch(addProduct(result))
+       let {result, status, message} = await Product.addProduct(payload)
+       if(status === 201){
+           dispatch(updateToast({status: 200, message: message, type: 'create'})) 
        } else{
-        dispatch(errorMessage({message: result}))
+        dispatch(updateToast({status: status, message: message, type: 'error'})) 
        }
     } catch (error) {
-        dispatch(errorMessage(() =>{return{message: 'something went wrong'}}))
+        dispatch(updateToast({status: 403, message: error, type: 'error'})) 
     }
 }
 
-export const getProductsByStatusHandler = payload => async (dispatch, state) => {
+export const getPendingProducts = payload => async (dispatch) => {
     try {
-        let result = await Product.getProductsByStatus(payload)
-        if (result.status === 200){
-            dispatch(getProducts({message: 'success', result: result}))
+        let {data, message, status} = await Product.getProducts({...payload, status: 'pending'})
+        if (status === 200){
+            dispatch(addData({pending:data}))
         } else {
-            dispatch(errorMessage(() =>{return{message: result.message}}))
+            dispatch(updateToast({status: status, message: message, type: 'error'}))
         }
     } catch (error) {
-        dispatch(errorMessage(() =>{return{message: 'something went wrong'}}))
+        dispatch(updateToast({status: 403, message: error.message, type: 'error'}))
+    }
+}
+
+export const updateProductStatus = (payload, type = 'pending') => async (dispatch, state) =>{
+    try {
+        let {status, data, message} =  await Product.updateProductStatus(payload)
+        if(status === 200) {
+            let {data:products, count} =  state().products[type]
+            let newState = products.map(product =>{
+                    if (product.id === data.id) return {...product, ...data}
+                    return product
+            })  
+            dispatch(addData({[type]:{data:newState, count:count}}))
+            dispatch(updateToast({status: status, message: message, type: 'update'}))
+             } else dispatch(updateToast({status: status, message: message, type: 'error'}))
+    } catch (error) {
+        dispatch(updateToast({status: 403, message: error, type: 'error'}))
+    }
+}
+
+export const getProductsByStatus = payload => async (dispatch, state) =>{
+    try {
+        let {data, message, status} = await Product.getProducts(payload)
+        if (status === 200){
+            dispatch(addData({overview:data}))
+        } else {
+            dispatch(updateToast({status: status, message: message, type: 'error'}))
+        }
+    } catch (error) {
+        dispatch(updateToast({status: 403, message: error.message, type: 'error'}))
     }
 }
 
 export const addProductPictureHandler = payload => async (dispatch, state) => {
     try {
-        let result = await Product.addProductPicture(payload)
-        let x = state().products
-        if(result.status === 200){
-            let y = {...x}
-            let newState = y.currentProducts.products.map(product =>{
-                if(result.data.product_id === product.id){
+        let {status, data, message} = await Product.addProductPicture(payload)
+        if(status === 200){
+            let {count, data:overview} = state().products.overview
+            let newState = overview.map(product =>{
+                if(data.product_id === product.id){
                     let newProduct = {...product}
-                    let newPic = {id: result.data.id, product_picture: result.data.product_picture}
+                    let newPic = {id: data.id, product_picture: data.product_picture}
                     newProduct['pictures'] = [...product.pictures, newPic]
                     return newProduct
                 } else return product
                 
             })
-            dispatch(addProductPicture({message: 'success', result: newState}))
+            dispatch(addData({overview: {count:count, data: newState}}))
+            dispatch(updateToast({status: status, message: message, type: 'add'}))
         } else{
-            dispatch(errorMessage({message: result}))
+            dispatch(updateToast({status: status, message: message, type: 'error'}))
         }
     } catch (error) {
-         dispatch(errorMessage(() =>{return{message: 'something went wrong'}}))
+        dispatch(updateToast({status: 403, message: error, type: 'error'})) 
     }
 }
 export const deleteProductPictureHandler = payload => async (dispatch, state) =>{
     try {
-        let {status, message} = await Product.deleteProductPicture(payload)
-        let x = state().products
+        let {status, message, data} = await Product.deleteProductPicture(payload)
         if(status===200){
-            let y = {...x}
-            let newState = y.currentProducts.products.map(product =>{
+            let {count, data:overview} = state().products.overview
+            let newState = overview.map(product =>{
                 let newProduct = {...product}
                  let newPics = product.pictures.filter(picture => picture.id !== payload.picture_id)
                  newProduct['pictures'] = newPics
                  return newProduct
             })
-            dispatch(deleteProductPicture({message: 'success', result: newState}))
+            dispatch(addData({overview:{ data: newState, count:count}}))
+            dispatch(updateToast({status: status, message: message, type: 'delete'}))
         } else{
-            dispatch(errorMessage({message: message}))
+            dispatch(updateToast({status: status, message: message, type: 'error'}))
         }
     } catch (error) {
-        dispatch(errorMessage(() =>{return{message: error.message}}))
+        dispatch(updateToast({status: 403, message: error, type: 'error'})) 
     }
 }
 export const updateSizeAndQuantity = payload => async (dispatch, state) => {
     try {
         let {result, message, status} = await Product.updateSizeAndQuantity(payload)
-        console.log("🚀 ~ file: product.js ~ line 114 ~ updateSizeAndQuantity ~ result", result)
         if(status === 200){
-            let newProducts = [...state().products.currentProducts.products].map(val => {
+            const {data: products, count}  = state().products.overview
+            let newProducts = products.map(val => {
                 if( val.id === result.id){
                   
-                    
                     return {...val,...result}
                 }   else return val 
                
             })
-            dispatch(updateProduct({result:[...newProducts], message: 'updated'}))
+            dispatch(addData({overview: {data: newProducts, count: count}}))
+            dispatch(updateToast({status: status, message: message, type: 'update'}))
         } else {
-            dispatch(errorMessage({message: {result, message, status}}))
+            dispatch(updateToast({status: status, message: message, type: 'update'}))
         }
     } catch (error) {
-        dispatch(errorMessage(() =>{return{message: error.message}}))  
+        dispatch(updateToast({status: 403, message: error, type: 'update'}))  
     }
 }
 
@@ -136,7 +171,8 @@ export const updateDiscount = payload => async (dispatch, state) => {
     try {
         let {result, message, status} = await Product.updateDiscount(payload)
         if (status === 200){
-            let newProducts = [...state().products.currentProducts.products].map(val => {
+            const {data: products, count}  = state().products.overview
+            let newProducts = products.map(val => {
                 if( val.id === result.id){
                     let product = {...val}
                     product['discount'] = result.discount
@@ -146,12 +182,13 @@ export const updateDiscount = payload => async (dispatch, state) => {
                 }   else return val 
                
             })
-            dispatch(updateProduct({result:[...newProducts], message: 'updated'}))
+            dispatch(addData({overview: {data: newProducts, count: count}}))
+            dispatch(updateToast({status: status, message: message, type: 'update'}))
         } else {
-            dispatch(errorMessage({message: {result, message, status}}))
+            dispatch(updateToast({status: status, message: message, type: 'update'}))
         }
     } catch (error) {
-        dispatch(errorMessage(() =>{return{message: error.message}}))  
+        dispatch(updateToast({status: 403, message: error, type: 'update'})) 
     }
 }
 export const getSearchDataHandler = payload => async (dispatch, state) => {
@@ -169,44 +206,58 @@ export const getSearchDataHandler = payload => async (dispatch, state) => {
 
 export const getSearchedProductHandler = payload => async (dispatch, state) => {
     try {
-        let {status,product} = await Product.getProduct(payload)
+        let {status,data:product, message} = await Product.getProduct(payload)
        
         if(product.id){
-            dispatch(addSearchedProduct({message: 'searchedProduct', result: product}))
+            dispatch(addData({searched: product}))
         } else {
-            dispatch(errorMessage({message:product}))
+            dispatch(updateToast({status: status, message: message, type: 'error'}))
         }
     } catch (error) {
         
-        dispatch(errorMessage(() =>{return{message: error.message}}))  
+        dispatch(updateToast({status: 403, message: error, type: 'error'}))
     }
 }
 
 export const updateProductHandler = payload => async (dispatch, state) => {
     try {
-        let {message, result, status} = await Product.updateProduct(payload)
+        let {message, result:data, status} = await Product.updateProduct(payload)
         if(status === 200){
-            dispatch(addSearchedProduct({message: 'product updated', result: {}}))
+            dispatch(addData({searched: data}))
+            dispatch(updateToast({status: status, message: message, type: 'update'}))
         } else{
-            dispatch(errorMessage({message:{message, result, status}}))
+            dispatch(updateToast({status: status, message: error, type: 'error'}))
         }
         
     } catch (error) {
-        dispatch(errorMessage(() =>{return{message: error.message}}))  
+        dispatch(updateToast({status: 403, message: error, type: 'error'}))
     }
 }
 
 export const deleteProductHandler = payload => async (dispatch, state) => {
     try {
-        let res = await Product.deleteProduct(payload)
-        if(res.includes('deleted')){
-            let results = state().products.currentProducts.products.filter(product => product.id !== payload)
-            console.log("🚀 ~ file: product.js ~ line 205 ~ deleteProductHandler ~ results", results)
-            dispatch(deleteProduct({message: res, result: results, count:state().products.currentProducts.count - 1 }))
+        let {status, data, message} = await Product.deleteProduct(payload)
+        if(status===200){
+            let {count, data:overview} = state().products.overview
+            let newState = overview.filter(val=> val.id !== data.id)
+            dispatch(addData({overview:{data:newState, count:count}}))
+            dispatch(updateToast({status: status, message: message, type: 'update'}))
+        } else  dispatch(updateToast({status: status, message: error, type: 'error'}))
+    } catch (error) {
+        dispatch(updateToast({status: 403, message: error, type: 'error'}))
+    }
+}
+
+export const getProductReviews = payload => async (dispatch, state) =>{
+    try {
+        let {message, status, data} = await Product.getProductReviews(payload)
+        if(status === 200){
+            dispatch(addData({reviews: data}))
         }
     } catch (error) {
-        dispatch(errorMessage(() =>{return{message: error.message}}))  
+        console.log("🚀 ~ file: product.js:258 ~ getProductReviews ~ error", error)
+        dispatch(updateToast({status: 403, message: error, type: 'error'}))
     }
 }
 export default products.reducer
-export const {addProduct,errorMessage,getProducts,addProductPicture,deleteProductPicture,updateProduct,addSearchData,addSearchedProduct,deleteProduct} = products.actions
+export const {addData,addProduct,errorMessage,getProducts,addProductPicture,deleteProductPicture,updateProduct,addSearchData,addSearchedProduct,deleteProduct} = products.actions

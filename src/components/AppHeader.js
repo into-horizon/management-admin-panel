@@ -1,6 +1,6 @@
-import React from 'react'
-import { NavLink } from 'react-router-dom'
-import { useSelector, useDispatch } from 'react-redux'
+import React from "react";
+import { NavLink } from "react-router-dom";
+import { useSelector, useDispatch, connect } from "react-redux";
 import {
   CContainer,
   CHeader,
@@ -10,27 +10,30 @@ import {
   CHeaderToggler,
   CNavLink,
   CNavItem,
-  CButton
-} from '@coreui/react'
-import CIcon from '@coreui/icons-react'
-import { cilBell, cilEnvelopeOpen, cilList, cilMenu } from '@coreui/icons'
+  CButton,
+  CAlert,
+} from "@coreui/react";
+import CIcon from "@coreui/icons-react";
+import { cilBell, cilEnvelopeOpen, cilList, cilMenu } from "@coreui/icons";
 
-import { AppBreadcrumb } from './index'
-import { AppHeaderDropdown } from './header/index'
-import { logo } from 'src/assets/brand/logo'
-import { useTranslation } from 'react-i18next';
+import { AppBreadcrumb } from "./index";
+import { AppHeaderDropdown } from "./header/index";
+import { logo } from "src/assets/brand/logo";
+import { populateStore } from "src/store/filter";
 
-const AppHeader = () => {
-  const dispatch = useDispatch()
-  const sidebarShow = useSelector((state) => state.changeState.sidebarShow)
-  const { t, i18n } = useTranslation()
-
+const AppHeader = ({populateStore}) => {
+  const dispatch = useDispatch();
+  const sidebarShow = useSelector((state) => state.changeState.sidebarShow);
+  const { store } = useSelector((state) => state.filter);
+  const onClose = ()=>{
+    populateStore()
+  }
   return (
     <CHeader position="sticky" className="mb-4">
       <CContainer fluid>
         <CHeaderToggler
           className="ps-1"
-          onClick={() => dispatch({ type: 'set', sidebarShow: !sidebarShow })}
+          onClick={() => dispatch({ type: "set", sidebarShow: !sidebarShow })}
         >
           <CIcon icon={cilMenu} size="lg" />
         </CHeaderToggler>
@@ -50,7 +53,19 @@ const AppHeader = () => {
             <CNavLink href="#">Settings</CNavLink>
           </CNavItem>
         </CHeaderNav>
-      <CButton color="primary" onClick={() =>i18n.changeLanguage(i18n.language === 'en'? 'ar': 'en')}>{t('lang')}</CButton>
+       
+          <CAlert color="info" dismissible  style={{ margin: "auto" }} visible={!!store.id} onClose={onClose}>
+            {`Populated store: ${store.title??'store'}`}
+          </CAlert>
+        
+        {/* <CButton
+          color="primary"
+          onClick={() =>
+            i18n.changeLanguage(i18n.language === "en" ? "ar" : "en")
+          }
+        >
+          {t("lang")}
+        </CButton> */}
         <CHeaderNav>
           <CNavItem>
             <CNavLink href="#">
@@ -77,7 +92,7 @@ const AppHeader = () => {
         <AppBreadcrumb />
       </CContainer>
     </CHeader>
-  )
-}
+  );
+};
 
-export default AppHeader
+export default connect(null, {populateStore})( AppHeader);

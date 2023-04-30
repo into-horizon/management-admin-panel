@@ -10,7 +10,6 @@ export const AppSidebarNav = ({ items }) => {
   const {t, i18n} = useTranslation('translation', { keyPrefix: 'routes' });
   const pendingOrders = useSelector((state) => state.orders.pendingOrders)
   const {status} = useSelector((state) => state.login.user)
-  console.log("🚀 ~ file: AppSidebarNav.js ~ line 13 ~ AppSidebarNav ~ status", status)
   const location = useLocation()
   const navLink = (name, icon, badge) => {
     return (

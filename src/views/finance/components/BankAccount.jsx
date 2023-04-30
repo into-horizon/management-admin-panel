@@ -4,7 +4,7 @@ import { getAccountHandler, deleteAccountHandler, getAccountsHandler, addAccount
 import { CCardTitle, CCard, CCardHeader, CCardBody, CButton, CCardText, CModal, CModalHeader, CModalTitle, CModalBody, CModalFooter, CForm, CFormInput, CFormSelect, CRow, CCol, CSpinner } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import { cilPlus } from '@coreui/icons';
-import DeleteModal from './DeleteModal'
+import DeleteModal from '../../../components/DeleteModal'
 import { useTranslation } from 'react-i18next';
 import AccountModal from './AccountModal'
 const { log } = console

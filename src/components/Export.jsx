@@ -1,21 +1,36 @@
-import { CButton } from '@coreui/react'
-import React from 'react'
-import * as XLSX from 'xlsx';
-import  CIcon  from '@coreui/icons-react';
-import { cilCloudDownload } from '@coreui/icons';
+import { CButton, CSpinner, CTooltip } from "@coreui/react";
+import React, { useState } from "react";
+import * as XLSX from "xlsx";
+import CIcon from "@coreui/icons-react";
+import { cilCloudDownload } from "@coreui/icons";
 
-const Export = ({title, data, fileName, sheetName, style}) =>{
-    const exportExcelHandler = () => {
-        const wb = XLSX.utils.book_new()
-        const ws = XLSX.utils.json_to_sheet(data)
-        XLSX.utils.book_append_sheet(wb, ws, sheetName?? 'sheet1')
-        XLSX.writeFile(wb, `${fileName}.xlsx`)
-    
+
+const Export = ({ title, data, fileName, sheetName, style, onClick, params,color }) => {
+  const [loading, setLoading] = useState(false)
+  const exportExcelHandler = async () => {
+    try{
+      setLoading(true)
+     let x = await data(params)
+     const wb = XLSX.utils.book_new();
+     const ws = XLSX.utils.json_to_sheet(x);
+     XLSX.utils.book_append_sheet(wb, ws, sheetName ?? "sheet1");
+     XLSX.writeFile(wb, `${fileName}.xlsx`);
+     setLoading(false)
+    } catch (e){
+      setLoading(false)
+      console.error({e});
     }
+  };
   return (
-    <CButton onClick={exportExcelHandler} color="secondary" style={style}><CIcon icon={cilCloudDownload} size="lg" />{title}</CButton>
-    
-  )
-}
+    <CTooltip content={`${title?? 'download'}`}>
 
-export default Export
+    <CButton onClick={exportExcelHandler} color={color??"secondary"} style={style} disabled={loading}>
+     {loading? <CSpinner size="sm" color="primary"/>:
+      <CIcon icon={cilCloudDownload}  />}
+     
+    </CButton>
+    </CTooltip>
+  );
+};
+
+export default Export;
