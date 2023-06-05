@@ -13,11 +13,10 @@ import {
   getChildCategoriesHandler,
   getGrandChildCategoriesHandler,
 } from "./store/category";
-import { getAddress } from "./store/address";
 import "react-select-search/style.css";
 import Auth from "./services/Auth";
-// import * as buffer from "buffer";
-// window.Buffer = buffer.Buffer;
+import { socket, notificationsOffers } from "./socket";
+import GlobalDialog from "./components/GlobalDialog";
 
 const loading = (
   <div className="pt-3 text-center">
@@ -37,9 +36,7 @@ const Page404 = React.lazy(() => import("./views/pages/page404/Page404"));
 const Page500 = React.lazy(() => import("./views/pages/page500/Page500"));
 const Verify = React.lazy(() => import("./views/pages/verify/verify"));
 const Reference = React.lazy(() => import("./views/pages/password/reference"));
-const ResetPassword = React.lazy(() =>
-  import("./views/pages/password/ResetPassword")
-);
+const ResetPassword = React.lazy(() => import("./views/pages/password/ResetPassword"));
 
 const App = ({
   getParentCategoriesHandler,
@@ -65,55 +62,57 @@ const App = ({
       return true;
     } else return false;
   };
+  socket.on('connect', () => {
+    console.log('connected successfully');
+    notificationsOffers.emit('offerNotification', { id: '123' })
+  })
   useEffect(() => {
-    Promise.all([new Auth().checkAPI(), new Auth().checkManagementAPI()]).then(()=>{
+
+    Promise.all([new Auth().checkAPI(), new Auth().checkManagementAPI(), socket.connect()]).then(() => {
       let tabID = sessionStorage.tabID
         ? sessionStorage.tabID
         : (sessionStorage.tabID = (Math.random() * 1000).toFixed(0));
-        window.location.pathname === '/500' && navigate('/')
-         cookie.save(
+      window.location.pathname === '/500' && navigate('/')
+      cookie.save(
         `current_path${sessionStorage.tabID}`,
         window.location.pathname
       );
-  
+
       let lang = localStorage.getItem("i18nextLng");
       if (lang) {
         i18n.changeLanguage(lang);
       } else {
         i18n.changeLanguage("en");
       }
-  
+
       if (!id && token) {
         try {
           getUser();
-          
         } catch (error) {
           logout()
         }
       }
-
-    }).catch(()=> {
-      setLoad(false)
+      let currentPath = cookie.load(`current_path${sessionStorage.tabID}`);
+      if (loggedIn) {
+        getParentCategoriesHandler();
+        navigate(checkUnAuth(currentPath) ? "/" : currentPath);
+        setLoad(false);
+      } else if (!loggedIn && !token) {
+        let path = checkUnAuth(currentPath) ? currentPath : "/login";
+        cookie.save(`current_path${sessionStorage.tabID}`, path, { path: "/" });
+        navigate(path);
+        setLoad(false);
+      }
+    }).catch(() => {
+      logout()
       navigate('/500')
+      setLoad(false)
     })
-  }, []);
 
-  useEffect(() => {
-    let currentPath = cookie.load(`current_path${sessionStorage.tabID}`);
-
-    if (loggedIn) {
-      getParentCategoriesHandler();
-      // getChildCategoriesHandler();
-      // getGrandChildCategoriesHandler();
-      navigate(checkUnAuth(currentPath) ? "/" : currentPath);
-      setLoad(false);
-    } else if (!loggedIn && !token) {
-      let path = checkUnAuth(currentPath) ? currentPath : "/login";
-      cookie.save(`current_path${sessionStorage.tabID}`, path, { path: "/" });
-      navigate(path);
-      setLoad(false);
-    }
   }, [loggedIn]);
+
+  // useEffect(() => {
+  // }, [loggedIn]);
 
   useEffect(() => {
     if (i18n.language === "en") {
@@ -129,16 +128,11 @@ const App = ({
     <PopupProvider>
       <React.Suspense fallback={loading}>
         <Toaster />
+        <GlobalDialog/>
         {load && (
-          <CRow className="justify-content-center align-items-center"
-          // style={{
-          //   display: "flex",
-          //   justifyContent: "center",
-          //   alignItems: "center",
-          // }}
-          >
+          <CRow className="justify-content-center align-items-center">
             <CCol xs='auto'>
-             <Rings height="35rem" width="150" color="blue"/>
+              <Rings height="35rem" width="150" color="blue" />
             </CCol>
           </CRow>
         )}
@@ -177,7 +171,6 @@ const mapDispatchToProps = {
   getParentCategoriesHandler,
   getChildCategoriesHandler,
   getGrandChildCategoriesHandler,
-  getAddress,
   logout
 };
 export default connect(mapStateToProps, mapDispatchToProps)(App);

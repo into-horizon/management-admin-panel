@@ -1,12 +1,17 @@
 import React, { useState, useEffect, Children, ReactPropTypes } from 'react'
 import Paginator from './Paginator'
-import { CTable, CTableHead, CTableRow, CTableHeaderCell, CTableBody, CTableDataCell, CFormCheck, CSpinner, CRow, CCol, CFormSelect, CFormLabel } from '@coreui/react'
+import { CTable, CTableHead, CTableRow, CTableHeaderCell, CTableBody, CTableDataCell, CFormCheck, CSpinner, CRow, CCol, CFormSelect, CFormLabel, CButton, CTooltip, CFormInput } from '@coreui/react'
 import _ from 'lodash'
 import PropTypes from 'prop-types'
+import CIcon from '@coreui/icons-react'
+import { cilCheck, cilPen, cilX } from '@coreui/icons'
+import TableEditCell from './TableEditCell'
 
 
-export const Table = ({ updateLoading, params, count, columns = [], data = [], changeData, cookieName, style, emptyMessage, checkbox, onSelect, updateParams, loading, displayedItems, pagination = true }) => {
+export const Table = ({ updateLoading, params, count, columns = [], data = [], changeData, cookieName, style, emptyMessage, checkbox, onSelect, updateParams, loading, displayedItems, pagination = true, editable, editFn, Actions }) => {
     const [selected, setSelected] = useState([])
+    const [onEdit, setOnEdit] = useState('')
+    const [item, setItem] = useState({})
     const onChange = e => {
         if (e.target.checked) {
             setSelected(x => [...x, e.target.value])
@@ -26,12 +31,25 @@ export const Table = ({ updateLoading, params, count, columns = [], data = [], c
         checkbox && onSelect?.(selected)
     }, [selected])
 
-    const changeHandler = e =>{
-        updateParams?.  (x=> {
-            changeData({...x, limit: Number(e.target.value)})
-            return {...x, limit: Number(e.target.value)}
+    const changeHandler = e => {
+        updateParams?.(x => {
+            changeData({ ...x, limit: Number(e.target.value) })
+            return { ...x, limit: Number(e.target.value) }
         })
-       
+
+    }
+
+    const updateItem = e => {
+        setItem(x => { return { ...x, [e.target.id]: e.target.value } })
+    }
+    const editClick = () => {
+        Promise.all([editFn(item)]).then(() => setOnEdit(''))
+    }
+
+    const CloneActions = ({ data, children }) => {
+        return (
+            React.cloneElement(children, data)
+        )
     }
     return (
         <>
@@ -44,16 +62,48 @@ export const Table = ({ updateLoading, params, count, columns = [], data = [], c
                             {Children.toArray(columns.map(({ header }) =>
                                 <CTableHeaderCell scope="col">{header}</CTableHeaderCell>
                             ))}
+                            <CTableHeaderCell>Actions</CTableHeaderCell>
                         </CTableRow>
+
                     </CTableHead>
                     <CTableBody>
-                        {!loading && Children.toArray(data.map(d =>
-
+                        {!loading && Children.toArray(data.map((d, i) =>
                             <CTableRow>
                                 {checkbox && <CTableDataCell><CFormCheck value={d.id} onChange={onChange} checked={selected.includes(d.id)} /></CTableDataCell>}
-                                {Children.toArray(columns.map(({ field, body: Body }) => {
+                                {Children.toArray(columns.map(({ field, body: Body, edit }) => {
+                                    if (i === onEdit) {
+                                        return <CTableDataCell>
+                                            {edit && edit.inputType ? <TableEditCell type={edit.inputType} id={field} onChange={updateItem} value={item[field]} options={edit.options} /> : <CFormInput type='text' disabled value={item[field]} />}
+                                        </CTableDataCell>
+                                    }
                                     return Body ? <CTableDataCell><Body {...d} /></CTableDataCell> : <CTableDataCell>{String(d[field] ?? '-')}</CTableDataCell>
                                 }))}
+                                {editable && <CTableDataCell>
+                                    {(i === onEdit) ? <>
+                                        <CTooltip content='confirm'>
+                                            <CButton color='success' onClick={editClick}>
+                                                <CIcon icon={cilCheck} />
+                                            </CButton>
+                                        </CTooltip>
+                                        <CTooltip content='cancel' >
+                                            <CButton color='danger' onClick={() => setOnEdit('')}>
+                                                <CIcon icon={cilX} />
+                                            </CButton>
+                                        </CTooltip>
+
+                                    </> :
+                                        <>
+                                            <CTooltip content='edit'>
+                                                <CButton color='secondary' onClick={() => {
+                                                    setOnEdit(i)
+                                                    setItem(d)
+                                                }}>
+                                                    <CIcon icon={cilPen} />
+                                                </CButton>
+                                            </CTooltip>
+                                            {Actions && <Actions {...d} /> }
+                                        </>}
+                                </CTableDataCell>}
                             </CTableRow>
                         ))}
                     </CTableBody>
@@ -67,19 +117,19 @@ export const Table = ({ updateLoading, params, count, columns = [], data = [], c
                         {displayedItems && <CCol xs='auto'>
                             <CRow className='align-items-center'>
                                 <CCol xs='auto' >
-                            <CFormLabel name='display'>
-                                Displayed Items
-                            </CFormLabel>
+                                    <CFormLabel name='display'>
+                                        Displayed Items
+                                    </CFormLabel>
 
                                 </CCol>
                                 <CCol xs='auto'>
-                            <CFormSelect name='display' onChange={changeHandler} value={params.limit}>
-                                {
-                                    Children.toArray(
-                                        displayItems.map(val => <option value={val}>{val}</option>)
-                                    )
-                                }
-                            </CFormSelect>
+                                    <CFormSelect name='display' onChange={changeHandler} value={params.limit}>
+                                        {
+                                            Children.toArray(
+                                                displayItems.map(val => <option value={val}>{val}</option>)
+                                            )
+                                        }
+                                    </CFormSelect>
 
                                 </CCol>
                             </CRow>
@@ -93,8 +143,8 @@ export const Table = ({ updateLoading, params, count, columns = [], data = [], c
     )
 }
 
-Table.propTypes ={
-    updateLoading : PropTypes.func,
+Table.propTypes = {
+    updateLoading: PropTypes.func,
     params: PropTypes.object,
     changeData: PropTypes.func,
     cookieName: PropTypes.string,
@@ -111,6 +161,7 @@ Table.propTypes ={
     pagination: PropTypes.bool,
     checkbox: PropTypes.bool,
     onSelect: PropTypes.func,
+    editable: PropTypes.bool
 }
 
 export default (Table)

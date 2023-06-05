@@ -47,10 +47,14 @@ export const Summary = ({ getWithdrawalsHandler, addWithdrawalHandler, getAmount
         const [visible, setVisible] = useState(false)
         const [type, setType] = useState('')
         const [reason, setReason ] = useState('')
+        const [file, setFile] = useState('')
         const updateType = t => {
             setType(t)
             setVisible(true)
         }
+        useEffect(()=>{
+            console.log({file});
+        },[file])
         const submitHandler = e => {
             let formData = new FormData()
             let _data = {...data, status: type === 'accept' ? 'transferred' :  'canceled', rejection_reason: reason? reason === 'other' ? e.target.rejection_reason_other.value : e.target.rejection_reason.value : null, document:  e.target.document?.files[0] }
@@ -78,13 +82,15 @@ export const Summary = ({ getWithdrawalsHandler, addWithdrawalHandler, getAmount
                     </CModalHeader>
                             <CForm onSubmit={submitHandler}>
                     <CRow className='justify-content-center align-items-center'>
-                        <CCol xs='auto'>
+                        <CCol xs='auto ' className='file-label'>
                                 {type === 'accept'&& <>
-                                <CFormLabel htmlFor='document' className='btn btn-primary'>{' '}
+                                <CFormLabel style={{margin:'auto'}} htmlFor='document' className='btn btn-primary'>{' '}
                                     <CIcon icon={cilFile} size='lg'/>
                                     upload document
                                     </CFormLabel>
-                                <CFormInput name='document' id='document' type='file' hidden onChange={e=> console.log(e.target.files)}/>
+                                <CFormInput name='document' id='document' type='file' hidden accept='.jpeg, .png, .pdf'  onChange={e=>setFile(e.target.files[0])}/>
+                               
+                                <CFormInput value={file?.name} readOnly placeholder='file name' />
                                 </>}
                                 {type === 'reject'&& <>
                                 <CFormLabel htmlFor='rejection' >rejection reason</CFormLabel>

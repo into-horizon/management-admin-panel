@@ -5,11 +5,8 @@ h4,
 h5,
 h6,
 strong,
-span,
 th,
-td,
 label,
-input::first-letter,
 button::first-letter {
     text-transform: capitalize;
 }
@@ -487,7 +484,8 @@ input[type=number]:out-of-range {
 .filter:hover{
     opacity: 1;
     background-color: #fff;
-    border: black solid 1px;
+    border: gray solid 1px;
+    border-radius: 2rem;
 
 }
 
@@ -530,4 +528,12 @@ input[type=number]:out-of-range {
 }
 .document:hover{
     background-color: aqua;
+}
+
+.file-label{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    row-gap: 1rem;
 }

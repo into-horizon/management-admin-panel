@@ -2,6 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 import cookie from 'react-cookies';
 import Auth from "../services/Auth"
 import Update from "src/services/Update";
+import { updateDialog } from "./globalDialog";
 const NewAuth = new Auth();
 const NewUpdate = new Update();
 
@@ -27,14 +28,13 @@ export const loginHandler = payload => async dispatch => {
         if (response.status === 200) {
             cookie.save('access_token', response.access_token, { path: '/' })
             cookie.save('refresh_token', response.refresh_token, { path: '/' })
-            // cookie.save('session_id', response.session_id, { path: '/' })
             let user = await NewAuth.getStore()
             dispatch(loginAction({ loggedIn: true, user: { ...user } }));
         } else {
-            dispatch(loginAction({ message: response.message }));
+            dispatch(updateDialog({message:response.message, title: 'incorrect credentials'}))
         }
     } catch (err) {
-        dispatch(loginAction({ message: 'you are not a seller' }));
+        dispatch(updateDialog({message:err.message, title: 'Login Error'}))
     }
 }
 export const getUser = () => async (dispatch) => {
@@ -46,7 +46,9 @@ export const getUser = () => async (dispatch) => {
             dispatch(logout())
         }
     } catch (error) {
+        dispatch(logout())
         dispatch(loginAction({ loggedIn: false, user: {} }))
+        throw new Error(error)
     }
 
 }
@@ -72,7 +74,6 @@ export const endSession = () => async (dispatch, state) => {
 export const updateInfo = info => async (dispatch, state) => {
     try {
         let response = await NewUpdate.updateInfo(info)
-        console.log(state())
         dispatch(loginAction({ user: { ...state().login.user, ...response.data } }))
 
     } catch (error) {

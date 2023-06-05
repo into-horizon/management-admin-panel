@@ -255,7 +255,6 @@ export const getProductReviews = payload => async (dispatch, state) =>{
             dispatch(addData({reviews: data}))
         }
     } catch (error) {
-        console.log("🚀 ~ file: product.js:258 ~ getProductReviews ~ error", error)
         dispatch(updateToast({status: 403, message: error, type: 'error'}))
     }
 }

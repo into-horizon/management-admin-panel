@@ -41,7 +41,7 @@ const AppHeaderDropdown = (props) => {
   return (
     <CDropdown variant="nav-item">
       <CDropdownToggle placement="bottom-end" className="py-0" caret={false}>
-        <CAvatar color="secondary" size="md" >{`${first_name.charAt(0).toUpperCase()}${last_name.charAt(0).toUpperCase()}`}</CAvatar>
+        <CAvatar color="secondary" size="md" >{`${first_name?.charAt(0).toUpperCase()}${last_name?.charAt(0).toUpperCase()}`}</CAvatar>
       </CDropdownToggle>
       <CDropdownMenu className="pt-0" placement="bottom-end">
         <CDropdownHeader className="bg-light fw-semibold py-2">Account</CDropdownHeader>
