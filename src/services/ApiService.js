@@ -89,21 +89,16 @@ export default class ApiService {
       return token
     }
     else {
-
-      let { refresh_token, access_token, status } = await this.post({endpoint:'refresh', management: true}, null, this.bearer(cookie.load('refresh_token',{ path: '/' }) ))
-      if (status === 200) {
-        // cookie.remove('access_token', { path: '/' })
-        // cookie.remove('refresh_token', { path: '/' })
+      try {
+        let { refresh_token, access_token, status } = await this.post({endpoint:'refresh', management: true}, null, this.bearer(cookie.load('refresh_token',{ path: '/' }) ))
         cookie.save('access_token', access_token, { path: '/' })
         cookie.save('refresh_token', refresh_token, { path: '/' })
-
+        
         return access_token
-      } else return endSession()
+      } catch (error) {
+          throw new Error(error)
+      }
     }
   }
-  // token(){
-  //   return 
-  // }
-
 }
 

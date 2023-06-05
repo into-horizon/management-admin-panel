@@ -69,6 +69,7 @@ const SellersOverview = lazy(() => import('./views/store/OverviewStores'))
 const PromoCodes =  lazy(()=> import('./views/promoCodes/PromoCodes'))
 const PendingProducts = lazy(()=> import('./views/product/PendingProducts'))
 const ProductReviews = lazy(()=> import('./views/product/ProductReviews'))
+const Employees =  lazy(()=> import('./views/employees/Overview'))
 const routes = [
   { path: '/', exact: true, name: 'Home' },
   { path: '/dashboard', name: 'Dashboard', component: Dashboard },
@@ -139,6 +140,7 @@ const routes = [
   { path: '/seller/new', name: 'Users Overview', component: NewSellers},
   { path: '/seller', name: 'Sellers', component: SellersOverview},
   { path: '/promo', name: 'Promo Codes', component: PromoCodes},
+  { path: '/employees', name: 'Employees', component: Employees},
   { path: '*', name: 'Error 404', component: Error404},
 
 ]

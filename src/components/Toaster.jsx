@@ -21,8 +21,8 @@ export const Toaster = () => {
           })
     }
     useEffect(()=>{
-      const toastType = status === 200 ? 'INFO': 'DANGER';
-      status && toastShow(toastType, message)
+      const toastType = type === 'error' ? 'DANGER': 'INFO' ;
+      type && toastShow(toastType, message)
       dispatch(resetState())
     },[status])
     return <></>

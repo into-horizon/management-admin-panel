@@ -30,10 +30,11 @@ const Login = (props) => {
   const { login, loginHandler } = props
   const { showAlert } = usePopup();
   const navigate = useNavigate()
-  const submitHandler = (e) => {
+  const submitHandler = async (e) => {
     setLoad(true)
     e.preventDefault()
-    loginHandler({ email: e.target.email.value, password: e.target.password.value })
+    await loginHandler({ email: e.target.email.value, password: e.target.password.value })
+    setLoad(false)
   }
   let currentPath = cookie.load(`current_path${sessionStorage.tabID}`)
   useEffect(() => {
@@ -120,10 +121,10 @@ const Login = (props) => {
                       </CCol>
                     </CRow>
                     <CRow className="justify-content-center">
-                     <CCol xs='auto'>
+                      <CCol xs='auto'>
 
-                      <CButton color='link' onClick={() => i18n.changeLanguage(i18n.language === 'en' ? 'ar' : 'en')}>{i18n.language === 'en' ? 'عربي' : 'English'}</CButton>
-                     </CCol>
+                        <CButton color='link' onClick={() => i18n.changeLanguage(i18n.language === 'en' ? 'ar' : 'en')}>{i18n.language === 'en' ? 'عربي' : 'English'}</CButton>
+                      </CCol>
                     </CRow>
                   </CForm>
                 </CCardBody>

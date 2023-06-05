@@ -335,7 +335,7 @@ useEffect(()=>{
                                     <option value='' disabled={parentCategories.length >0}>{t('parentCategory')}</option>
                                     {Children.toArray(
                                         parentCategories.map((val) =>
-                                            <option value={val.id}>{val[`${i18n.language}title`]}</option>
+                                            <option value={val.id}>{val.entitle}</option>
                                         )
 
                                     )}
@@ -346,7 +346,7 @@ useEffect(()=>{
 
                                     {Children.toArray(
                                         secondCategory.map((val) =>
-                                           <option value={val.id}>{val[`${i18n.language}title`]}</option>
+                                           <option value={val.id}>{val.entitle}</option>
                                        )
 
                                     )
@@ -358,7 +358,7 @@ useEffect(()=>{
                                     <option value=''>{t('grandChildCategory')}</option>
                                     {Children.toArray(
                                         thirdCategory.map((val) =>
-                                            <option value={val.id} >{val[`${i18n.language}title`]}</option>
+                                            <option value={val.id} >{val.entitle}</option>
                                         )
                                     )
                                     }
@@ -496,9 +496,7 @@ useEffect(()=>{
     )
 }
 
-const mapStateToProps = (state) => ({
 
-})
 
 const mapDispatchToProps = { addProductHandler, getParentCategoriesHandler, getChildCategoriesHandler, getGrandChildCategoriesHandler }
-export default connect(mapStateToProps, mapDispatchToProps)(AddProduct);
+export default connect(null, mapDispatchToProps)(AddProduct);

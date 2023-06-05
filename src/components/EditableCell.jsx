@@ -10,9 +10,9 @@ import {
   CTooltip,
 } from "@coreui/react";
 
-const EditableCell = ({ data, action, field, type='text', options=[] }) => {
+const EditableCell = ({ data, action, field, type = 'text', options = [] }) => {
   const [edit, setEdit] = useState(false);
-  const [cell, setCell] = useState(data[field]?? '');
+  const [cell, setCell] = useState(data[field] ?? '');
   const onChange = (e) => setCell(e.target.value);
   const submit = () => {
     let _data = { ...data };
@@ -20,7 +20,7 @@ const EditableCell = ({ data, action, field, type='text', options=[] }) => {
     action?.(_data);
     setEdit(false);
   };
-  const  onClose = ()=>{
+  const onClose = () => {
     setEdit(false)
     setCell(data[field])
   }
@@ -29,12 +29,12 @@ const EditableCell = ({ data, action, field, type='text', options=[] }) => {
       {edit ? (
         <CRow className="align-items-center justify-content-center">
           <CCol xs="auto">
-           {type === 'dropdown'&& <CFormSelect value={cell} onChange={onChange} > 
-           {
-            Children.toArray(options.map(option=> <option value={option.value}>{option.name}</option>))
-           }
+            {type === 'dropdown' && <CFormSelect value={cell} onChange={onChange} >
+              {
+                Children.toArray(options.map(option => <option value={option.value}>{option.name}</option>))
+              }
             </CFormSelect>}
-            {type === 'text' && <CFormInput  value={cell} onChange={onChange} />}
+            {type === 'text' && <CFormInput value={cell} onChange={onChange} />}
             {type === 'date' && <CFormInput type="date" value={cell} onChange={onChange} />}
           </CCol>
           <CCol xs="auto">
@@ -55,7 +55,7 @@ const EditableCell = ({ data, action, field, type='text', options=[] }) => {
       ) : (
         <CRow className="align-items-center">
           <CCol xs="auto">
-           {type === 'date'? <span>{new Date(cell).toLocaleDateString()}</span> :  <span>{String(cell?? "-") }</span>}
+            {type === 'date' ? <span>{new Date(cell).toLocaleDateString()}</span> : <span>{String(cell ?? "-")}</span>}
           </CCol>
 
           <CCol xs="auto">
@@ -65,7 +65,7 @@ const EditableCell = ({ data, action, field, type='text', options=[] }) => {
                 size="sm"
                 color="info"
               >
-                <CIcon icon={cilPencil} size='sm'/>
+                <CIcon icon={cilPencil} size='sm' />
               </CButton>
             </CTooltip>
           </CCol>
