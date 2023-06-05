@@ -96,7 +96,7 @@
     "stream-browserify": "^3.0.0",
     "util": "^0.12.4",
     "webpack": "^5.74.0",
-    "xlsx": "^0.18.5"
+     "xlsx": ">=0.19.3"
   },
   "resolutions": {
     "react-error-overlay": "6.0.9"
