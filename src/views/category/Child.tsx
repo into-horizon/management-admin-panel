@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, FormEvent } from "react";
 import { connect, useSelector } from "react-redux";
 import Table from "../../components/Table";
 import EditableCell from "src/components/EditableCell";
@@ -16,35 +16,46 @@ import { cilTrash, cilSearch, cilFilterX } from "@coreui/icons";
 import Category from "src/services/CategoryService";
 import SearchDropdown from "src/components/SearchDropdown";
 import FilterCard from "src/components/FilterCard";
+import { RootState } from "src/store";
 
 
-export const Child = ({
+type PropTypes = {
+  getChildCategoriesHandler : (p: ParamsType & {}) => Promise<void>,
+  updateChildCategory : (p:ChildAndGrandCategoriesType) =>  Promise<void>,
+  addChildCategoryHandler : (p:ChildAndGrandCategoriesType) =>  Promise<void>,
+  deleteChildCategoryHandler : (id: string) =>  Promise<void>,
+}
+ const Child = ({
   getChildCategoriesHandler,
   updateChildCategory,
   addChildCategoryHandler,
   deleteChildCategoryHandler,
-}) => {
+} :PropTypes) => {
   const {
     childCategories: { data, count }, parentCategories: { data: parentCategories, }
-  } = useSelector((state) => state.category);
-  const [params, setParams] = useState({ limit: 10, offset: 0 });
-  const [visible, setVisible] = useState(false);
+  } = useSelector((state : RootState) => state.category);
+  const [params, setParams] = useState<ParamsType>({ limit: 10, offset: 0 });
   const [parentData, setParentData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [tableLoading, setTableLoading] = useState(true)
-  const [selectedValue, setSelectedValue] = useState({})
+  const [selectedValue, setSelectedValue] = useState<ParentCategoriesType| null>(null)
+
   useEffect(() => {
     Promise.all([getChildCategoriesHandler(params)]).then(() => setTableLoading(false))
   }, [])
   const DeleteButton = ({ id }) => {
+    const [visible, setVisible] = useState(false);
+    const deleteHandler =async () => {
+        await deleteChildCategoryHandler(id)
+        await getChildCategoriesHandler(params)
+        setVisible(false)
+    }
     return (
       <React.Fragment>
         <DeleteModal
           visible={visible}
           onClose={() => setVisible(false)}
-          onDelete={deleteChildCategoryHandler}
-          id={id}
-          params={params}
+          onDelete={deleteHandler}
         />
         <CTooltip content="Delete">
           <CButton color="danger" onClick={() => setVisible(true)}>
@@ -58,14 +69,14 @@ export const Child = ({
     {
       header: "english title",
       field: "entitle",
-      body: (e) => (
+      body: (e : ChildAndGrandCategoriesType) => (
         <EditableCell data={e} field="entitle" action={updateChildCategory} />
       ),
     },
     {
       header: "arabic title",
       field: "artitle",
-      body: (e) => (
+      body: (e : ChildAndGrandCategoriesType) => (
         <EditableCell data={e} field="artitle" action={updateChildCategory} />
       ),
     },
@@ -74,16 +85,16 @@ export const Child = ({
     {
       header: "meta title",
       field: "metatitle",
-      body: (e) => (
+      body: (e : ChildAndGrandCategoriesType) => (
         <EditableCell data={e} field="metatitle" action={updateChildCategory} />
       ),
     },
     { header: "actions", body: DeleteButton },
   ];
-  const onSelect = (e) => {
+  const onSelect = (e : ParentCategoriesType) => {
     setSelectedValue(e)
   };
-  const getParent = async (title) => {
+  const getParent = async (title : string) => {
     setLoading(true);
     let {
       data: { data },
@@ -93,22 +104,29 @@ export const Child = ({
     setLoading(false);
     setParentData(data);
   };
-  const onChange = (e) => {
+  const onChange = (e : string) => {
     setTimeout(() => getParent(e), 1000);
   };
 
 
-  const submitHandler = e => {
+  const submitHandler = (e: FormEvent<HTMLFormElement>)  => {
     e.preventDefault()
-
+    const target = e.target as typeof e.target & {
+      title: {value: string}
+      reset(): void
+    }
     let data = {}
-    selectedValue.id && (data['parent_id'] = selectedValue.id)
-    e.target.title.value && (data['title'] = e.target.title.value)
+    selectedValue?.id && (data['parent_id'] = selectedValue.id)
+    target.title.value && (data['title'] = target.title.value)
     getChildCategoriesHandler(data)
   }
-  const resetFilter = (e) => {
-    setSelectedValue({})
-    e.target.reset()
+  const resetFilter = (e : FormEvent<HTMLFormElement> ) => {
+    const target = e.target as typeof e.target & {
+      title: {value: string}
+      reset(): void
+    }
+    setSelectedValue(null)
+    target.reset()
     getChildCategoriesHandler(params)
   }
   useEffect(() => {
@@ -119,7 +137,7 @@ export const Child = ({
       <AddCategoryModal
         action={addChildCategoryHandler}
         type="child"
-        params={params}
+       
       />
       <FilterCard>
         <CForm onSubmit={submitHandler} onReset={resetFilter}>
@@ -129,14 +147,14 @@ export const Child = ({
             </CCol>
             <CCol xs='auto'>
               <SearchDropdown
-                options={parentData.map((x) => {
+                options={parentData.map((x : ChildAndGrandCategoriesType) => {
                   return { id: x.id, title: `${x.entitle} - ${x.artitle}` };
                 })}
                 onSelect={onSelect}
                 loading={loading}
                 onChange={onChange}
                 placeholder="search for parent category"
-                reset={!selectedValue.id}
+                reset={!selectedValue?.id}
               />
             </CCol>
             <CCol xs="auto">
@@ -173,7 +191,6 @@ export const Child = ({
   );
 };
 
-const mapStateToProps = (state) => ({});
 
 const mapDispatchToProps = {
   getChildCategoriesHandler,
@@ -182,4 +199,4 @@ const mapDispatchToProps = {
   deleteChildCategoryHandler,
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(Child);
+export default connect(null, mapDispatchToProps)(Child);

@@ -1,8 +1,8 @@
 import { createSlice } from "@reduxjs/toolkit";
-import cookie from "react-cookies";
 
 import Category from "../services/CategoryService";
 import { updateToast } from "./globalToasts";
+import { AppDispatch } from ".";
 
 const category = createSlice({
   name: "Category",
@@ -25,43 +25,49 @@ const category = createSlice({
 });
 
 export const getParentCategoriesHandler =
-  (payload) => async (dispatch, state) => {
+  (payload : ParamsType) => async (dispatch: AppDispatch) => {
     try {
       let { data } = await Category.getAllParentCategoires(payload);
       dispatch(getParentCategories(data));
     } catch (error) {
-      dispatch(
-        updateToast({ status: 403, message: error.message, type: "error" })
-      );
+      if(error instanceof Error) {
+        dispatch(
+          updateToast({ status: 403, message: error.message, type: "error" })
+        )
+      }
     }
   };
 
 export const getChildCategoriesHandler =
-  (payload) => async (dispatch, state) => {
+  (payload : ParamsType) => async (dispatch: AppDispatch) => {
     try {
       let { data } = await Category.getAllChildCategoires(payload);
       dispatch(getChildCategories(data));
     } catch (error) {
-      dispatch(
-        updateToast({ status: 403, message: error.message, type: "error" })
-      );
+      if(error instanceof Error) {
+        dispatch(
+          updateToast({ status: 403, message: error.message, type: "error" })
+        )
+      }
     }
   };
 
 export const getGrandChildCategoriesHandler =
-  (payload) => async (dispatch, state) => {
+  (payload : ParamsType) => async (dispatch : AppDispatch) => {
     try {
       let { data } = await Category.getAllGrandChildCategoires(payload);
       dispatch(getGrandChildCategories(data));
     } catch (error) {
-      dispatch(
-        updateToast({ status: 403, message: error.message, type: "error" })
-      );
+      if(error instanceof Error) {
+        dispatch(
+          updateToast({ status: 403, message: error.message, type: "error" })
+        )
+      }
     }
   };
 
 export const updateGrandChildCategory =
-  (payload) => async (dispatch, state) => {
+  (payload : ChildAndGrandCategoriesType) => async (dispatch : AppDispatch, state: ()=> RootState) => {
     const { data, count } = state().category.grandChildCategories;
     try {
       let {
@@ -70,7 +76,7 @@ export const updateGrandChildCategory =
         status,
       } = await Category.updateGrandChildCategory(payload);
       if (status === 200) {
-        let newData = data.map((val) => {
+        let newData = data.map((val : ChildAndGrandCategoriesType) => {
           if (item.id === val.id) {
             return { ...val, ...item };
           } else return val;
@@ -84,12 +90,14 @@ export const updateGrandChildCategory =
           updateToast({ status: status, message: message, type: "error" })
         );
     } catch (e) {
-      dispatch(
-        updateToast({ status: 403, message: error.message, type: "error" })
-      );
+      if(e instanceof Error) {
+        dispatch(
+          updateToast({ status: 403, message: e.message, type: "error" })
+        )
+      }
     }
   };
-export const updateChildCategory = (payload) => async (dispatch, state) => {
+export const updateChildCategory = (payload : ChildAndGrandCategoriesType) => async (dispatch: AppDispatch , state: ()=> RootState) => {
   const { data, count } = state().category.childCategories;
   try {
     let {
@@ -112,12 +120,15 @@ export const updateChildCategory = (payload) => async (dispatch, state) => {
         updateToast({ status: status, message: message, type: "error" })
       );
   } catch (e) {
-    dispatch(
-      updateToast({ status: 403, message: error.message, type: "error" })
-    );
+    if(e instanceof Error) {
+
+      dispatch(
+        updateToast({ status: 403, message: e.message, type: "error" })
+      );
+    }
   }
 };
-export const updateParentCategory = (payload) => async (dispatch, state) => {
+export const updateParentCategory = (payload : ParentCategoriesType) => async (dispatch : AppDispatch, state : ()=> RootState) => {
   const { data, count } = state().category.parentCategories;
   try {
     let {
@@ -140,124 +151,133 @@ export const updateParentCategory = (payload) => async (dispatch, state) => {
         updateToast({ status: status, message: message, type: "error" })
       );
   } catch (e) {
-    dispatch(
-      updateToast({ status: 403, message: error.message, type: "error" })
-    );
+    if(e instanceof Error) {
+      dispatch(
+        updateToast({ status: 403, message: e.message, type: "error" })
+      );
+    }
   }
 };
 
 export const addParentCategoryHandler =
-  (payload, params) => async (dispatch) => {
+  (payload : ParentCategoriesType) => async (dispatch : AppDispatch) => {
     try {
       let { message, data, status } = await Category.addParentCategory(payload);
       if (status === 200) {
         dispatch(
           updateToast({ status: status, message: message, type: "create" })
         );
-        dispatch(getParentCategoriesHandler(params));
+       
       } else {
         dispatch(
           updateToast({ status: status, message: message, type: "error" })
         );
       }
     } catch (error) {
-      dispatch(
-        updateToast({ status: 403, message: error.message, type: "error" })
-      );
+      if(error instanceof Error) {
+        dispatch(
+          updateToast({ status: 403, message: error.message, type: "error" })
+        )
+      }
     }
   };
 export const addChildCategoryHandler =
-  (payload, params) => async (dispatch) => {
+  (payload : ChildAndGrandCategoriesType) => async (dispatch : AppDispatch) => {
     try {
       let { message, data, status } = await Category.addChildCategory(payload);
       if (status === 200) {
         dispatch(
           updateToast({ status: status, message: message, type: "create" })
         );
-        dispatch(getChildCategoriesHandler(params));
       } else
         dispatch(
           updateToast({ status: status, message: message, type: "error" })
         );
     } catch (error) {
-      dispatch(
-        updateToast({ status: 403, message: error.message, type: "error" })
-      );
+      if(error instanceof Error) {
+        dispatch(
+          updateToast({ status: 403, message: error.message, type: "error" })
+        )
+      }
     }
   };
 export const addGrandchildCategoryHandler =
-  (payload, params) => async (dispatch) => {
+  (payload : ChildAndGrandCategoriesType) => async (dispatch : AppDispatch) => {
     try {
       let { message, data, status } = await Category.addGrandChildCategory(
         payload
       );
       if (status === 200) {
         dispatch(updateToast({ status: status, message: message, type: "create" }));
-        dispatch(getGrandChildCategoriesHandler(params));
       } else
         dispatch(
           updateToast({ status: status, message: message, type: "error" })
         );
     } catch (error) {
-      dispatch(
-        updateToast({ status: 403, message: error.message, type: "error" })
-      );
+      if(error instanceof Error) {
+        dispatch(
+          updateToast({ status: 403, message: error.message, type: "error" })
+        )
+      }
     }
   };
 
-export const deleteGrandchildCategoryHandler = (payload, params) => async (dispatch) => {
+export const deleteGrandchildCategoryHandler = (payload : string) => async (dispatch: AppDispatch) => {
     try {
       let { message, data, status } = await Category.deleteGrandChildCategory(payload );
       if (status === 200) {
         dispatch(updateToast({ status: status, message: message, type: "delete" }));
-        dispatch(getGrandChildCategoriesHandler(params));
       } else
         dispatch(
           updateToast({ status: status, message: message, type: "error" })
         );
     } catch (error) {
-      dispatch(
-        updateToast({ status: 403, message: error.message, type: "error" })
-      );
+      if(error instanceof Error) {
+        dispatch(
+          updateToast({ status: 403, message: error.message, type: "error" })
+        )
+      }
     }
   };
 
   export const deleteChildCategoryHandler =
-  (payload, params) => async (dispatch) => {
+  (payload : string) => async (dispatch :AppDispatch) => {
     try {
       let { message, data, status } = await Category.deleteChildCategory(payload);
       if (status === 200) {
         dispatch( updateToast({ status: status, message: message, type: "delete" }) );
-        dispatch(getChildCategoriesHandler(params));
       } else
         dispatch(
           updateToast({ status: status, message: message, type: "error" })
         );
     } catch (error) {
-      dispatch(
-        updateToast({ status: 403, message: error.message, type: "error" })
-      );
+      if(error instanceof Error) {
+        dispatch(
+          updateToast({ status: 403, message: error.message, type: "error" })
+        )
+      }
     }
   };
 
   export const deleteParentCategoryHandler =
-  (payload, params) => async (dispatch) => {
+  (payload : string ) => async (dispatch :AppDispatch) => {
     try {
       let { message, data, status } = await Category.deleteParentCategory(payload);
       if (status === 200) {
         dispatch(
           updateToast({ status: status, message: message, type: "delete" })
         );
-        dispatch(getParentCategoriesHandler(params));
       } else {
         dispatch(
           updateToast({ status: status, message: message, type: "error" })
         );
       }
     } catch (error) {
-      dispatch(
-        updateToast({ status: 403, message: error.message, type: "error" })
-      );
+      if(error instanceof Error) {
+        dispatch(
+          updateToast({ status: 403, message: error.message, type: "error" })
+        )
+      }
     }
   };
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, Children } from "react";
+import React, { useState, useEffect, Children, ChangeEvent } from "react";
 import {
   CCol,
   CFormInput,
@@ -8,6 +8,15 @@ import {
   CSpinner,
 } from "@coreui/react";
 
+
+type PropTypes ={
+  options :  {title: string, id: string}[],
+  onSelect: (d:any) => void ,
+  onChange : (d: string) => void,
+  loading : boolean,
+  placeholder? : string,
+  reset? : boolean,
+}
 const SearchDropdown = ({
   options,
   onSelect,
@@ -15,29 +24,27 @@ const SearchDropdown = ({
   loading,
   placeholder,
   reset,
-  id,
-  c = "",
-}) => {
+} :PropTypes) => {
   const [className, setClassName] = useState("floating-dropdown-hide");
   const [value, setValue] = useState({ title: "" });
-  const [array, setArray] = useState([]);
+  const [array, setArray] = useState<{title:string, disabled: boolean}[] | {title: string, id: string}[]>([]);
   const showDropdown = () => {
     setClassName("floating-dropdown-show");
   };
 
-  const onSelectValue = (e) => {
+  const onSelectValue = (e : typeof options[0]) => {
     setValue(e);
     setClassName("floating-dropdown-hide");
     onSelect(e);
   };
-  const onChangeValue = (e) => {
+  const onChangeValue = (e :ChangeEvent<HTMLInputElement> ) => {
     setValue({ title: e.target.value });
     onChange && onChange(e.target.value);
   };
 
   document.addEventListener("click", () => {
     className === "floating-dropdown-show" &&
-      !document.activeElement.className.includes("dropdown-input") &&
+      !document.activeElement?.className.includes("dropdown-input") &&
       setClassName("floating-dropdown-hide");
   });
   const resetValue = () => {
@@ -49,10 +56,10 @@ const SearchDropdown = ({
 
   useEffect(() => {
     !loading &&
-    document.activeElement.className.includes("dropdown-input") &&
+    document.activeElement?.className.includes("dropdown-input") &&
     options.length === 0
       ? setArray([{ title: "no results found", disabled: true }])
-      : setArray(options) && showDropdown();
+      : () =>  {setArray(options) ; showDropdown()};
   }, [options]);
   return (
     // <CRow className={`justify-content-center ${c}`} id={id}>

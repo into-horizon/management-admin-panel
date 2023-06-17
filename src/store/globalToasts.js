@@ -10,12 +10,6 @@ const globalToasts = createSlice({
     updateToast(state, action) {
       return { ...action.payload };
     },
-    // createToast(state, action) {
-    //   return { ...state, create: action.payload };
-    // },
-    // deleteToast(state, action) {
-    //   return { ...state, delete: action.payload };
-    // },
     
     resetState(){
       return {...initialState}

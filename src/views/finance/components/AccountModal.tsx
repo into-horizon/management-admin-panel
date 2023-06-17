@@ -1,17 +1,31 @@
-import React, { useState, useEffect } from 'react'
+import React from 'react'
 import { connect } from 'react-redux'
 import { useTranslation } from 'react-i18next';
 import { CButton, CModal, CModalHeader, CModalTitle, CModalFooter, CForm, CFormInput, CFormSelect, CRow, CCol } from '@coreui/react'
 import { addAccountHandler, updateAccountHandler } from 'src/store/bankAccount'
 
-export const AccountModal = ({ add, update ,addAccountHandler, updateAccountHandler ,account, onClose}) => {
+type PropsTypes = {
+    add?: boolean,
+    update?: boolean,
+    addAccountHandler?: (a: { type: string, title: string, reference: string }) => void,
+    updateAccountHandler?: (a: { type: string, title: string, reference: string, id: string }) => void,
+    account?: AccountType,
+    onClose: () => void
+}
+export const AccountModal = ({ add, update, addAccountHandler, updateAccountHandler, account, onClose }: PropsTypes) => {
     const { t: g } = useTranslation('translation', { keyPrefix: 'globals' })
     const { t } = useTranslation('translation', { keyPrefix: 'bankAccount' })
-    const submitHandler = e => {
+    const submitHandler = (e: React.FormEvent<HTMLFormElement>) => {
+        const target = e.target as typeof e.target & {
+            title: { value: string };
+            type: { value: string };
+            referenceNumber: { value: string }
+        };
         e.preventDefault()
-        let obj = { title: e.target.title.value, type: e.target.type.value, reference: e.target.referenceNumber.value }
-        Promise.all([update ? updateAccountHandler({ ...obj, id: account.id }) : addAccountHandler(obj)]).then(onClose)
+        let obj: { type: string, title: string, reference: string } = { title: target.title.value, type: target.type.value, reference: target.referenceNumber.value }
+        Promise.all([update && account ? updateAccountHandler?.({ ...obj, id: account?.id }) : addAccountHandler?.(obj)]).then(() => onClose())
     }
+    
     return (
         <CModal
             onClose={onClose}
@@ -25,10 +39,10 @@ export const AccountModal = ({ add, update ,addAccountHandler, updateAccountHand
                 <CRow xs={{ gutterY: 3 }} className="mrgn50 justify-content-md-center">
                     <CCol xs={8}>
 
-                        <CFormInput id='title' placeholder={t('title')} required defaultValue={account.title} />
+                        <CFormInput id='title' placeholder={t('title')} required defaultValue={account? account.title: ''} />
                     </CCol>
                     <CCol xs={8}>
-                        <CFormSelect id='type' required defaultValue={account.type}>
+                        <CFormSelect id='type' required defaultValue={account? account.type: ''}>
                             <option value='bank Account'>{t('bankAccount')}</option>
                             <option value='Cliq'>{t('cliq')}</option>
                             <option value='e-wallet'>{t('ewallet')}</option>
@@ -36,7 +50,7 @@ export const AccountModal = ({ add, update ,addAccountHandler, updateAccountHand
 
                     </CCol>
                     <CCol xs={8}>
-                        <CFormInput id='referenceNumber' placeholder={t('reference')} defaultValue={account.reference} required />
+                        <CFormInput id='referenceNumber' placeholder={t('reference')} defaultValue={account? account.reference: ''} required />
                     </CCol>
 
                 </CRow>
@@ -51,6 +65,6 @@ export const AccountModal = ({ add, update ,addAccountHandler, updateAccountHand
 
 const mapStateToProps = (state) => ({})
 
-const mapDispatchToProps = {addAccountHandler, updateAccountHandler }
+const mapDispatchToProps = { addAccountHandler, updateAccountHandler }
 
 export default connect(mapStateToProps, mapDispatchToProps)(AccountModal)

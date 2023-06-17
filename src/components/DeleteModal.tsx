@@ -10,10 +10,21 @@ import React from "react";
 import { connect } from "react-redux";
 import { useTranslation } from "react-i18next";
 
-export const DeleteModal = ({ visible, onClose, onDelete, id, params }) => {
+
+type PropTypes = {
+  visible: boolean,
+  onClose: () => void,
+  onDelete: (s?: string | { id?: string }) => void,
+  id?: string ,
+}
+export const DeleteModal = ({ visible, onClose, onDelete, id }:PropTypes)  => {
   const { t } = useTranslation("translation", { keyPrefix: "globals" });
   const deleteHandler = () => {
-    Promise.all([onDelete({ id: id }, params)]);
+    if(id) {
+      onDelete(id)
+    } else {
+      onDelete()
+    }
     onClose();
   };
   return (
@@ -40,8 +51,7 @@ export const DeleteModal = ({ visible, onClose, onDelete, id, params }) => {
   );
 };
 
-const mapStateToProps = (state) => ({});
 
 const mapDispatchToProps = {};
 
-export default connect(mapStateToProps, mapDispatchToProps)(DeleteModal);
+export default connect(null, mapDispatchToProps)(DeleteModal);

@@ -1,66 +1,64 @@
 import ApiService from "./ApiService";
 
- class CategoryService extends ApiService {
+class CategoryService extends ApiService {
+    private path : string
     constructor() {
         super();
         this.path = "api/admin/category";
     }
-    params(data) {
-        return {limit:10, offset: 0, ...data}
-    }
-
-    async getAllParentCategoires(data) {
+   
+    async getAllParentCategoires(data? : ParamsType & {}) {
 
         try {
             let res = await this.get(`${this.path}/parent`, data);
             return res;
         } catch (error) {
-            throw new Error(error.message);
+           return error
         }
     }
-    async getAllChildCategoires(data) {
+    async getAllChildCategoires(data? : ParamsType &{}) {
 
         try {
             let res = await this.get(`${this.path}/child`, data);
             return res;
         } catch (error) {
-            throw new Error(error.message);
+           return error
         }
     }
-    async getAllGrandChildCategoires(data) {
+    async getAllGrandChildCategoires(data? : ParamsType &{}) {
 
         try {
             let res = await this.get(`${this.path}/grandchild`, data);
             return res;
         } catch (error) {
-            throw new Error(error.message);
+            return error
         }
     }
-    async updateGrandChildCategory(data) {
+    async updateGrandChildCategory(data :ChildAndGrandCategoriesType) {
         try {
-            let res = this.update( `${this.path}/grandchild`, data)
+            let res = this.update(`${this.path}/grandchild`, data)
             return res
         } catch (error) {
             return error
         }
     }
-    async updateParentCategory(data) {
+    async updateParentCategory(data : ParentCategoriesType) {
         try {
-            let res = this.update( `${this.path}/parent`, data)
+            let res = this.update(`${this.path}/parent`, data)
             return res
         } catch (error) {
             return error
         }
     }
-    async updateChildCategory(data) {
+    async updateChildCategory(data : ChildAndGrandCategoriesType) {
         try {
-            let res = this.update( `${this.path}/child`, data)
+            let res = this.update(`${this.path}/child`, data)
             return res
         } catch (error) {
             return error
         }
     }
-    async addGrandChildCategory(data) {
+    async addGrandChildCategory(data : ChildAndGrandCategoriesType) {
         try {
             let res = this.post(`${this.path}/grandchild`, data)
             return res
@@ -68,7 +66,7 @@ import ApiService from "./ApiService";
             return error
         }
     }
-    async addChildCategory(data) {
+    async addChildCategory(data : ChildAndGrandCategoriesType) {
         try {
             let res = this.post(`${this.path}/child`, data)
             return res
@@ -76,7 +74,7 @@ import ApiService from "./ApiService";
             return error
         }
     }
-    async addParentCategory(data) {
+    async addParentCategory(data : ParentCategoriesType) {
         try {
             let res = this.post(`${this.path}/parent`, data)
             return res
@@ -84,7 +82,7 @@ import ApiService from "./ApiService";
             return error
         }
     }
-    async deleteGrandChildCategory({id}) {
+    async deleteGrandChildCategory(id : string) {
         try {
             let res = this.delete(`${this.path}/grandchild/${id}`)
             return res
@@ -92,7 +90,7 @@ import ApiService from "./ApiService";
             return error
         }
     }
-    async deleteChildCategory({id}) {
+    async deleteChildCategory(id : string) {
         try {
             let res = this.delete(`${this.path}/child/${id}`)
             return res
@@ -100,7 +98,7 @@ import ApiService from "./ApiService";
             return error
         }
     }
-    async deleteParentCategory({id}) {
+    async deleteParentCategory(id: string) {
         try {
             let res = this.delete(`${this.path}/parent/${id}`)
             return res

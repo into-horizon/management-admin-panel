@@ -9,7 +9,7 @@ const store = createSlice({
     pending: { data: [], count: 0 },
     overview: { data: [], count: 0 },
     searched: [], 
-    populatedStore: load('populated-store', {path: '/'})?JSON.parse(load('populated-store', {path: '/'})):{}
+    populatedStore: load('populated-store')?JSON.parse(load('populated-store')):{}
   },
   reducers: {
     addData(state, action) {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, Children } from "react";
+import React, { useState, useEffect, Children, FormEvent } from "react";
 import { connect, useSelector } from "react-redux";
 import Table from "../../components/Table";
 import {
@@ -8,7 +8,7 @@ import {
   deleteGrandchildCategoryHandler,
 } from "src/store/category";
 import CIcon from "@coreui/icons-react";
-import { cilTrash, cilSearch,cilFilterX } from "@coreui/icons";
+import { cilTrash, cilSearch, cilFilterX } from "@coreui/icons";
 import {
   CButton,
   CCol,
@@ -20,9 +20,9 @@ import {
 import EditableCell from "src/components/EditableCell";
 import AddCategoryModal from "src/components/AddCategoryModal";
 import DeleteModal from "src/components/DeleteModal";
-import SelectSearch from "react-select-search";
 import Category from "src/services/CategoryService";
 import SearchDropdown from "src/components/SearchDropdown";
+import { RootState } from "src/store";
 
 
 export const Grandchild = ({
@@ -33,25 +33,30 @@ export const Grandchild = ({
 }) => {
   const {
     grandChildCategories: { data, count },
-  } = useSelector((state) => state.category);
-  const [params, setParams] = useState({ limit: 10, offset: 0 });
+  } = useSelector((state : RootState) => state.category);
+  const [params, setParams] = useState<ParamsType & {}>({ limit: 10, offset: 0 });
   const [visible, setVisible] = useState(false);
-  const [childData, setChildData] = useState([]);
-  const [value, setValue] = useState({})
+  const [childData, setChildData] = useState<ChildAndGrandCategoriesType[]>([]);
+  const [value, setValue] = useState<{id?:string}>({})
   const [loading, setLoading] = useState(true);
-  const [searchLoading, setSearchLoading] =  useState(false)
-  useEffect(()=>{
-    getGrandChildCategoriesHandler(params).then(()=> setLoading(false))
-  },[])
+  const [searchLoading, setSearchLoading] = useState(false)
+  useEffect(() => {
+    getGrandChildCategoriesHandler(params).then(() => setLoading(false))
+  }, [])
   const DeleteButton = ({ id }) => {
+
+    const deleteHandler = async () =>{
+      await deleteGrandchildCategoryHandler(id)
+      await getGrandChildCategoriesHandler(params)
+      setVisible(false)
+    }
     return (
       <React.Fragment>
         <DeleteModal
           visible={visible}
           onClose={() => setVisible(false)}
-          onDelete={deleteGrandchildCategoryHandler}
-          id={id}
-          params={params}
+          onDelete={deleteHandler}
+          id={undefined}    
         />
         <CTooltip content="Delete">
           <CButton color="danger" onClick={() => setVisible(true)}>
@@ -100,27 +105,29 @@ export const Grandchild = ({
     { header: "actions", body: DeleteButton },
   ];
 
-  const getChild = async (title) =>{
+  const getChild = async (title : string) => {
     let {
-          data: { data },
-        } = await Category.getAllChildCategoires({title : title});
-        setChildData(data);
-        setSearchLoading(false)
+      data: { data  },
+    } = await Category.getAllChildCategoires({ title: title });
+    setChildData(data);
+    setSearchLoading(false)
   }
-  const submitHandler = e => {
+  const submitHandler = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    let data = {}
-    e.target.title.value&& (data.title=  e.target.title.value)
+    const target = e.target as typeof e.target & {title: {value: string}}
+    let data :{title?: string, parent_id?: string} = {}
+    target.title.value && (data.title = target.title.value)
     value.id && (data.parent_id = value.id)
-    getGrandChildCategoriesHandler({...params,...data})
+    getGrandChildCategoriesHandler({ ...params, ...data })
   }
 
-  const clearFilter = (e)=>{
-    e.target.reset()
+  const clearFilter = (e:FormEvent<HTMLFormElement>) => {
+    const target  = e.target as typeof e.target & {reset: ()=> void}
+    target.reset()
     getGrandChildCategoriesHandler(params)
     setValue({})
   }
-  const onChange = (e) => {
+  const onChange = (e ) => {
     setSearchLoading(true)
     setTimeout(() => getChild(e), 1000);
   };
@@ -129,7 +136,6 @@ export const Grandchild = ({
       <AddCategoryModal
         type="grandchild"
         action={addGrandchildCategoryHandler}
-        params={params}
       />
       <div className="card padding mrgn25">
         <CForm onSubmit={submitHandler} onReset={clearFilter}>
@@ -138,7 +144,7 @@ export const Grandchild = ({
             xs={{ gutter: 1 }}
           >
             <CCol xs="auto">
-              <CFormInput id="title" placeholder="title"/>
+              <CFormInput id="title" placeholder="title" />
             </CCol>
             <CCol xs="auto">
               {Children.toArray(
@@ -152,7 +158,7 @@ export const Grandchild = ({
                   placeholder="select child category"
                   onChange={onChange}
                   reset={!value.id}
-                  onSelect={e=> setValue(e)}
+                  onSelect={e => setValue(e)}
                   loading={searchLoading}
                 />
               )}
@@ -166,7 +172,7 @@ export const Grandchild = ({
             </CCol>
             <CCol xs="auto">
               <CTooltip content="clear filter">
-                <CButton color="secondary"  type="reset">
+                <CButton color="secondary" type="reset">
                   <CIcon icon={cilFilterX} />
                 </CButton>
               </CTooltip>
@@ -190,7 +196,6 @@ export const Grandchild = ({
   );
 };
 
-const mapStateToProps = (state) => ({});
 
 const mapDispatchToProps = {
   getGrandChildCategoriesHandler,
@@ -199,4 +204,4 @@ const mapDispatchToProps = {
   deleteGrandchildCategoryHandler,
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(Grandchild);
+export default connect(null, mapDispatchToProps)(Grandchild);

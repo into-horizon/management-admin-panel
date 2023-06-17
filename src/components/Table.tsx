@@ -1,4 +1,4 @@
-import React, { useState, useEffect, Children, ReactPropTypes } from 'react'
+import React, { useState, useEffect, Children,  Component, } from 'react'
 import Paginator from './Paginator'
 import { CTable, CTableHead, CTableRow, CTableHeaderCell, CTableBody, CTableDataCell, CFormCheck, CSpinner, CRow, CCol, CFormSelect, CFormLabel, CButton, CTooltip, CFormInput } from '@coreui/react'
 import _ from 'lodash'
@@ -7,31 +7,51 @@ import CIcon from '@coreui/icons-react'
 import { cilCheck, cilPen, cilX } from '@coreui/icons'
 import TableEditCell from './TableEditCell'
 
+type PropTypes = {
+    updateLoading: React.Dispatch<React.SetStateAction<boolean>>
+    params: {limit?:number, offset?: number} & {}
+    count: number
+    columns: {header: string, field?: string | undefined, body?: React.FC<any>  , edit?: {inputType: string, options: {value: string, name: string}[]}}[]
+    data: {id?: string}[]
+    changeData: (p:ParamsType)=> Promise<void>
+    cookieName: string
+    style?: React.CSSProperties
+    emptyMessage?: string
+    checkbox?: boolean
+    onSelect?: ({})=>  []
+    updateParams ?:React.Dispatch<React.SetStateAction<{}>>
+    loading?: boolean
+    displayedItems?: boolean
+    pagination?: boolean
+    editable?: boolean | undefined
+    editFn?:  ({}) => {}
+    Actions?: typeof Component
 
-export const Table = ({ updateLoading, params, count, columns = [], data = [], changeData, cookieName, style, emptyMessage, checkbox, onSelect, updateParams, loading, displayedItems, pagination = true, editable, editFn, Actions }) => {
-    const [selected, setSelected] = useState([])
-    const [onEdit, setOnEdit] = useState('')
-    const [item, setItem] = useState({})
-    const onChange = e => {
+}
+export const Table = ({ updateLoading, params, count, columns, data , changeData, cookieName, style, emptyMessage, checkbox, onSelect, updateParams, loading, displayedItems, pagination = true, editable, editFn, Actions }:PropTypes)  => {
+    const [selected, setSelected] = useState< (string| undefined |{})[]>([])
+    const [onEdit, setOnEdit] = useState<string| null| number >('')
+    const [item, setItem] = useState<{}>({})
+    const onChange = (e : React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.checked) {
             setSelected(x => [...x, e.target.value])
         } else {
             setSelected(x => x.filter(w => w !== e.target.value))
         }
     }
-    const selectAll = (e) => {
+    const selectAll = (e : React.ChangeEvent<HTMLInputElement>)=> {
         if (e.target.checked) {
             setSelected(data.map(s => s.id))
         } else {
             setSelected([])
         }
     }
-    let displayItems = _.range(5, 100, 5)
+    let displayItems :number[] = _.range(5, 100, 5)
     useEffect(() => {
         checkbox && onSelect?.(selected)
     }, [selected])
 
-    const changeHandler = e => {
+    const changeHandler = (e: React.ChangeEvent<HTMLSelectElement>) => {
         updateParams?.(x => {
             changeData({ ...x, limit: Number(e.target.value) })
             return { ...x, limit: Number(e.target.value) }
@@ -39,44 +59,39 @@ export const Table = ({ updateLoading, params, count, columns = [], data = [], c
 
     }
 
-    const updateItem = e => {
+    const updateItem = (e:  React.ChangeEvent<HTMLInputElement | HTMLSelectElement> ) : void => {
         setItem(x => { return { ...x, [e.target.id]: e.target.value } })
     }
     const editClick = () => {
-        Promise.all([editFn(item)]).then(() => setOnEdit(''))
+       editFn && Promise.all([editFn(item)]).then(() => setOnEdit(''))
     }
 
-    const CloneActions = ({ data, children }) => {
-        return (
-            React.cloneElement(children, data)
-        )
-    }
+    
     return (
         <>
             <div className='overflow-x'>
-
                 <CTable style={style} striped>
                     <CTableHead>
                         <CTableRow>
                             {checkbox && <CTableDataCell><CFormCheck onChange={selectAll} /></CTableDataCell>}
-                            {Children.toArray(columns.map(({ header }) =>
+                            {Children.toArray(columns.map(({ header  } ) =>
                                 <CTableHeaderCell scope="col">{header}</CTableHeaderCell>
                             ))}
-                            <CTableHeaderCell>Actions</CTableHeaderCell>
+                            {(editable || Actions) && <CTableHeaderCell>Actions</CTableHeaderCell>}
                         </CTableRow>
 
                     </CTableHead>
                     <CTableBody>
-                        {!loading && Children.toArray(data.map((d, i) =>
+                        {!loading && Children.toArray(data.map((d, i)  =>
                             <CTableRow>
                                 {checkbox && <CTableDataCell><CFormCheck value={d.id} onChange={onChange} checked={selected.includes(d.id)} /></CTableDataCell>}
-                                {Children.toArray(columns.map(({ field, body: Body, edit }) => {
+                                {Children.toArray(columns.map(({ field, body: Body , edit } ) => {
                                     if (i === onEdit) {
                                         return <CTableDataCell>
-                                            {edit && edit.inputType ? <TableEditCell type={edit.inputType} id={field} onChange={updateItem} value={item[field]} options={edit.options} /> : <CFormInput type='text' disabled value={item[field]} />}
+                                            {edit && edit.inputType ? <TableEditCell type={edit.inputType} id={field? field : ''} onChange={updateItem} value={field && item[field] ?item[field ]: ''} options={edit.options} /> : <CFormInput type='text' disabled value={field && item[field] ?item[field ]: ''} />}
                                         </CTableDataCell>
                                     }
-                                    return Body ? <CTableDataCell><Body {...d} /></CTableDataCell> : <CTableDataCell>{String(d[field] ?? '-')}</CTableDataCell>
+                                    return Body ? <CTableDataCell><Body {...d} /></CTableDataCell> : <CTableDataCell>{String(field && d[field] ?d[field ]: '' ?? '-')}</CTableDataCell>
                                 }))}
                                 {editable && <CTableDataCell>
                                     {(i === onEdit) ? <>
@@ -117,7 +132,7 @@ export const Table = ({ updateLoading, params, count, columns = [], data = [], c
                         {displayedItems && <CCol xs='auto'>
                             <CRow className='align-items-center'>
                                 <CCol xs='auto' >
-                                    <CFormLabel name='display'>
+                                    <CFormLabel htmlFor='display' >
                                         Displayed Items
                                     </CFormLabel>
 
@@ -143,25 +158,5 @@ export const Table = ({ updateLoading, params, count, columns = [], data = [], c
     )
 }
 
-Table.propTypes = {
-    updateLoading: PropTypes.func,
-    params: PropTypes.object,
-    changeData: PropTypes.func,
-    cookieName: PropTypes.string,
-    updateParams: PropTypes.func,
-    displayedItems: PropTypes.bool,
-    columns: PropTypes.arrayOf(PropTypes.shape({
-        header: PropTypes.string.isRequired,
-        field: PropTypes.string,
-        body: PropTypes.elementType
-    })).isRequired,
-    data: PropTypes.array.isRequired,
-    count: PropTypes.number,
-    emptyMessage: PropTypes.string,
-    pagination: PropTypes.bool,
-    checkbox: PropTypes.bool,
-    onSelect: PropTypes.func,
-    editable: PropTypes.bool
-}
 
-export default (Table)
+export default Table

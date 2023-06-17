@@ -5,7 +5,7 @@ import Employee from 'src/services/Employee'
 
 const employee = createSlice({
     name: 'employee',
-    initialState: { employees: { data: [], count: 0 } },
+    initialState: { data: [], count: 0  },
     reducers: {
         setData(state, action) {
             return { ...state, ...action.payload }
@@ -18,7 +18,7 @@ export const getEmployees = payload => async dispatch => {
     try {
         let { data, status, message } = await Employee.getEmployees(payload)
         if (status === 200) {
-            dispatch(setData({ employees: data }))
+            dispatch(setData( data ))
         } else dispatch(updateToast({ type: 'error', message }))
 
     } catch (error) {
@@ -28,7 +28,7 @@ export const getEmployees = payload => async dispatch => {
 
 export const updateEmployee = payload => async (dispatch, state) => {
     try {
-        const { data: employees, count } = state().employee.employees
+        const { data: employees, count } = state().employee
         let { status, message, data } = await Employee.updateEmployee(payload)
         if (status === 200) {
             let i = employees.findIndex(s => s.id === data.id)

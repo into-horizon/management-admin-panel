@@ -3,6 +3,8 @@ import cookie from 'react-cookies';
 import Auth from "../services/Auth"
 import Update from "src/services/Update";
 import { updateDialog } from "./globalDialog";
+import { AppDispatch, RootState } from ".";
+
 const NewAuth = new Auth();
 const NewUpdate = new Update();
 
@@ -22,7 +24,12 @@ const login = createSlice({
     },
 })
 
-export const loginHandler = payload => async dispatch => {
+type PayloadTypes = {
+    email: string,
+    password: string
+}
+
+export const loginHandler = ( payload :PayloadTypes ) => async (dispatch : AppDispatch) => {
     try {
         let response = await NewAuth.basicAuth(payload)
         if (response.status === 200) {
@@ -31,34 +38,36 @@ export const loginHandler = payload => async dispatch => {
             let user = await NewAuth.getStore()
             dispatch(loginAction({ loggedIn: true, user: { ...user } }));
         } else {
-            dispatch(updateDialog({message:response.message, title: 'incorrect credentials'}))
+            dispatch(updateDialog({ message: response.message, title: 'incorrect credentials' }))
         }
     } catch (err) {
-        dispatch(updateDialog({message:err.message, title: 'Login Error'}))
+        if( err instanceof Error){
+
+            dispatch(updateDialog({ message: err.message, title: 'Login Error' }))
+        }
     }
 }
-export const getUser = () => async (dispatch) => {
+export const getUser = () => async (dispatch : AppDispatch  ) => {
     try {
         let user = await NewAuth.getStore()
         if (user?.id) {
             dispatch(loginAction({ loggedIn: true, user: { ...user } }))
-        } else {
-            dispatch(logout())
-        }
+        } 
     } catch (error) {
-        dispatch(logout())
         dispatch(loginAction({ loggedIn: false, user: {} }))
-        throw new Error(error)
+        if (typeof error === 'string' ) {
+            throw new Error(error)
+        }
     }
 
 }
 
-export const logout = () => async dispatch => {
+export const logout = () => async (dispatch : AppDispatch) => {
     await NewAuth.logout()
     let cookies = cookie.loadAll()
     Object.keys(cookies).forEach(key => {
-       
-        cookie.remove(key,{ path: '/' })
+
+        cookie.remove(key, { path: '/' })
     })
     console.log(cookie.loadAll())
     dispatch(loginAction({ loggedIn: false, user: {} }))
@@ -67,11 +76,11 @@ export const logout = () => async dispatch => {
 
 }
 
-export const endSession = () => async (dispatch, state) => {
+export const endSession = () => async (dispatch : AppDispatch) => {
     dispatch(loginAction({ logged: false, user: {} }))
 }
 
-export const updateInfo = info => async (dispatch, state) => {
+export const updateInfo = (info :{}) => async (dispatch : AppDispatch,state : () => RootState ) => {
     try {
         let response = await NewUpdate.updateInfo(info)
         dispatch(loginAction({ user: { ...state().login.user, ...response.data } }))
@@ -82,7 +91,7 @@ export const updateInfo = info => async (dispatch, state) => {
     }
 }
 
-export const updateName = name => async (dispatch, state) => {
+export const updateName = (name : string) => async (dispatch : AppDispatch, state: () => RootState) => {
     try {
         let response = await NewUpdate.updateStoreName({ store_name: name })
         dispatch(loginAction({ user: { ...state().login.user, ...response.data } }))
@@ -92,11 +101,11 @@ export const updateName = name => async (dispatch, state) => {
     }
 }
 
-export const updateStorePicture = data => async (dispatch, state) => {
+export const updateStorePicture = (data: FormData) => async (dispatch : AppDispatch, state: () => RootState) => {
     try {
         let response = await NewUpdate.updateStorePicture(data);
-        let {status} = response
-        if(status === 200) {
+        let { status } = response
+        if (status === 200) {
 
             dispatch(loginAction({ user: { ...state().login.user, store_picture: response.result.store_picture } }))
         }
@@ -106,7 +115,7 @@ export const updateStorePicture = data => async (dispatch, state) => {
     }
 }
 
-export const createStoreHandler = payload => async (dispatch, state) => {
+export const createStoreHandler = (payload : {})=> async (dispatch : AppDispatch) => {
     try {
         let res = await NewAuth.createStore(payload);
         let { result, message, status } = res;
@@ -120,7 +129,7 @@ export const createStoreHandler = payload => async (dispatch, state) => {
     }
 }
 
-export const verifiedEmailHandler = payload => async (dispatch, state) => {
+export const verifiedEmailHandler = payload => async (dispatch : AppDispatch) => {
     try {
         let res = await NewAuth.verifyEmail(payload)
         let { result, message, status } = res
@@ -135,7 +144,7 @@ export const verifiedEmailHandler = payload => async (dispatch, state) => {
     }
 }
 
-export const updateVerficationCodeHandler = payload => async (dispatch, state) => {
+export const updateVerficationCodeHandler = (payload: {} | string) => async (dispatch : AppDispatch) => {
     try {
         let res = await NewAuth.updateCode(payload)
         let { result, message, status } = res
@@ -150,7 +159,7 @@ export const updateVerficationCodeHandler = payload => async (dispatch, state) =
     }
 }
 
-export const provideReferenceHandler = payload => async (dispatch, state) => {
+export const provideReferenceHandler = payload => async (dispatch : AppDispatch) => {
     try {
         let { status, message } = await NewAuth.provideReference(payload)
         if (status === 200) {
@@ -164,7 +173,7 @@ export const provideReferenceHandler = payload => async (dispatch, state) => {
     }
 }
 
-export const validateTokenHandler = (token) => async (dispatch, state) => {
+export const validateTokenHandler = (token : string) => async (dispatch : AppDispatch) => {
     try {
         const { status, message } = await NewAuth.validateToken(token);
         if (status === 200) {
@@ -178,7 +187,7 @@ export const validateTokenHandler = (token) => async (dispatch, state) => {
     }
 }
 
-export const resetPasswordHandler = (token, password) => async (dispatch, state) => {
+export const resetPasswordHandler = (token : string, password: string) => async (dispatch : AppDispatch) => {
     try {
         let { message, status } = await NewAuth.resetPassword(token, password)
         if (status === 200) {
@@ -193,6 +202,6 @@ export const resetPasswordHandler = (token, password) => async (dispatch, state)
 }
 
 export default login.reducer
-export const { loginAction, deleteMessage, logoutAction } = login.actions
+export const { loginAction, deleteMessage } = login.actions
 
 

@@ -1,4 +1,4 @@
-import React, { Component, useEffect, useState } from "react";
+import React, { Component, FC, useEffect, useState } from "react";
 import { HashRouter, Route, Routes, useParams } from "react-router-dom";
 import "./scss/style.scss";
 import { PopupProvider } from "react-custom-popup";
@@ -18,11 +18,8 @@ import Auth from "./services/Auth";
 import { socket, notificationsOffers } from "./socket";
 import GlobalDialog from "./components/GlobalDialog";
 
-const loading = (
-  <div className="pt-3 text-center">
-    <div className="sk-spinner sk-spinner-pulse"></div>
-  </div>
-);
+
+
 import Toaster from "./components/Toaster";
 import { CCol, CRow } from "@coreui/react";
 
@@ -38,11 +35,18 @@ const Verify = React.lazy(() => import("./views/pages/verify/verify"));
 const Reference = React.lazy(() => import("./views/pages/password/reference"));
 const ResetPassword = React.lazy(() => import("./views/pages/password/ResetPassword"));
 
-const App = ({
+type PropsTypes = {
+  getParentCategoriesHandler: ()=> void
+  getUser: ()=> void
+  logout: ()=> void
+}
+
+const App : FC<PropsTypes> = ({
   getParentCategoriesHandler,
   getUser,
   logout
 }) => {
+  
   const {
     loggedIn,
     user: { id },
@@ -53,7 +57,7 @@ const App = ({
   const { t, i18n } = useTranslation();
   const [load, setLoad] = useState(true);
   let token = cookie.load("access_token");
-  const checkUnAuth = (route) => {
+  const checkUnAuth = (route : string) => {
     let unAuth = ["/login", "/register", "/reference"];
     if (
       unAuth.some((x) => x === route) ||
@@ -75,7 +79,8 @@ const App = ({
       window.location.pathname === '/500' && navigate('/')
       cookie.save(
         `current_path${sessionStorage.tabID}`,
-        window.location.pathname
+        window.location.pathname,
+        {path:'/'}
       );
 
       let lang = localStorage.getItem("i18nextLng");
@@ -113,7 +118,17 @@ const App = ({
 
   // useEffect(() => {
   // }, [loggedIn]);
+  const loading  = (
 
+      <div className="pt-3 text-center">
+         <div className="sk-spinner sk-spinner-pulse"></div>
+       </div>
+
+  ) 
+ 
+    
+    
+    
   useEffect(() => {
     if (i18n.language === "en") {
       document.documentElement.setAttribute("lang", "en");
@@ -139,23 +154,22 @@ const App = ({
 
         {!load && (
           <Routes>
-            <Route exact path="/login" name="Login Page" element={<Login />} />
+            <Route path="/login" element={<Login />} />
             <Route
-              exact
+            
               path="/register"
-              name="Register Page"
+              
               element={<Register />}
             />
-            <Route exact path="/verify" name="verify" element={<Verify />} />
-            <Route exact path="/500" name="Page 500" element={<Page500 />} />
-            <Route path="/reference" name="reference" element={<Reference />} />
+            <Route path="/verify"  element={<Verify />} />
+            <Route path="/500"  element={<Page500 />} />
+            <Route path="/reference"  element={<Reference />} />
             <Route
               path="/resetPassword/:token"
-              name="password reset"
-              element={<ResetPassword load={(x) => setLoad(x)} />}
+              element={<ResetPassword load={(x: boolean) => setLoad(x)} />}
             />
-            <Route path="/*" name="Home" element={<DefaultLayout />} />
-            <Route path="*" name="Page 404" element={<Page404 />} />
+            <Route path="/*" element={<DefaultLayout />} />
+            <Route path="*" element={<Page404 />} />
           </Routes>
         )}
       </React.Suspense>

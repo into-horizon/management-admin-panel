@@ -12,13 +12,13 @@ import AccountModal from './components/AccountModal';
 import Table from '../../components/Table';
 
 export const Summary = ({ getWithdrawalsHandler, addWithdrawalHandler, getAmounts, updateWithdrawalHandler }) => {
-    const { pending, released, refunded, withdrawn, canceledWithdrawn, commission, delivery, transferred } = useSelector(state => state.finance)
-    const { account, cashAccount } = useSelector(state => state.bankAccount)
-    const { withdrawals: { data: withdrawals, count } } = useSelector(state => state.withdrawals)
+    const { pending, released, refunded, withdrawn, canceledWithdrawn, commission, delivery, transferred } = useSelector((state: RootState) => state.finance)
+    const { account, cashAccount } = useSelector((state: RootState) => state.bankAccount)
+    const { data: withdrawals, count } = useSelector((state: RootState) => state.withdrawals)
     const [params, setParams] = useState({ limit: 10, offset: 0 })
     const [loading, setLoading] = useState(true)
-    const [releasedFinal, setReleasedFinal] = useState(0)
-    const [active, setActive] = useState(0)
+    const [releasedFinal, setReleasedFinal] = useState<number>(0)
+    const [active, setActive] = useState<number | boolean>(0)
     const [add, setAdd] = useState(false)
     const [progressLoading, setProgressLoading] = useState(false)
 
@@ -27,15 +27,21 @@ export const Summary = ({ getWithdrawalsHandler, addWithdrawalHandler, getAmount
     }, [])
 
     useEffect(() => {
-        setReleasedFinal((released - withdrawn + canceledWithdrawn).toFixed(2))
+        let newValue: number = released - withdrawn + canceledWithdrawn
+        setReleasedFinal(Number(newValue.toFixed(2)))
     }, [released, withdrawn, canceledWithdrawn])
 
-    const submitHandler = (e) => {
+    const submitFormHandler = (e: React.FormEvent): void => {
+        const target = e.target as typeof e.target & {
+            account: { value: string };
+            amount: { value: string };
+            reset: () => void
+        };
         e.preventDefault()
         setProgressLoading(true)
-        let obj = { account_id: e.target.account.value, amount: e.target.amount.value }
+        let obj = { account_id: target.account.value, amount: target.amount.value }
         Promise.all([addWithdrawalHandler(obj)]).then(() => {
-            e.target.reset()
+            target.reset()
             setProgressLoading(false)
         })
 
@@ -43,22 +49,31 @@ export const Summary = ({ getWithdrawalsHandler, addWithdrawalHandler, getAmount
     useEffect(() => {
         setActive(!withdrawals.find(w => w.status === 'requested'))
     }, [withdrawals])
-    const UpdateWithdrawalStatus = data => {
+    const UpdateWithdrawalStatus = (data: WithdrawalType) => {
         const [visible, setVisible] = useState(false)
-        const [type, setType] = useState('')
-        const [reason, setReason ] = useState('')
-        const [file, setFile] = useState('')
-        const updateType = t => {
+        const [type, setType] = useState<string | null>('')
+        const [reason, setReason] = useState<string | null>('')
+        const [file, setFile] = useState<Blob | null>(null)
+        const updateType = (t : string) => {
             setType(t)
             setVisible(true)
         }
-        useEffect(()=>{
-            console.log({file});
-        },[file])
-        const submitHandler = e => {
+        useEffect(() => {
+            console.log({ file });
+        }, [file])
+        const submitHandler = (e: React.FormEvent<HTMLFormElement>) => {
+            const target = e.target as typeof e.target & {
+                rejection_reason_other: { value: string };
+                rejection_reason: { value: string };
+                document: {files:Blob[]}
+                reset: () => void
+            };
             let formData = new FormData()
-            let _data = {...data, status: type === 'accept' ? 'transferred' :  'canceled', rejection_reason: reason? reason === 'other' ? e.target.rejection_reason_other.value : e.target.rejection_reason.value : null, document:  e.target.document?.files[0] }
-            Object.entries(_data).forEach(([key,value])=>{
+            let _data = { ...data, status: type === 'accept' ? 'transferred' : 'canceled', rejection_reason: reason ? reason === 'other' ? target.rejection_reason_other.value :target.rejection_reason.value : null, document: target.document?.files[0] }
+            Object.entries(_data).forEach(([key, value]) => {
+                if (typeof value === 'number') {
+                    value = String(value)
+                }
                 value && formData.append(key, value)
             })
             e.preventDefault()
@@ -80,35 +95,35 @@ export const Summary = ({ getWithdrawalsHandler, addWithdrawalHandler, getAmount
                     <CModalHeader>
                         <CModalTitle>Update withdrawal</CModalTitle>
                     </CModalHeader>
-                            <CForm onSubmit={submitHandler}>
-                    <CRow className='justify-content-center align-items-center'>
-                        <CCol xs='auto ' className='file-label'>
-                                {type === 'accept'&& <>
-                                <CFormLabel style={{margin:'auto'}} htmlFor='document' className='btn btn-primary'>{' '}
-                                    <CIcon icon={cilFile} size='lg'/>
-                                    upload document
+                    <CForm onSubmit={submitHandler}>
+                        <CRow className='justify-content-center align-items-center'>
+                            <CCol xs='auto ' className='file-label'>
+                                {type === 'accept' && <>
+                                    <CFormLabel style={{ margin: 'auto' }} htmlFor='document' className='btn btn-primary'>{' '}
+                                        <CIcon icon={cilFile} size='lg' />
+                                        upload document
                                     </CFormLabel>
-                                <CFormInput name='document' id='document' type='file' hidden accept='.jpeg, .png, .pdf'  onChange={e=>setFile(e.target.files[0])}/>
-                               
-                                <CFormInput value={file?.name} readOnly placeholder='file name' />
+                                    <CFormInput name='document' id='document' type='file' hidden accept='.jpeg, .png, .pdf' onChange={e => setFile(e.target.files ?e.target.files[0] : null )} />
+
+                                    <CFormInput value={file && file.name? file?.name: ''} readOnly placeholder='file name' />
                                 </>}
-                                {type === 'reject'&& <>
-                                <CFormLabel htmlFor='rejection' >rejection reason</CFormLabel>
-                                <CFormSelect id='rejection_reason' onChange={e=> setReason(e.target.value)} defaultValue={'invalid amount'}>
-                                    <option value="invalid amount">invalid amount</option>
-                                    <option value="incorrect bank details">incorrect bank details</option>
-                                    <option value="other">other</option>
-                                </CFormSelect>
-                                { reason === 'other' && <CFormInput placeholder='enter reason' id='rejection_reason_other'  required></CFormInput>}
+                                {type === 'reject' && <>
+                                    <CFormLabel htmlFor='rejection' >rejection reason</CFormLabel>
+                                    <CFormSelect id='rejection_reason' onChange={e => setReason(e.target.value)} defaultValue={'invalid amount'}>
+                                        <option value="invalid amount">invalid amount</option>
+                                        <option value="incorrect bank details">incorrect bank details</option>
+                                        <option value="other">other</option>
+                                    </CFormSelect>
+                                    {reason === 'other' && <CFormInput placeholder='enter reason' id='rejection_reason_other' required></CFormInput>}
                                 </>}
 
-                        </CCol>
-                    </CRow>
-                    <CModalFooter>
-                        <CButton color='primary' type='submit'>submit</CButton>
-                        <CButton color='secondary' onClick={()=> setVisible(false)}>close</CButton>
-                    </CModalFooter>
-                            </CForm>
+                            </CCol>
+                        </CRow>
+                        <CModalFooter>
+                            <CButton color='primary' type='submit'>submit</CButton>
+                            <CButton color='secondary' onClick={() => setVisible(false)}>close</CButton>
+                        </CModalFooter>
+                    </CForm>
                 </CModal>
             </Fragment>
         )
@@ -117,16 +132,16 @@ export const Summary = ({ getWithdrawalsHandler, addWithdrawalHandler, getAmount
         { header: 'transfer to', field: 'title' },
         { header: 'amount', field: 'amount' },
         { header: 'status', field: 'status' },
-        { header: 'created at', body: data => <span>{new Date(data.created_at)?.toLocaleDateString()}</span> },
-        { header: 'updated at', body: data => <span>{data.updated ? new Date(data.updated)?.toLocaleDateString() : '-'}</span> },
-        { header: 'attachment', body: data => data.document ? <a href={data.document} target="_blank" ><CIcon icon={cilPaperclip} /></a> : '-' },
-        { header: 'action', body: data => data.status === 'requested' ? <UpdateWithdrawalStatus {...data} /> : <span>completed</span> }
+        { header: 'created at', body: (data : WithdrawalType) => <span>{new Date(data.created_at)?.toLocaleDateString()}</span> },
+        { header: 'updated at', body: (data : WithdrawalType) => <span>{data.updated ? new Date(data.updated)?.toLocaleDateString() : '-'}</span> },
+        { header: 'attachment', body: (data : WithdrawalType) => data.document ? <a href={data.document} target="_blank" ><CIcon icon={cilPaperclip} /></a> : '-' },
+        { header: 'action', body: (data : WithdrawalType) => data.status === 'requested' ? <UpdateWithdrawalStatus {...data} /> : <span>completed</span> }
 
     ]
     return (
         loading ? <CSpinner /> :
             <>
-                <AccountModal account={{}} add={add} onClose={() => setAdd(false)} />
+                <AccountModal  add={add} onClose={() => setAdd(false)} />
                 <CRow>
                     <CCol lg={4} md={4} xs={12} sm={4}>
                         <CWidgetStatsF
@@ -181,7 +196,7 @@ export const Summary = ({ getWithdrawalsHandler, addWithdrawalHandler, getAmount
                                         </CRow>
                                     </CAccordionHeader>
                                     <CAccordionBody>
-                                        <CForm onSubmit={submitHandler}>
+                                        <CForm onSubmit={submitFormHandler}>
                                             <CRow className="justify-content-md-center align-items-end ">
                                                 <CCol xs={3}>
                                                     <CFormLabel>requested amount</CFormLabel>

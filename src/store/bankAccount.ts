@@ -1,5 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import BankAccount from '../services/BankAccount'
+import { AppDispatch } from ".";
 
 const bankAccount = createSlice({
     name: 'Bank Account',
@@ -19,7 +20,7 @@ const bankAccount = createSlice({
 })
 
 
-export const addAccountHandler = (payload) => async (dispatch) =>{
+export const addAccountHandler = (payload : AccountType) => async (dispatch: AppDispatch) =>{
     try {
        let {status, result, message} = await BankAccount.addBankAccount(payload)
         if(status === 200){
@@ -32,7 +33,7 @@ export const addAccountHandler = (payload) => async (dispatch) =>{
     }
 }
 
-export const updateAccountHandler = (payload) =>  async (dispatch)=>{
+export const updateAccountHandler = (payload : AccountType) =>  async (dispatch :  AppDispatch)=>{
     
     try {
         let { result, message, status} = await BankAccount.updateBankAccount(payload)
@@ -46,7 +47,7 @@ export const updateAccountHandler = (payload) =>  async (dispatch)=>{
     }
 }
 
-export const deleteAccountHandler = payload => async (dispatch) => {
+export const deleteAccountHandler = (payload : AccountType) => async (dispatch :  AppDispatch) => {
     try {
         let {  message, status} = await BankAccount.deleteBankAccount(payload)
         if(status === 200){
@@ -60,7 +61,7 @@ export const deleteAccountHandler = payload => async (dispatch) => {
        
     }
 }
-export const getAccountHandler = payload => async (dispatch) => {
+export const getAccountHandler = (payload : AccountType) => async (dispatch :  AppDispatch) => {
     try {
         let { result, message, status} = await BankAccount.getBankAccount(payload)
         if(status === 200){
@@ -73,7 +74,7 @@ export const getAccountHandler = payload => async (dispatch) => {
     }
 }
 
-export const getAccountsHandler = () => async (dispatch) => {
+export const getAccountsHandler = () => async (dispatch :  AppDispatch) => {
     try {
         let { result, message, status} = await BankAccount.getBankAccounts()
         if(status === 200){
@@ -86,7 +87,7 @@ export const getAccountsHandler = () => async (dispatch) => {
     }
 }
 
-export const getCashAccount = () => async (dispatch) => {
+export const getCashAccount = () => async (dispatch :  AppDispatch) => {
     try {
         let { data, message, status} = await BankAccount.cashAccount()
         if(status === 200) {

@@ -20,9 +20,9 @@ const finance = createSlice({
 })
 
 
-export const getAmounts = payload => async (dispatch) =>{
+export const getAmounts = () => async (dispatch) =>{
     try {
-        let {status, data, message}  = await Finance.getAmounts(payload)
+        let {status, data, message}  = await Finance.getAmounts()
         const getData = (data,type, description, status) =>{
             return data.find(val => val.type === type && val.description === description && val.status === status)?.sum.toFixed(2) ?? 0
         }

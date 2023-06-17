@@ -6,10 +6,10 @@ import { updateToast } from "./globalToasts";
 
 const withdrawal = createSlice({
     name: "withdrawal",
-    initialState: { msg: "", withdrawals: { count: 0, data: [] } },
+    initialState: {  count: 0, data: []  },
     reducers: {
         addWithdrawals(state, action) {
-            return { ...state, withdrawals: action.payload }
+            return { ...state, ...action.payload }
         },
         addMsg(state, action) {
             return { ...state, msg: action.payload }
@@ -47,7 +47,7 @@ export const addWithdrawalHandler = payload => async (dispatch) => {
 export const updateWithdrawalHandler = payload => async (dispatch, state) => {
     try {
         let { data, message, status } = await Withdrawal.updateWithdrawal(payload)
-        let { withdrawals: { data: withdrawals, count } } = state().withdrawals
+        let { withdrawals: { data: withdrawals, count } } = state()
         const newWithdrawals = withdrawals.map(w => {
             if (data.id === w.id) {
                 return { ...w, ...data }

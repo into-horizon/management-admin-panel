@@ -5,10 +5,11 @@ import Table from '../../components/Table'
 import FilterCard from '../../components/FilterCard'
 import FormButtons from '../../components/FormButtons'
 import { CCol, CForm, CFormInput, CFormLabel, CFormSelect, CRow } from '@coreui/react'
+import { RootState } from 'src/store'
 
 
 export const Statement = ({ getTransactions }) => {
-    const { transactions: { data, count } } = useSelector(state => state.finance)
+    const { transactions: { data, count } } = useSelector((state : RootState) => state.finance)
     let initialParams = { limit: 20, offset: 0 }
     const [params, setParams] = useState(initialParams)
     const [loading, setLoading] = useState(true)
@@ -16,17 +17,17 @@ export const Statement = ({ getTransactions }) => {
         Promise.all([getTransactions(params)]).then(() => setLoading(false))
     }, [])
     const columns = [
-        { header: 'id', field: 'id', body: data => <span>{data.id.substring(24)}</span> },
+        { header: 'id', field: 'id', body: (data: TransactionType) => <span>{data.id.substring(24)}</span> },
         { header: 'order number', field: 'customer_order_id' },
         { header: 'product', field: 'entitle' },
         { header: 'description', field: 'description' },
-        { header: 'amount', field: 'amount', body: data => <span>{data.amount.toFixed(2)}</span> },
+        { header: 'amount', field: 'amount', body: (data: TransactionType) => <span>{data.amount.toFixed(2)}</span> },
         { header: 'status', field: 'status' },
         { header: 'type', field: 'type' },
-        { header: 'created at', field: 'created_at', body: data => <span>{new Date(data.created_at).toLocaleDateString()}</span> },
+        { header: 'created at', field: 'created_at', body: (data: TransactionType) => <span>{new Date(data.created_at).toLocaleDateString()}</span> },
 
     ]
-    const submitHandler = e => {
+    const submitHandler = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
         const _params = ['type', 'description', 'status', 'customer_order_id']
         let _data = {}
@@ -39,8 +40,11 @@ export const Statement = ({ getTransactions }) => {
             return newData
         })
     }
-    const resetHandler = e => {
-        e.target.reset()
+    const resetHandler = (e: React.FormEvent<HTMLFormElement>) => {
+        const target = e.target as typeof e.target & {
+            reset: () => void
+        };
+        target.reset()
         setParams(() => {
             getTransactions(initialParams)
             return initialParams
@@ -110,8 +114,7 @@ export const Statement = ({ getTransactions }) => {
     )
 }
 
-const mapStateToProps = (state) => ({})
 
 const mapDispatchToProps = { getTransactions }
 
-export default connect(mapStateToProps, mapDispatchToProps)(Statement)
+export default connect(null, mapDispatchToProps)(Statement)

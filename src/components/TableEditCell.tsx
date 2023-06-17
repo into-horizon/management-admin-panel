@@ -1,4 +1,4 @@
-import React, { useState, Children } from "react";
+import React, { Children, FC } from "react";
 
 import {
     CCol,
@@ -7,7 +7,15 @@ import {
     CRow,
 } from "@coreui/react";
 
-const TableEditCell = ({ type = 'text', options = [], onChange, value, id }) => {
+
+type PropTypes = {
+    type: string
+    options: {name:string, value: string}[]
+    onChange:  (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void
+    value: string
+    id: string
+}
+const TableEditCell : FC<PropTypes> = ({ type = 'text', options = [], onChange, value, id }) => {
 
     return (
         <React.Fragment>
