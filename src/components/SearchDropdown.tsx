@@ -27,7 +27,7 @@ const SearchDropdown = ({
 } :PropTypes) => {
   const [className, setClassName] = useState("floating-dropdown-hide");
   const [value, setValue] = useState({ title: "" });
-  const [array, setArray] = useState<{title:string, disabled: boolean}[] | {title: string, id: string}[]>([]);
+  const [array, setArray] = useState<{title: string, id: string, disabled?: boolean}[]>([]);
   const showDropdown = () => {
     setClassName("floating-dropdown-show");
   };
@@ -58,7 +58,7 @@ const SearchDropdown = ({
     !loading &&
     document.activeElement?.className.includes("dropdown-input") &&
     options.length === 0
-      ? setArray([{ title: "no results found", disabled: true }])
+      ? setArray([{ title: "no results found", disabled: true, id: '0' }])
       : () =>  {setArray(options) ; showDropdown()};
   }, [options]);
   return (
@@ -93,7 +93,7 @@ const SearchDropdown = ({
               className="floating-dropdown-item"
               type="button"
               onClick={() => onSelectValue(option)}
-              disabled={option.disabled}
+              disabled={option?.disabled}
             >
               {option.title}
             </CListGroupItem>

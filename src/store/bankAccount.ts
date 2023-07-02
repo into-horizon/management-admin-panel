@@ -2,9 +2,33 @@ import { createSlice } from "@reduxjs/toolkit";
 import BankAccount from '../services/BankAccount'
 import { AppDispatch } from ".";
 
+
+const initialState : BankAccountStateType = {
+    msg: "",
+    account: {
+        id: undefined,
+        title: "",
+        type: "",
+        courier_id: undefined,
+        store_id: "",
+        reference: "",
+        display: false,
+        created_at: ""
+    },
+    cashAccount: {
+        id: undefined,
+        title: "",
+        type: "",
+        courier_id: undefined,
+        store_id: "",
+        reference: "",
+        display: false,
+        created_at: ""
+    }
+}
 const bankAccount = createSlice({
     name: 'Bank Account',
-    initialState: {msg: '', account: {}, cashAccount:{}},
+    initialState: initialState,
     reducers: {
         addAccount(state, action){
             return {...state, account: action.payload}
@@ -47,7 +71,7 @@ export const updateAccountHandler = (payload : AccountType) =>  async (dispatch 
     }
 }
 
-export const deleteAccountHandler = (payload : AccountType) => async (dispatch :  AppDispatch) => {
+export const deleteAccountHandler = (payload : {id: string}) => async (dispatch :  AppDispatch) => {
     try {
         let {  message, status} = await BankAccount.deleteBankAccount(payload)
         if(status === 200){
@@ -61,7 +85,7 @@ export const deleteAccountHandler = (payload : AccountType) => async (dispatch :
        
     }
 }
-export const getAccountHandler = (payload : AccountType) => async (dispatch :  AppDispatch) => {
+export const getAccountHandler = (payload : string) => async (dispatch :  AppDispatch) => {
     try {
         let { result, message, status} = await BankAccount.getBankAccount(payload)
         if(status === 200){

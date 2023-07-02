@@ -35,7 +35,7 @@ type PropTypes = {
     childCategories: { data, count }, parentCategories: { data: parentCategories, }
   } = useSelector((state : RootState) => state.category);
   const [params, setParams] = useState<ParamsType>({ limit: 10, offset: 0 });
-  const [parentData, setParentData] = useState([]);
+  const [parentData, setParentData] = useState<ParentCategoriesType[]>([]);
   const [loading, setLoading] = useState(false);
   const [tableLoading, setTableLoading] = useState(true)
   const [selectedValue, setSelectedValue] = useState<ParentCategoriesType| null>(null)
@@ -43,7 +43,7 @@ type PropTypes = {
   useEffect(() => {
     Promise.all([getChildCategoriesHandler(params)]).then(() => setTableLoading(false))
   }, [])
-  const DeleteButton = ({ id }) => {
+  const DeleteButton = ({ id } : {id: string}) => {
     const [visible, setVisible] = useState(false);
     const deleteHandler =async () => {
         await deleteChildCategoryHandler(id)
@@ -115,7 +115,7 @@ type PropTypes = {
       title: {value: string}
       reset(): void
     }
-    let data = {}
+    let data :{parent_id?: string, title?: string} = {}
     selectedValue?.id && (data['parent_id'] = selectedValue.id)
     target.title.value && (data['title'] = target.title.value)
     getChildCategoriesHandler(data)
@@ -147,7 +147,7 @@ type PropTypes = {
             </CCol>
             <CCol xs='auto'>
               <SearchDropdown
-                options={parentData.map((x : ChildAndGrandCategoriesType) => {
+                options={parentData.map((x : ParentCategoriesType) => {
                   return { id: x.id, title: `${x.entitle} - ${x.artitle}` };
                 })}
                 onSelect={onSelect}

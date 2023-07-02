@@ -46,7 +46,7 @@ type PropTypes = {
     getParentCategoriesHandler(params) 
     setLoading(false)
   }, [])
-  const DeleteButton = ({ id }) => {
+  const DeleteButton = ({ id } : {id: string}) => {
     const [visible, setVisible] = useState(false)
     const deleteHandler = async () => {
       await deleteParentCategoryHandler(id)

@@ -22,6 +22,8 @@ import GlobalDialog from "./components/GlobalDialog";
 
 import Toaster from "./components/Toaster";
 import { CCol, CRow } from "@coreui/react";
+import { RootState } from "./store";
+import { log } from "console";
 
 // Containers
 const DefaultLayout = React.lazy(() => import("./layout/DefaultLayout"));
@@ -36,28 +38,27 @@ const Reference = React.lazy(() => import("./views/pages/password/reference"));
 const ResetPassword = React.lazy(() => import("./views/pages/password/ResetPassword"));
 
 type PropsTypes = {
-  getParentCategoriesHandler: ()=> void
-  getUser: ()=> void
-  logout: ()=> void
+  getParentCategoriesHandler: (p: ParamsType) => Promise<void>
+  getUser: () => Promise<void>
+  logout: () => Promise<void>
 }
 
-const App : FC<PropsTypes> = ({
+const App: FC<PropsTypes> = ({
   getParentCategoriesHandler,
   getUser,
   logout
 }) => {
-  
+
   const {
     loggedIn,
     user: { id },
-  } = useSelector((state) => state.login);
+  } = useSelector((state: RootState) => state.login);
 
   const navigate = useNavigate();
   const to = useParams().token;
   const { t, i18n } = useTranslation();
   const [load, setLoad] = useState(true);
-  let token = cookie.load("access_token");
-  const checkUnAuth = (route : string) => {
+  const checkUnAuth = (route: string) => {
     let unAuth = ["/login", "/register", "/reference"];
     if (
       unAuth.some((x) => x === route) ||
@@ -71,35 +72,30 @@ const App : FC<PropsTypes> = ({
     notificationsOffers.emit('offerNotification', { id: '123' })
   })
   useEffect(() => {
-
+    let token = cookie.load("access_token");
+    
     Promise.all([new Auth().checkAPI(), new Auth().checkManagementAPI(), socket.connect()]).then(() => {
       let tabID = sessionStorage.tabID
         ? sessionStorage.tabID
         : (sessionStorage.tabID = (Math.random() * 1000).toFixed(0));
-      window.location.pathname === '/500' && navigate('/')
-      cookie.save(
-        `current_path${sessionStorage.tabID}`,
-        window.location.pathname,
-        {path:'/'}
-      );
-
-      let lang = localStorage.getItem("i18nextLng");
+        window.location.pathname === '/500' && navigate('/')
+        cookie.save(
+          `current_path${sessionStorage.tabID}`,
+          window.location.pathname,
+          { path: '/' }
+          );
+          
+          let lang = localStorage.getItem("i18nextLng");
       if (lang) {
         i18n.changeLanguage(lang);
       } else {
         i18n.changeLanguage("en");
       }
 
-      if (!id && token) {
-        try {
-          getUser();
-        } catch (error) {
-          logout()
-        }
-      }
+     
       let currentPath = cookie.load(`current_path${sessionStorage.tabID}`);
       if (loggedIn) {
-        getParentCategoriesHandler();
+        (async () => await getParentCategoriesHandler({ limit: 10, offset: 0 }))()
         navigate(checkUnAuth(currentPath) ? "/" : currentPath);
         setLoad(false);
       } else if (!loggedIn && !token) {
@@ -108,7 +104,8 @@ const App : FC<PropsTypes> = ({
         navigate(path);
         setLoad(false);
       }
-    }).catch(() => {
+    }).catch((error) => {
+      
       logout()
       navigate('/500')
       setLoad(false)
@@ -116,19 +113,28 @@ const App : FC<PropsTypes> = ({
 
   }, [loggedIn]);
 
-  // useEffect(() => {
-  // }, [loggedIn]);
-  const loading  = (
+  useEffect(() => {
+    let token = cookie.load("access_token");
 
-      <div className="pt-3 text-center">
-         <div className="sk-spinner sk-spinner-pulse"></div>
-       </div>
+    if (!id && token) {
+      try {
+       (async()=> await getUser())()
+      } catch (error) {
+        logout()
+      }
+    }
+  }, []);
+  const loading = (
 
-  ) 
- 
-    
-    
-    
+    <div className="pt-3 text-center">
+      <div className="sk-spinner sk-spinner-pulse"></div>
+    </div>
+
+  )
+
+
+
+
   useEffect(() => {
     if (i18n.language === "en") {
       document.documentElement.setAttribute("lang", "en");
@@ -143,7 +149,7 @@ const App : FC<PropsTypes> = ({
     <PopupProvider>
       <React.Suspense fallback={loading}>
         <Toaster />
-        <GlobalDialog/>
+        <GlobalDialog />
         {load && (
           <CRow className="justify-content-center align-items-center">
             <CCol xs='auto'>
@@ -156,14 +162,14 @@ const App : FC<PropsTypes> = ({
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route
-            
+
               path="/register"
-              
+
               element={<Register />}
             />
-            <Route path="/verify"  element={<Verify />} />
-            <Route path="/500"  element={<Page500 />} />
-            <Route path="/reference"  element={<Reference />} />
+            <Route path="/verify" element={<Verify />} />
+            <Route path="/500" element={<Page500 />} />
+            <Route path="/reference" element={<Reference />} />
             <Route
               path="/resetPassword/:token"
               element={<ResetPassword load={(x: boolean) => setLoad(x)} />}
@@ -177,7 +183,7 @@ const App : FC<PropsTypes> = ({
   );
 };
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: RootState) => ({
   login: state.login,
 });
 const mapDispatchToProps = {

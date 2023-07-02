@@ -10,10 +10,18 @@ import { getCashAccount, getAccountsHandler } from 'src/store/bankAccount';
 import { getWithdrawalsHandler, addWithdrawalHandler, updateWithdrawalHandler } from 'src/store/withdrawal'
 import AccountModal from './components/AccountModal';
 import Table from '../../components/Table';
+import { RootState } from 'src/store';
 
-export const Summary = ({ getWithdrawalsHandler, addWithdrawalHandler, getAmounts, updateWithdrawalHandler }) => {
+
+type PropTypes = {
+    getWithdrawalsHandler: (p: ParamsType) => Promise<void>
+    addWithdrawalHandler: (p: WithdrawalType) => Promise<void>
+    getAmounts: () => Promise<void>
+    updateWithdrawalHandler: (p: WithdrawalType | FormData) => Promise<void>
+}
+const Summary = ({ getWithdrawalsHandler, addWithdrawalHandler, getAmounts, updateWithdrawalHandler }: PropTypes) => {
     const { pending, released, refunded, withdrawn, canceledWithdrawn, commission, delivery, transferred } = useSelector((state: RootState) => state.finance)
-    const { account, cashAccount } = useSelector((state: RootState) => state.bankAccount)
+    const { account , cashAccount }  = useSelector((state: RootState) => state.bankAccount)
     const { data: withdrawals, count } = useSelector((state: RootState) => state.withdrawals)
     const [params, setParams] = useState({ limit: 10, offset: 0 })
     const [loading, setLoading] = useState(true)
@@ -31,7 +39,7 @@ export const Summary = ({ getWithdrawalsHandler, addWithdrawalHandler, getAmount
         setReleasedFinal(Number(newValue.toFixed(2)))
     }, [released, withdrawn, canceledWithdrawn])
 
-    const submitFormHandler = (e: React.FormEvent): void => {
+    const submitFormHandler = async (e: React.FormEvent): Promise<void> => {
         const target = e.target as typeof e.target & {
             account: { value: string };
             amount: { value: string };
@@ -39,22 +47,37 @@ export const Summary = ({ getWithdrawalsHandler, addWithdrawalHandler, getAmount
         };
         e.preventDefault()
         setProgressLoading(true)
-        let obj = { account_id: target.account.value, amount: target.amount.value }
-        Promise.all([addWithdrawalHandler(obj)]).then(() => {
+        let obj: WithdrawalType = {
+            account_id: target.account.value, amount: Number(target.amount.value),
+            id: '',
+            courier_id: null,
+            store_id: '',
+            type: '',
+            status: '',
+            updated: null,
+            document: null,
+            created_at: ''
+        }
+        try {
+            await addWithdrawalHandler(obj)
             target.reset()
             setProgressLoading(false)
-        })
+            await getWithdrawalsHandler(params)
+        } catch(e){
+           return
+        }
+        
 
     }
     useEffect(() => {
-        setActive(!withdrawals.find(w => w.status === 'requested'))
+        setActive(!withdrawals.find((w: WithdrawalType) => w.status === 'requested'))
     }, [withdrawals])
     const UpdateWithdrawalStatus = (data: WithdrawalType) => {
         const [visible, setVisible] = useState(false)
         const [type, setType] = useState<string | null>('')
         const [reason, setReason] = useState<string | null>('')
         const [file, setFile] = useState<Blob | null>(null)
-        const updateType = (t : string) => {
+        const updateType = (t: string) => {
             setType(t)
             setVisible(true)
         }
@@ -65,11 +88,11 @@ export const Summary = ({ getWithdrawalsHandler, addWithdrawalHandler, getAmount
             const target = e.target as typeof e.target & {
                 rejection_reason_other: { value: string };
                 rejection_reason: { value: string };
-                document: {files:Blob[]}
+                document: { files: Blob[] }
                 reset: () => void
             };
             let formData = new FormData()
-            let _data = { ...data, status: type === 'accept' ? 'transferred' : 'canceled', rejection_reason: reason ? reason === 'other' ? target.rejection_reason_other.value :target.rejection_reason.value : null, document: target.document?.files[0] }
+            let _data = { ...data, status: type === 'accept' ? 'transferred' : 'canceled', rejection_reason: reason ? reason === 'other' ? target.rejection_reason_other.value : target.rejection_reason.value : null, document: target.document?.files[0] }
             Object.entries(_data).forEach(([key, value]) => {
                 if (typeof value === 'number') {
                     value = String(value)
@@ -103,9 +126,9 @@ export const Summary = ({ getWithdrawalsHandler, addWithdrawalHandler, getAmount
                                         <CIcon icon={cilFile} size='lg' />
                                         upload document
                                     </CFormLabel>
-                                    <CFormInput name='document' id='document' type='file' hidden accept='.jpeg, .png, .pdf' onChange={e => setFile(e.target.files ?e.target.files[0] : null )} />
+                                    <CFormInput name='document' id='document' type='file' hidden accept='.jpeg, .png, .pdf' onChange={e => setFile(e.target.files ? e.target.files[0] : null)} />
 
-                                    <CFormInput value={file && file.name? file?.name: ''} readOnly placeholder='file name' />
+                                    <CFormInput value={file && file.name ? file?.name : ''} readOnly placeholder='file name' />
                                 </>}
                                 {type === 'reject' && <>
                                     <CFormLabel htmlFor='rejection' >rejection reason</CFormLabel>
@@ -132,16 +155,16 @@ export const Summary = ({ getWithdrawalsHandler, addWithdrawalHandler, getAmount
         { header: 'transfer to', field: 'title' },
         { header: 'amount', field: 'amount' },
         { header: 'status', field: 'status' },
-        { header: 'created at', body: (data : WithdrawalType) => <span>{new Date(data.created_at)?.toLocaleDateString()}</span> },
-        { header: 'updated at', body: (data : WithdrawalType) => <span>{data.updated ? new Date(data.updated)?.toLocaleDateString() : '-'}</span> },
-        { header: 'attachment', body: (data : WithdrawalType) => data.document ? <a href={data.document} target="_blank" ><CIcon icon={cilPaperclip} /></a> : '-' },
-        { header: 'action', body: (data : WithdrawalType) => data.status === 'requested' ? <UpdateWithdrawalStatus {...data} /> : <span>completed</span> }
+        { header: 'created at', body: (data: WithdrawalType) => <span>{new Date(data.created_at)?.toLocaleDateString()}</span> },
+        { header: 'updated at', body: (data: WithdrawalType) => <span>{data.updated ? new Date(data.updated)?.toLocaleDateString() : '-'}</span> },
+        { header: 'attachment', body: (data: WithdrawalType) => data.document ? <a href={data.document} target="_blank" ><CIcon icon={cilPaperclip} /></a> : '-' },
+        { header: 'action', body: (data: WithdrawalType) => data.status === 'requested' ? <UpdateWithdrawalStatus {...data} /> : <span>completed</span> }
 
     ]
     return (
         loading ? <CSpinner /> :
             <>
-                <AccountModal  add={add} onClose={() => setAdd(false)} />
+                <AccountModal add={add} onClose={() => setAdd(false)} />
                 <CRow>
                     <CCol lg={4} md={4} xs={12} sm={4}>
                         <CWidgetStatsF
@@ -231,7 +254,7 @@ export const Summary = ({ getWithdrawalsHandler, addWithdrawalHandler, getAmount
                 </CRow>
                 <CRow className="justify-content-md-center mgn-top50">
                     <CCol xs={12} lg={10} xl={8}>
-                        <Table columns={columns} data={withdrawals} count={count} changeData={getWithdrawalsHandler} cookieName='withdrawal' params={params} />
+                        <Table columns={columns} data={withdrawals} count={count} changeData={getWithdrawalsHandler} cookieName='withdrawal' params={params} updateLoading={setLoading } />
                     </CCol>
                 </CRow>
             </>
@@ -239,7 +262,7 @@ export const Summary = ({ getWithdrawalsHandler, addWithdrawalHandler, getAmount
     )
 }
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state : RootState) => ({
     pending: state.finance.pending
 })
 

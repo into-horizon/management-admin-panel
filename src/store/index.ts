@@ -20,7 +20,7 @@ const initialState = {
 }
 
 
-const changeState = (state = initialState, { type, ...rest }) => {
+const changeState = (state = initialState, { type, ...rest }:{type:string}) => {
   switch (type) {
     case 'set':
       return { ...state, ...rest }

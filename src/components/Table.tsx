@@ -18,7 +18,7 @@ type PropTypes = {
     style?: React.CSSProperties
     emptyMessage?: string
     checkbox?: boolean
-    onSelect?: ({})=>  []
+    onSelect?: React.Dispatch<React.SetStateAction<any[]>>
     updateParams ?:React.Dispatch<React.SetStateAction<{}>>
     loading?: boolean
     displayedItems?: boolean
@@ -29,7 +29,7 @@ type PropTypes = {
 
 }
 export const Table = ({ updateLoading, params, count, columns, data , changeData, cookieName, style, emptyMessage, checkbox, onSelect, updateParams, loading, displayedItems, pagination = true, editable, editFn, Actions }:PropTypes)  => {
-    const [selected, setSelected] = useState< (string| undefined |{})[]>([])
+    const [selected, setSelected] = useState< any[]>([])
     const [onEdit, setOnEdit] = useState<string| null| number >('')
     const [item, setItem] = useState<{}>({})
     const onChange = (e : React.ChangeEvent<HTMLInputElement>) => {
@@ -88,10 +88,10 @@ export const Table = ({ updateLoading, params, count, columns, data , changeData
                                 {Children.toArray(columns.map(({ field, body: Body , edit } ) => {
                                     if (i === onEdit) {
                                         return <CTableDataCell>
-                                            {edit && edit.inputType ? <TableEditCell type={edit.inputType} id={field? field : ''} onChange={updateItem} value={field && item[field] ?item[field ]: ''} options={edit.options} /> : <CFormInput type='text' disabled value={field && item[field] ?item[field ]: ''} />}
+                                            {edit && edit.inputType ? <TableEditCell type={edit.inputType} id={field? field : ''} onChange={updateItem} value={(field  && item[field as keyof typeof item]) ?item[field as keyof typeof item ]: ''} options={edit.options} /> : <CFormInput type='text' disabled value={field && item[field as keyof typeof item] ?item[field as keyof typeof item]: ''} />}
                                         </CTableDataCell>
                                     }
-                                    return Body ? <CTableDataCell><Body {...d} /></CTableDataCell> : <CTableDataCell>{String(field && d[field] ?d[field ]: '' ?? '-')}</CTableDataCell>
+                                    return Body ? <CTableDataCell><Body {...d} /></CTableDataCell> : <CTableDataCell>{String(field && d[field as keyof typeof d ] ?d[field as keyof typeof d ]: '' ?? '-')}</CTableDataCell>
                                 }))}
                                 {editable && <CTableDataCell>
                                     {(i === onEdit) ? <>

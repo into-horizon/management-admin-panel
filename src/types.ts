@@ -6,6 +6,7 @@ type UserType = {
     active: boolean
     mobile: string
     created_at: string
+    profile_id?: string
 }
 type AuthStateType = {
     loggedIn: boolean

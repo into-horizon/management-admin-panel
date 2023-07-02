@@ -1,4 +1,4 @@
-import React, { useState, useEffect, Children, FormEvent } from "react";
+import React, { useState, useEffect, Children, FormEvent, ChangeEvent } from "react";
 import { connect, useSelector } from "react-redux";
 import Table from "../../components/Table";
 import {
@@ -25,12 +25,18 @@ import SearchDropdown from "src/components/SearchDropdown";
 import { RootState } from "src/store";
 
 
-export const Grandchild = ({
+type PropTypes ={
+  getGrandChildCategoriesHandler : (p: ParamsType) => Promise<void>,
+  updateGrandChildCategory : (c: ChildAndGrandCategoriesType) => Promise<void>,
+  addGrandchildCategoryHandler : (c: ChildAndGrandCategoriesType) => Promise<void>,
+  deleteGrandchildCategoryHandler : (id: string) => Promise<void>,
+}
+ const Grandchild = ({
   getGrandChildCategoriesHandler,
   updateGrandChildCategory,
   addGrandchildCategoryHandler,
   deleteGrandchildCategoryHandler,
-}) => {
+ } :PropTypes) => {
   const {
     grandChildCategories: { data, count },
   } = useSelector((state : RootState) => state.category);
@@ -43,7 +49,7 @@ export const Grandchild = ({
   useEffect(() => {
     getGrandChildCategoriesHandler(params).then(() => setLoading(false))
   }, [])
-  const DeleteButton = ({ id }) => {
+  const DeleteButton = ({ id  }: {id: string}) => {
 
     const deleteHandler = async () =>{
       await deleteGrandchildCategoryHandler(id)
@@ -70,7 +76,7 @@ export const Grandchild = ({
     {
       header: "english title",
       field: "entitle",
-      body: (e) => (
+      body: (e : ChildAndGrandCategoriesType) => (
         <EditableCell
           data={e}
           field="entitle"
@@ -81,7 +87,7 @@ export const Grandchild = ({
     {
       header: "arabic title",
       field: "artitle",
-      body: (e) => (
+      body: (e : ChildAndGrandCategoriesType) => (
         <EditableCell
           data={e}
           field="artitle"
@@ -94,7 +100,7 @@ export const Grandchild = ({
     {
       header: "meta title",
       field: "metatitle",
-      body: (e) => (
+      body: (e : ChildAndGrandCategoriesType) => (
         <EditableCell
           data={e}
           field="metatitle"
@@ -127,7 +133,7 @@ export const Grandchild = ({
     getGrandChildCategoriesHandler(params)
     setValue({})
   }
-  const onChange = (e ) => {
+  const onChange = (e : string ) => {
     setSearchLoading(true)
     setTimeout(() => getChild(e), 1000);
   };

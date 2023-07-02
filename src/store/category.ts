@@ -2,7 +2,8 @@ import { createSlice } from "@reduxjs/toolkit";
 
 import Category from "../services/CategoryService";
 import { updateToast } from "./globalToasts";
-import { AppDispatch } from ".";
+import { AppDispatch, RootState } from ".";
+import { DialogResponseTypes } from "src/enums";
 
 const category = createSlice({
   name: "Category",
@@ -32,7 +33,7 @@ export const getParentCategoriesHandler =
     } catch (error) {
       if(error instanceof Error) {
         dispatch(
-          updateToast({ status: 403, message: error.message, type: "error" })
+          updateToast({ status: 403, message: error.message, type: DialogResponseTypes.ERROR })
         )
       }
     }
@@ -46,7 +47,7 @@ export const getChildCategoriesHandler =
     } catch (error) {
       if(error instanceof Error) {
         dispatch(
-          updateToast({ status: 403, message: error.message, type: "error" })
+          updateToast({ status: 403, message: error.message, type: DialogResponseTypes.ERROR })
         )
       }
     }
@@ -60,7 +61,7 @@ export const getGrandChildCategoriesHandler =
     } catch (error) {
       if(error instanceof Error) {
         dispatch(
-          updateToast({ status: 403, message: error.message, type: "error" })
+          updateToast({ status: 403, message: error.message, type: DialogResponseTypes.ERROR })
         )
       }
     }
@@ -87,12 +88,12 @@ export const updateGrandChildCategory =
         );
       } else
         dispatch(
-          updateToast({ status: status, message: message, type: "error" })
+          updateToast({ status: status, message: message, type: DialogResponseTypes.ERROR })
         );
     } catch (e) {
       if(e instanceof Error) {
         dispatch(
-          updateToast({ status: 403, message: e.message, type: "error" })
+          updateToast({ status: 403, message: e.message, type: DialogResponseTypes.ERROR })
         )
       }
     }
@@ -106,7 +107,7 @@ export const updateChildCategory = (payload : ChildAndGrandCategoriesType) => as
       status,
     } = await Category.updateChildCategory(payload);
     if (status === 200) {
-      let newData = data.map((val) => {
+      let newData = data.map((val :ChildAndGrandCategoriesType) => {
         if (item.id === val.id) {
           return { ...val, ...item };
         } else return val;
@@ -117,13 +118,13 @@ export const updateChildCategory = (payload : ChildAndGrandCategoriesType) => as
       );
     } else
       dispatch(
-        updateToast({ status: status, message: message, type: "error" })
+        updateToast({ status: status, message: message, type: DialogResponseTypes.ERROR })
       );
   } catch (e) {
     if(e instanceof Error) {
 
       dispatch(
-        updateToast({ status: 403, message: e.message, type: "error" })
+        updateToast({ status: 403, message: e.message, type: DialogResponseTypes.ERROR })
       );
     }
   }
@@ -137,7 +138,7 @@ export const updateParentCategory = (payload : ParentCategoriesType) => async (d
       status,
     } = await Category.updateParentCategory(payload);
     if (status === 200) {
-      let newData = data.map((val) => {
+      let newData = data.map((val :ParentCategoriesType)  => {
         if (item.id === val.id) {
           return { ...val, ...item };
         } else return val;
@@ -148,12 +149,12 @@ export const updateParentCategory = (payload : ParentCategoriesType) => async (d
       );
     } else
       dispatch(
-        updateToast({ status: status, message: message, type: "error" })
+        updateToast({ status: status, message: message, type: DialogResponseTypes.ERROR })
       );
   } catch (e) {
     if(e instanceof Error) {
       dispatch(
-        updateToast({ status: 403, message: e.message, type: "error" })
+        updateToast({ status: 403, message: e.message, type: DialogResponseTypes.ERROR })
       );
     }
   }
@@ -170,13 +171,13 @@ export const addParentCategoryHandler =
        
       } else {
         dispatch(
-          updateToast({ status: status, message: message, type: "error" })
+          updateToast({ status: status, message: message, type: DialogResponseTypes.ERROR })
         );
       }
     } catch (error) {
       if(error instanceof Error) {
         dispatch(
-          updateToast({ status: 403, message: error.message, type: "error" })
+          updateToast({ status: 403, message: error.message, type: DialogResponseTypes.ERROR })
         )
       }
     }
@@ -191,12 +192,12 @@ export const addChildCategoryHandler =
         );
       } else
         dispatch(
-          updateToast({ status: status, message: message, type: "error" })
+          updateToast({ status: status, message: message, type: DialogResponseTypes.ERROR })
         );
     } catch (error) {
       if(error instanceof Error) {
         dispatch(
-          updateToast({ status: 403, message: error.message, type: "error" })
+          updateToast({ status: 403, message: error.message, type: DialogResponseTypes.ERROR })
         )
       }
     }
@@ -211,12 +212,12 @@ export const addGrandchildCategoryHandler =
         dispatch(updateToast({ status: status, message: message, type: "create" }));
       } else
         dispatch(
-          updateToast({ status: status, message: message, type: "error" })
+          updateToast({ status: status, message: message, type: DialogResponseTypes.ERROR })
         );
     } catch (error) {
       if(error instanceof Error) {
         dispatch(
-          updateToast({ status: 403, message: error.message, type: "error" })
+          updateToast({ status: 403, message: error.message, type: DialogResponseTypes.ERROR })
         )
       }
     }
@@ -229,12 +230,12 @@ export const deleteGrandchildCategoryHandler = (payload : string) => async (disp
         dispatch(updateToast({ status: status, message: message, type: "delete" }));
       } else
         dispatch(
-          updateToast({ status: status, message: message, type: "error" })
+          updateToast({ status: status, message: message, type: DialogResponseTypes.ERROR })
         );
     } catch (error) {
       if(error instanceof Error) {
         dispatch(
-          updateToast({ status: 403, message: error.message, type: "error" })
+          updateToast({ status: 403, message: error.message, type: DialogResponseTypes.ERROR })
         )
       }
     }
@@ -248,12 +249,12 @@ export const deleteGrandchildCategoryHandler = (payload : string) => async (disp
         dispatch( updateToast({ status: status, message: message, type: "delete" }) );
       } else
         dispatch(
-          updateToast({ status: status, message: message, type: "error" })
+          updateToast({ status: status, message: message, type: DialogResponseTypes.ERROR })
         );
     } catch (error) {
       if(error instanceof Error) {
         dispatch(
-          updateToast({ status: 403, message: error.message, type: "error" })
+          updateToast({ status: 403, message: error.message, type: DialogResponseTypes.ERROR })
         )
       }
     }
@@ -269,13 +270,13 @@ export const deleteGrandchildCategoryHandler = (payload : string) => async (disp
         );
       } else {
         dispatch(
-          updateToast({ status: status, message: message, type: "error" })
+          updateToast({ status: status, message: message, type: DialogResponseTypes.ERROR })
         );
       }
     } catch (error) {
       if(error instanceof Error) {
         dispatch(
-          updateToast({ status: 403, message: error.message, type: "error" })
+          updateToast({ status: 403, message: error.message, type: DialogResponseTypes.ERROR })
         )
       }
     }

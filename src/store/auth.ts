@@ -4,14 +4,27 @@ import Auth from "../services/Auth"
 import Update from "src/services/Update";
 import { updateDialog } from "./globalDialog";
 import { AppDispatch, RootState } from ".";
+import { updateToast } from "./globalToasts";
+import { DialogResponseTypes } from "src/enums";
 
 const NewAuth = new Auth();
 const NewUpdate = new Update();
 
 
+const initialState: AuthStateType = {
+    loggedIn: false, user: {
+        id: "",
+        first_name: "",
+        last_name: "",
+        role: "",
+        active: false,
+        mobile: "",
+        created_at: ""
+    }, message: ''
+}
 const login = createSlice({
     name: 'login',
-    initialState: { loggedIn: false, user: {}, message: '' },
+    initialState: initialState,
     reducers: {
         loginAction(state, action) {
 
@@ -29,7 +42,7 @@ type PayloadTypes = {
     password: string
 }
 
-export const loginHandler = ( payload :PayloadTypes ) => async (dispatch : AppDispatch) => {
+export const loginHandler = (payload: PayloadTypes) => async (dispatch: AppDispatch) => {
     try {
         let response = await NewAuth.basicAuth(payload)
         if (response.status === 200) {
@@ -38,70 +51,72 @@ export const loginHandler = ( payload :PayloadTypes ) => async (dispatch : AppDi
             let user = await NewAuth.getStore()
             dispatch(loginAction({ loggedIn: true, user: { ...user } }));
         } else {
-            dispatch(updateDialog({ message: response.message, title: 'incorrect credentials' }))
+            dispatch(updateDialog({ message: response.message, title: 'incorrect credentials', type: DialogResponseTypes.ERROR }))
         }
     } catch (err) {
-        if( err instanceof Error){
+        if (err instanceof Error) {
 
-            dispatch(updateDialog({ message: err.message, title: 'Login Error' }))
+            dispatch(updateDialog({ message: err.message, title: 'Login Error', type: DialogResponseTypes.ERROR }))
         }
     }
 }
-export const getUser = () => async (dispatch : AppDispatch  ) => {
+export const getUser = () => async (dispatch: AppDispatch) => {
     try {
         let user = await NewAuth.getStore()
         if (user?.id) {
             dispatch(loginAction({ loggedIn: true, user: { ...user } }))
-        } 
+        }
     } catch (error) {
-        dispatch(loginAction({ loggedIn: false, user: {} }))
-        if (typeof error === 'string' ) {
-            throw new Error(error)
+        dispatch(loginAction(initialState))
+        if (error instanceof Error) {
+
+            dispatch(updateDialog({ type:DialogResponseTypes.ERROR, message: error.message }))
         }
     }
 
 }
 
-export const logout = () => async (dispatch : AppDispatch) => {
+export const logout = () => async (dispatch: AppDispatch) => {
     await NewAuth.logout()
     let cookies = cookie.loadAll()
     Object.keys(cookies).forEach(key => {
-
         cookie.remove(key, { path: '/' })
     })
-    console.log(cookie.loadAll())
     dispatch(loginAction({ loggedIn: false, user: {} }))
-
-
-
 }
 
-export const endSession = () => async (dispatch : AppDispatch) => {
+export const endSession = () => async (dispatch: AppDispatch) => {
     dispatch(loginAction({ logged: false, user: {} }))
 }
 
-export const updateInfo = (info :{}) => async (dispatch : AppDispatch,state : () => RootState ) => {
+export const updateInfo = (info: StoreType) => async (dispatch: AppDispatch, state: () => RootState) => {
     try {
         let response = await NewUpdate.updateInfo(info)
         dispatch(loginAction({ user: { ...state().login.user, ...response.data } }))
 
     } catch (error) {
-        console.log("🚀 ~ file: auth.js ~ line 65 ~ error", error)
+        if (error instanceof Error) {
+
+            dispatch(updateDialog({ type: DialogResponseTypes.ERROR, message: error.message }))
+        }
 
     }
 }
 
-export const updateName = (name : string) => async (dispatch : AppDispatch, state: () => RootState) => {
+export const updateName = (name: string) => async (dispatch: AppDispatch, state: () => RootState) => {
     try {
         let response = await NewUpdate.updateStoreName({ store_name: name })
         dispatch(loginAction({ user: { ...state().login.user, ...response.data } }))
     } catch (error) {
-        console.log("🚀 ~ file: auth.js ~ line 77 ~ error", error)
+        if (error instanceof Error) {
+
+            dispatch(updateDialog({ type: DialogResponseTypes.ERROR, message: error.message }))
+        }
 
     }
 }
 
-export const updateStorePicture = (data: FormData) => async (dispatch : AppDispatch, state: () => RootState) => {
+export const updateStorePicture = (data: FormData) => async (dispatch: AppDispatch, state: () => RootState) => {
     try {
         let response = await NewUpdate.updateStorePicture(data);
         let { status } = response
@@ -110,12 +125,15 @@ export const updateStorePicture = (data: FormData) => async (dispatch : AppDispa
             dispatch(loginAction({ user: { ...state().login.user, store_picture: response.result.store_picture } }))
         }
     } catch (error) {
-        console.log("🚀 ~ file: auth.js ~ line 88 ~ updateStorePicture ~ error", error)
+        if (error instanceof Error) {
+
+            dispatch(updateToast({ type: DialogResponseTypes.ERROR, message: error.message }))
+        }
 
     }
 }
 
-export const createStoreHandler = (payload : {})=> async (dispatch : AppDispatch) => {
+export const createStoreHandler = (payload: {}) => async (dispatch: AppDispatch) => {
     try {
         let res = await NewAuth.createStore(payload);
         let { result, message, status } = res;
@@ -125,41 +143,44 @@ export const createStoreHandler = (payload : {})=> async (dispatch : AppDispatch
             dispatch(loginAction({ message: res }))
         }
     } catch (error) {
-        console.log("🚀 ~ file: auth.js ~ line 109 ~ createStoreHandler ~ error", error)
-    }
-}
+        if (error instanceof Error) {
 
-export const verifiedEmailHandler = payload => async (dispatch : AppDispatch) => {
-    try {
-        let res = await NewAuth.verifyEmail(payload)
-        let { result, message, status } = res
-        if (res.status === 200) {
-            dispatch(loginAction({ user: result, message: message }))
-        } else if (res.status === 403) {
-            dispatch(loginAction({ message: message }))
+            dispatch(updateDialog({ type: DialogResponseTypes.ERROR, message: error.message, title: 'create store error' }))
         }
-    } catch (error) {
-        console.log("🚀 ~ file: auth.js ~ line 88 ~ updateStorePicture ~ error", error)
-
     }
 }
 
-export const updateVerficationCodeHandler = (payload: {} | string) => async (dispatch : AppDispatch) => {
-    try {
-        let res = await NewAuth.updateCode(payload)
-        let { result, message, status } = res
-        if (status === 200) {
-            dispatch(loginAction({ user: result, message: message }))
-        } else {
-            dispatch(loginAction({ message: res.message }))
-        }
-    } catch (error) {
-        console.log("🚀 ~ file: auth.js ~ line 131 ~ updateVerficationCodeHandler ~ error", error)
+// export const verifiedEmailHandler = payload => async (dispatch : AppDispatch) => {
+//     try {
+//         let res = await NewAuth.verifyEmail(payload)
+//         let { result, message, status } = res
+//         if (res.status === 200) {
+//             dispatch(loginAction({ user: result, message: message }))
+//         } else if (res.status === 403) {
+//             dispatch(loginAction({ message: message }))
+//         }
+//     } catch (error) {
+//         console.log("🚀 ~ file: auth.js ~ line 88 ~ updateStorePicture ~ error", error)
 
-    }
-}
+//     }
+// }
 
-export const provideReferenceHandler = payload => async (dispatch : AppDispatch) => {
+// export const updateVerficationCodeHandler = (payload: {} | string) => async (dispatch : AppDispatch) => {
+//     try {
+//         let res = await NewAuth.updateCode(payload)
+//         let { result, message, status } = res
+//         if (status === 200) {
+//             dispatch(loginAction({ user: result, message: message }))
+//         } else {
+//             dispatch(loginAction({ message: res.message }))
+//         }
+//     } catch (error) {
+//         console.log("🚀 ~ file: auth.js ~ line 131 ~ updateVerficationCodeHandler ~ error", error)
+
+//     }
+// }
+
+export const provideReferenceHandler = (payload: any) => async (dispatch: AppDispatch) => {
     try {
         let { status, message } = await NewAuth.provideReference(payload)
         if (status === 200) {
@@ -168,12 +189,14 @@ export const provideReferenceHandler = payload => async (dispatch : AppDispatch)
             dispatch(loginAction({ message: message }))
         }
     } catch (error) {
-        console.log("🚀 ~ file: auth.js ~ line 131 ~ updateVerficationCodeHandler ~ error", error)
+        if (error instanceof Error) {
 
+            dispatch(updateDialog({ type: DialogResponseTypes.ERROR, message: error.message, title: 'reset password error' }))
+        }
     }
 }
 
-export const validateTokenHandler = (token : string) => async (dispatch : AppDispatch) => {
+export const validateTokenHandler = (token: string) => async (dispatch: AppDispatch) => {
     try {
         const { status, message } = await NewAuth.validateToken(token);
         if (status === 200) {
@@ -182,12 +205,15 @@ export const validateTokenHandler = (token : string) => async (dispatch : AppDis
             dispatch(loginAction({ message: 'invalid' }))
         }
     } catch (error) {
-        console.log("🚀 ~ file: auth.js ~ line 162 ~ validateTokenHandler ~ error", error)
+        if (error instanceof Error) {
+
+            dispatch(updateDialog({ type: DialogResponseTypes.ERROR, message: error.message, title: 'reset password error' }))
+        }
 
     }
 }
 
-export const resetPasswordHandler = (token : string, password: string) => async (dispatch : AppDispatch) => {
+export const resetPasswordHandler = (token: string, password: string) => async (dispatch: AppDispatch) => {
     try {
         let { message, status } = await NewAuth.resetPassword(token, password)
         if (status === 200) {
@@ -196,7 +222,10 @@ export const resetPasswordHandler = (token : string, password: string) => async 
             dispatch(loginAction({ message: message }))
         }
     } catch (error) {
-        console.log("🚀 ~ file: auth.js ~ line 176 ~ resetPasswordHandler ~ error", error)
+        if (error instanceof Error) {
+
+            dispatch(updateDialog({ type: DialogResponseTypes.ERROR, message: error.message, title: 'reset password error' }))
+        }
 
     }
 }
