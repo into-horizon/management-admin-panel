@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { connect, useSelector, useDispatch } from 'react-redux'
 import { CFormSelect, CFormLabel, CFormText, CFormCheck, CFormInput, CButton, CFormFloating, CFormTextarea, CFormFeedback, CCol, CForm, CRow, CInputGroup, CInputGroupText, CSpinner } from '@coreui/react'
 import { usePopup, DialogType, AnimationType, ToastPosition } from "react-custom-popup";
-import { getSearchDataHandler, getSearchedProductHandler, updateProductHandler } from "../../store/product"
+import {  getSearchedProductHandler, updateProductHandler } from "../../store/product"
 import { useTranslation } from 'react-i18next';
 import { addProductHandler, errorMessage } from 'src/store/product';
 import {getParentCategoriesHandler,getChildCategoriesHandler,getGrandChildCategoriesHandler} from '../../store/category'
@@ -23,7 +23,7 @@ const UpdateProduct = (props) => {
         }
 
     }
-    const { getSearchDataHandler, getSearchedProductHandler, addProductHandler, updateProductHandler } = props
+    const {  getSearchedProductHandler, addProductHandler, updateProductHandler } = props
   
     const [loading, setLoading] = useState(true)
     const search = useLocation().search;
@@ -237,5 +237,5 @@ useEffect(()=>{
     )
 }
 
-const mapDispatchToProps = { getSearchDataHandler, getSearchedProductHandler, addProductHandler, updateProductHandler }
+const mapDispatchToProps = {  getSearchedProductHandler, addProductHandler, updateProductHandler }
 export default connect(null, mapDispatchToProps)(UpdateProduct)

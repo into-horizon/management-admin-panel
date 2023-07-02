@@ -12,7 +12,7 @@ import { cilTrash } from '@coreui/icons'
 import DeleteModal from 'src/components/DeleteModal'
 
 export const Overview = ({ getEmployees, updateEmployee, deleteEmployee }) => {
-  const { data, count } = useSelector(state => state.employee.employees)
+  const { data, count } = useSelector(state => state.employee)
   const [loading, setLoading] = useState(true)
   const [params, setParams] = useState({ offset: 0, limit: 10 })
   useEffect(() => {

@@ -17,7 +17,7 @@ module.exports = {
   plugins: ['react', 'react-hooks'],
   rules: {
     'prettier/prettier': 0,
-    "react/prop-types": 1
+    "react/prop-types": 0
   },
 }
 
