@@ -16,10 +16,11 @@ type ItemType = {
 }
 export const AppSidebarNav = ({ items }: { items: ItemType[] }) => {
   const location = useLocation()
-  const navLink = (icon?: ForwardRefExoticComponent<any>, badge?: { color: string, text: string }) => {
+  const navLink = (name:string,icon?: ForwardRefExoticComponent<any>, badge?: { color: string, text: string }) => {
     return (
       <>
         {icon && icon}
+        {name&& name}
         {badge && (
           <CBadge color={badge.color} className="ms-auto">
             {badge.text}
@@ -42,7 +43,7 @@ export const AppSidebarNav = ({ items }: { items: ItemType[] }) => {
         key={index}
         {...rest}
       >
-        {navLink( icon, badge)}
+        {navLink(name, icon, badge)}
       </Component>
     )
   }
@@ -53,7 +54,7 @@ export const AppSidebarNav = ({ items }: { items: ItemType[] }) => {
       <Component
         idx={String(index)}
         key={index}
-        toggler={navLink(icon)}
+        toggler={navLink(name,icon)}
         visible={location.pathname.startsWith(to)}
         {...rest}
       >
