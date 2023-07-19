@@ -17,25 +17,26 @@ import Category from "src/services/CategoryService";
 import SelectSearch from "react-select-search";
 import CIcon from "@coreui/icons-react";
 import { cilPlus } from "@coreui/icons";
-import SearchDropdown from "./SearchDropdown";
+import SearchDropdown from "../../../components/SearchDropdown";
 import { getParentCategoriesHandler, getChildCategoriesHandler } from "src/store/category";
 import { connect, useSelector } from "react-redux";
 import { RootState } from "src/store";
+import { ParentCategoriesType, ChildAndGrandCategoriesType } from "src/types";
 
 type PropTypes = {
   action : (d:any) => void
   type : 'child' | 'grand' | 'parent'
 }
 
-const AddCategoryModal = ({ action, type   }) => {
+const AddCategoryModal = ({ action, type   }:PropTypes) => {
   const { parentCategories: { data: parentCategories }, childCategories: { data: childCategories }, grandChildCategories: { data: grandChildCategories } } = useSelector((state: RootState) => state.category)
   const [visible, setVisible] = useState(false);
-  const [parentData, setParentData] = useState([]);
-  const [parentId, setParentId] = useState("");
-  const [childData, setChildData] = useState([]);
-  const [childId, setChildId] = useState("");
-  const [loading, setLoading] = useState(false);
-
+  const [parentData, setParentData] = useState<ParentCategoriesType[]>([]);
+  const [parentId, setParentId] = useState<string>("");
+  const [childData, setChildData] = useState<ChildAndGrandCategoriesType[]>([]);
+  const [childId, setChildId] = useState<string>("");
+    const [loading, setLoading] = useState(false);
+  const [resetChild, setResetChild] = useState<boolean>(false)
   const callParentData = async () => {
     const { data: { data } } = await Category.getAllParentCategoires()
     return data
@@ -44,23 +45,26 @@ const AddCategoryModal = ({ action, type   }) => {
     const { data: { data } } = await Category.getAllChildCategoires({ parent_id: id })
     setParentId(id)
     setChildData(data)
+    setResetChild(true)
   }
   useEffect(() => {
     callParentData().then(data => setParentData(data))
   }, []);
+ 
   const onChange = (e: string) => {
     setChildData(childCategories.filter((x: ChildAndGrandCategoriesType) => x.entitle.toLowerCase().includes(e.toLowerCase()) || x.artitle.toLowerCase().includes(e.toLowerCase())))
   }
 
 
   const onChangeParent = (e: string) => {
-    setParentData(parentCategories.filter((x: ParentCategoriesType ) => x.entitle.includes(e) || x.artitle.includes(e)))
+    setParentData(parentCategories.filter((x: ParentCategoriesType ) => x.entitle.toLocaleLowerCase().includes(e.toLocaleLowerCase()) || x.artitle.toLocaleLowerCase().includes(e.toLocaleLowerCase())))
+    setResetChild(true)
   }
   const submitHandler = (e : FormEvent <HTMLFormElement>) => {
     e.preventDefault();
     const target = e.target as typeof e.target & {
       entitle : {value:string}
-      artitle :{value:string}
+      artitle :{value:string} 
       metatitle: {value:string}
       content: {value:string}
     }
@@ -86,7 +90,7 @@ const AddCategoryModal = ({ action, type   }) => {
         alignment="center"
         visible={visible}
         onClose={() => setVisible(false)}
-        fullscreen="lg"
+       
         backdrop="static"
       >
         <CModalHeader>
@@ -100,7 +104,7 @@ const AddCategoryModal = ({ action, type   }) => {
             <CCol xs="auto">
               <CFormInput placeholder="arabic title" id="artitle" required />
             </CCol>
-            {(type === "child" || type === "grandchild") && (
+            {(type === "child" || type === "grand") && (
               <CCol xs='auto'>
                 <SearchDropdown options={parentData.map((val: ParentCategoriesType) => {
                   return {
@@ -111,11 +115,12 @@ const AddCategoryModal = ({ action, type   }) => {
 
                 onChange={onChangeParent}
                 placeholder="select parent category"
-                onSelect={e => callChildData(e.id)} loading={loading} />
+                onSelect={e => callChildData(e.id)} 
+                loading={loading} />
               </CCol>
             )}
             {type === 'child' && <CCol xs={5}><CFormInput type="number" placeholder="commission" max='.99' min='.01' step='.01' required /></CCol>}
-            {type === "grandchild" && (
+            {type === "grand" && (
               <CCol xs='auto'>
                 <SearchDropdown options={childData.map((val : ChildAndGrandCategoriesType) => {
                   return {
@@ -123,7 +128,8 @@ const AddCategoryModal = ({ action, type   }) => {
                     id: val.id,
                   };
                 })}
-
+                  reset={resetChild}
+                  resetCallback={setResetChild}
                   onChange={onChange}
                   placeholder="select child category"
                   onSelect={(e: ChildAndGrandCategoriesType) => setChildId(e.id)}

@@ -2,10 +2,11 @@ import React, { useState, useEffect, Dispatch, FC } from 'react'
 import { CPagination, CPaginationItem } from '@coreui/react'
 import cookie from 'react-cookies'
 import _ from 'lodash'
+import { ParamsType } from 'src/types'
 
 type PropTypes = {
     count: number
-    changeData: (p:ParamsType) => void
+    changeData: (p:ParamsType) => Promise<void>
     cookieName: string 
     params: ParamsType
     updateParams?: Dispatch<React.SetStateAction<{}>>

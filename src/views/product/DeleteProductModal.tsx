@@ -6,7 +6,12 @@ import {
   cilTrash
 } from "@coreui/icons";
 import { useTranslation } from "react-i18next";
-const DeleteProductModal = ({deleteHandler, product}) => {
+import { ProductType } from "src/types";
+type PropTypes ={
+  deleteHandler: (id: {id:string})=> Promise<void>,
+   product : ProductType
+}
+const DeleteProductModal = ({deleteHandler, product}:PropTypes) => {
     const [visible,setVisible] = useState(false)
     const { t, i18n } = useTranslation("translation", {
         keyPrefix: "addProduct",

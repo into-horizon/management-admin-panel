@@ -8,7 +8,7 @@ import {
   addChildCategoryHandler,
   deleteChildCategoryHandler,
 } from "src/store/category";
-import AddCategoryModal from "src/components/AddCategoryModal";
+import AddCategoryModal from "src/views/category/components/AddCategoryModal";
 import DeleteModal from "src/components/DeleteModal";
 import { CButton, CCol, CForm, CFormInput, CRow, CTooltip } from "@coreui/react";
 import CIcon from "@coreui/icons-react";
@@ -17,6 +17,7 @@ import Category from "src/services/CategoryService";
 import SearchDropdown from "src/components/SearchDropdown";
 import FilterCard from "src/components/FilterCard";
 import { RootState } from "src/store";
+import { ParamsType, ChildAndGrandCategoriesType, ParentCategoriesType } from "src/types";
 
 
 type PropTypes = {
@@ -39,7 +40,10 @@ type PropTypes = {
   const [loading, setLoading] = useState(false);
   const [tableLoading, setTableLoading] = useState(true)
   const [selectedValue, setSelectedValue] = useState<ParentCategoriesType| null>(null)
-
+  const [reset,setReset] = useState<boolean>(false)
+  useEffect(()=>{
+    !selectedValue?.id && setReset(true)
+  },[selectedValue?.id])
   useEffect(() => {
     Promise.all([getChildCategoriesHandler(params)]).then(() => setTableLoading(false))
   }, [])
@@ -80,8 +84,9 @@ type PropTypes = {
         <EditableCell data={e} field="artitle" action={updateChildCategory} />
       ),
     },
-    { header: "parent english title", field: "p_entitle" },
-    { header: "parent arabic title", field: "p_artitle" },
+    // { header: "parent english title", field: "p_entitle" },
+    // { header: "parent arabic title", field: "p_artitle" },
+    { header: "parent title", field: "p_artitle", body: (e :ChildAndGrandCategoriesType)=> `${e.p_entitle} - ${e.p_artitle}`  },
     {
       header: "meta title",
       field: "metatitle",
@@ -154,7 +159,8 @@ type PropTypes = {
                 loading={loading}
                 onChange={onChange}
                 placeholder="search for parent category"
-                reset={!selectedValue?.id}
+                reset={reset}
+                resetCallback={setReset}
               />
             </CCol>
             <CCol xs="auto">

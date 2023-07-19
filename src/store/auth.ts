@@ -6,6 +6,7 @@ import { updateDialog } from "./globalDialog";
 import { AppDispatch, RootState } from ".";
 import { updateToast } from "./globalToasts";
 import { DialogResponseTypes } from "src/enums";
+import { AuthStateType, StoreType } from "src/types";
 
 const NewAuth = new Auth();
 const NewUpdate = new Update();

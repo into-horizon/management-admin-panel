@@ -7,15 +7,19 @@ import StarRatings from 'react-star-ratings';
 import CIcon from '@coreui/icons-react'
 import { cilChevronDoubleLeft } from '@coreui/icons';
 import Paginator from 'src/components/Paginator'
-
-export const ProductReviews = ({ getProductReviews }) => {
+import { RootState } from 'src/store'
+import { GetFunctionType, ParamsType } from 'src/types'
+type PropTypes ={
+  getProductReviews : GetFunctionType
+}
+export const ProductReviews = ({ getProductReviews }:PropTypes) => {
   const navigate = useNavigate()
   const [loading, setLoading] = useState(true)
-  const [params, setParams] =  useState({limit: 10, offset: 0})
-  const { reviews: { data, count } } = useSelector(state => state.products)
+  const [params, setParams] =  useState<ParamsType>({limit: 10, offset: 0})
+  const { reviews: { data, count } } = useSelector((state: RootState) => state.products)
   const { id } = useParams()
   useEffect(() => {
-    getProductReviews({ id: id, ...params }).then(() => setLoading(false))
+    getProductReviews({ id: id!, ...params }).then(() => setLoading(false))
   }, [id])
   return (
      loading? <CSpinner color='primary'/> :
@@ -65,8 +69,7 @@ export const ProductReviews = ({ getProductReviews }) => {
   )
 }
 
-const mapStateToProps = (state) => ({})
 
 const mapDispatchToProps = { getProductReviews }
 
-export default connect(mapStateToProps, mapDispatchToProps)(ProductReviews)
+export default connect(null, mapDispatchToProps)(ProductReviews)

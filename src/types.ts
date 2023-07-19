@@ -1,36 +1,37 @@
-type UserType = {
-    id: string
+
+export type UserType = {
+    id?: string
     first_name: string
     last_name: string
     role: string
-    active: boolean
+    active?: boolean
     mobile: string
-    created_at: string
+    created_at?: string
     profile_id?: string
 }
-type AuthStateType = {
+export type AuthStateType = {
     loggedIn: boolean
     user: UserType
     message: string
 }
 
-type AccountType = {
+export type AccountType = {
     id?: string
     title: string
     type: string
     courier_id?: string
-    store_id: string
+    store_id?: string
     reference: string
-    display: boolean
-    created_at: string
+    display?: boolean
+    created_at?: string
 }
-type BankAccountStateType = {
+export type BankAccountStateType = {
     msg: string,
     account: AccountType,
     cashAccount: AccountType
 }
 
-type ParentCategoriesType = {
+export type ParentCategoriesType = {
     id: string
     entitle: string
     artitle: string
@@ -39,42 +40,42 @@ type ParentCategoriesType = {
     display: boolean
     created_at: string
 }
-type ChildAndGrandCategoriesType = ParentCategoriesType & { parent_id: string, p_entitle: string, p_artitle: string }
-type CategoriesStateType = {
+export type ChildAndGrandCategoriesType = ParentCategoriesType & { parent_id: string, p_entitle: string, p_artitle: string }
+export type CategoriesStateType = {
     parentCategories: { data: ParentCategoriesType[], count: number },
     childCategories: { data: ChildAndGrandCategoriesType[], count: number },
     grandChildCategories: { data: ChildAndGrandCategoriesType[], count: number },
 }
 
-type DiscountCodeType = {
-    id: string
+export type DiscountCodeType = {
+    id?: string 
     discount_code: string,
     expiry_date: string,
-    min_order_amount: number,
+    min_order_amount?: number,
     max_counter: number,
     discount: number,
     max_discount: number,
     number_of_time: number,
-    created_at: string
+    created_at?: string
 }
 
-type DiscountCodeStateType = {
+export type DiscountCodeStateType = {
     data: DiscountCodeType[]
     count: number
 }
 
-type EmployeeType = UserType & { name: string }
+export type EmployeeType = UserType & { name?: string, email?: string, password?:string }
 
-type EmployeeStateType = {
+export type EmployeeStateType = {
     data: EmployeeType[]
     count: number
 }
 
-type FilterStateType = {
+export type FilterStateType = {
     store?: { title: string, id: string }
     duration: string
 }
-type TransactionType = {
+export type TransactionType = {
     id: string,
     store_id: string,
     courier_id: string,
@@ -89,7 +90,7 @@ type TransactionType = {
     artitle?: string,
     created_at: string,
 }
-type FinanceStateType = {
+export type FinanceStateType = {
     transactions: { data: TransactionType[], count: number },
     message: string,
     pending: number,
@@ -102,19 +103,19 @@ type FinanceStateType = {
     delivery: number
 }
 
-type DialogStateType = {
+export type DialogStateType = {
     message: string,
     status: number,
     type: string,
     title: string
 }
 
-type ToastStateType = {
+export type ToastStateType = {
     message: string
     status: number
     type: string
 }
-type OrderItemType = {
+export type OrderItemType = {
     id: string
     order_id: string
     profile_id: string
@@ -138,7 +139,7 @@ type OrderItemType = {
     store_name: string
     picture: string
 }
-type OrderType = {
+export type OrderType = {
     id: string
     customer_order_id: string
     profile_id: string
@@ -177,19 +178,19 @@ type OrderType = {
     }
     items: OrderItemType[]
 }
-type OrdersStateType = {
+export type OrdersStateType = {
     pendingOrders: { data: OrderType[], count: number }
     ordersOverview: { data: OrderType[], count: number }
     messages: string
     statuses: string[]
 }
 
-type ProductPictureType = {
+export type ProductPictureType = {
     id?: string
     product_id?: string
     product_picture: string
 }
-type ProductType = {
+export type ProductType = {
     id: string
     store_id: string
     entitle: string
@@ -226,7 +227,7 @@ type ProductType = {
     pictures: ProductPictureType[]
 }
 
-type ReviewType = {
+export type ReviewType = {
     id: string
     review: string
     rate: number
@@ -236,14 +237,14 @@ type ReviewType = {
     last_name: string
     profile_picture?: string
 }
-type ProductStateType = {
+export type ProductStateType = {
     pending: { data: ProductType[], count: number },
     overview: { data: ProductType[], count: number },
-    searched: {},
+    searched: ProductType,
     reviews: { data: ReviewType[], count: number }
 }
 
-type StoreType = {
+export type StoreType = {
     id: string
     profile_id: string
     store_name: string
@@ -263,14 +264,14 @@ type StoreType = {
     verification_code: string | null
 }
 
-type StoreStateType = {
+export type StoreStateType = {
     pending: { data: StoreType[], count: number },
     overview: { data: StoreType[], count: number },
     searched: [],
     populatedStore: { title?: string, id?: string }
 }
 
-type CustomerType = {
+export type CustomerType = {
     id: string
     email: string
     mobile: string
@@ -284,12 +285,12 @@ type CustomerType = {
     country: string
 }
 
-type UserStateType = {
+export type UserStateType = {
     data: CustomerType[]
     count: number
 }
 
-type WithdrawalType = {
+export type WithdrawalType = {
     id: string
     account_id: string
     courier_id: string | null
@@ -306,12 +307,18 @@ type WithdrawalType = {
     reference?: string
 }
 
-type WithdrawalStateType ={
+export type WithdrawalStateType ={
     data: WithdrawalType[]
     count: number
 }
 
-type ParamsType = {
+export type ParamsType = {
     limit?: number
     offset?: number
 } & {[key: string]: string | number}
+
+export type GetFunctionType = ( p: ParamsType) => Promise<void>
+
+export type QuantityDetailsType = {color: string | null, size: string | null, quantity: number, id: number | string,idx?:number }
+
+export type DashboardStateType = {stores:number, products: number, itemsSold: number, orderPlaced: number , users: number,ratedStores:{id: string, store_name: string, store_rating: number,store_picture:string}[]}

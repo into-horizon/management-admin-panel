@@ -119,7 +119,7 @@ export default class ApiService {
   getPopulatedStore(data: { store_id?: string, duration?: string } & ParamsType = {}) {
     const store = cookie.load('populated-store')
     const duration = cookie.load('duration')
-    store && (data.store_id = JSON.parse(store).id)
+    store && (data.store_id = store.id)
     duration && (data.duration = duration)
     return data
   }

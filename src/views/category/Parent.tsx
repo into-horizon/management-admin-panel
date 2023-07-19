@@ -24,29 +24,30 @@ import {
   addParentCategoryHandler,
   deleteParentCategoryHandler
 } from "../../store/category";
-import AddCategoryModal from '../../components/AddCategoryModal'
+import AddCategoryModal from './components/AddCategoryModal'
 import DeleteModal from "src/components/DeleteModal";
 import { RootState } from "src/store";
+import { ParamsType, ParentCategoriesType } from "src/types";
 
 type PropTypes = {
-  getParentCategoriesHandler : (p : ParamsType & {}) => Promise<void>
-  updateParentCategory : (p:ParentCategoriesType)=>   Promise<void>
-  addParentCategoryHandler : (p:ParentCategoriesType)=>  Promise<void>
-  deleteParentCategoryHandler : (d: string) =>  Promise<void>
+  getParentCategoriesHandler: (p: ParamsType & {}) => Promise<void>
+  updateParentCategory: (p: ParentCategoriesType) => Promise<void>
+  addParentCategoryHandler: (p: ParentCategoriesType) => Promise<void>
+  deleteParentCategoryHandler: (d: string) => Promise<void>
 }
 
 
- const Parent = ({ getParentCategoriesHandler, updateParentCategory, addParentCategoryHandler, deleteParentCategoryHandler}: PropTypes)  => {
+const Parent = ({ getParentCategoriesHandler, updateParentCategory, addParentCategoryHandler, deleteParentCategoryHandler }: PropTypes) => {
   const {
     parentCategories: { data, count },
   } = useSelector((state: RootState) => state.category);
   const [params, setParams] = useState<ParamsType & {}>({ limit: 10, offset: 0 });
   const [loading, setLoading] = useState(true)
-  useEffect( () => {
-    getParentCategoriesHandler(params) 
+  useEffect(() => {
+    getParentCategoriesHandler(params)
     setLoading(false)
   }, [])
-  const DeleteButton = ({ id } : {id: string}) => {
+  const DeleteButton = ({ id }: { id: string }) => {
     const [visible, setVisible] = useState(false)
     const deleteHandler = async () => {
       await deleteParentCategoryHandler(id)
@@ -71,14 +72,14 @@ type PropTypes = {
     {
       header: "english title",
       field: "entitle",
-      body: (e : ParentCategoriesType) => (
+      body: (e: ParentCategoriesType) => (
         <EditableCell data={e} field="entitle" action={updateParentCategory} />
       ),
     },
     {
       header: "arabic title",
       field: "artitle",
-      body: (e : ParentCategoriesType) => (
+      body: (e: ParentCategoriesType) => (
         <EditableCell data={e} field="artitle" action={updateParentCategory} />
       ),
     },
@@ -98,7 +99,7 @@ type PropTypes = {
       body: DeleteButton
     },
   ];
-  const addHandler = async (e: ParentCategoriesType) =>{
+  const addHandler = async (e: ParentCategoriesType) => {
     await addParentCategoryHandler(e)
     await getParentCategoriesHandler(params)
 
@@ -106,7 +107,7 @@ type PropTypes = {
   return (
     <>
 
-      <AddCategoryModal  action={addHandler} type={undefined} />
+      <AddCategoryModal action={addHandler} type='parent' />
       <Table
         data={data}
         count={count}
@@ -114,7 +115,7 @@ type PropTypes = {
         cookieName="parent"
         columns={columns}
         params={params}
-        checkbox={true}
+        checkbox
         loading={loading}
         updateParams={setParams}
         updateLoading={setLoading}

@@ -91,7 +91,6 @@ export default class Auth extends ApiService {
             let rest = await this.get('')
             return rest
         } catch (error) {
-            console.log("🚀 ~ file: Auth.ts:94 ~ Auth ~ checkAPI ~ error:", error)
             if(error instanceof Error) throw new Error(error.message)
         }
     }

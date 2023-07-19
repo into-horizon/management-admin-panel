@@ -15,6 +15,7 @@ import SearchDropdown from "src/components/SearchDropdown";
 import { searchForStore } from '../store/store'
 import { populateStore } from "src/store/filter";
 import { RootState } from "src/store";
+import { StoreType } from "src/types";
 
 type PropTypes ={
   searchForStore(q:{query: string}): Promise<void>

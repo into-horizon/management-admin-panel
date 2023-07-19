@@ -1,4 +1,4 @@
-import React, { lazy } from 'react'
+import React, { Children, lazy, useEffect } from 'react'
 
 import {
   CAvatar,
@@ -22,10 +22,12 @@ import {
   CAccordionHeader,
   CAccordionBody,
   CWidgetStatsF,
-  CWidgetStatsB
+  CWidgetStatsB,
+  CImage,
+  CBadge
 } from '@coreui/react'
 import { CChartLine } from '@coreui/react-chartjs'
-import { getStyle, hexToRgba } from '@coreui/utils'
+// import { getStyle, hexToRgba } from '@coreui/utils'
 import CIcon from '@coreui/icons-react'
 import {
   cibCcAmex,
@@ -48,7 +50,10 @@ import {
   cilPeople,
   cilUser,
   cilUserFemale,
-  cilWarning
+  cilWarning,
+  cilCart,
+  cilBarcode,
+  cilGift
 } from '@coreui/icons'
 import { useTranslation } from 'react-i18next';
 
@@ -58,11 +63,15 @@ import avatar3 from 'src/assets/images/avatars/3.jpg'
 import avatar4 from 'src/assets/images/avatars/4.jpg'
 import avatar5 from 'src/assets/images/avatars/5.jpg'
 import avatar6 from 'src/assets/images/avatars/6.jpg'
-import { useSelector } from 'react-redux'
+import { connect, useSelector } from 'react-redux'
+import { getDashboardData } from 'src/store/dashboard'
+import { RootState } from 'src/store'
 
-
-const Dashboard = () => {
-  const { message, user: { rejected_reason, status, ontime_orders, overall_orders, fulfilled_orders, performance_rate, sales_rate }, loggedIn } = useSelector((state) => state.login)
+type PropTypes = {
+  getDashboardData: () => Promise<void>
+}
+const Dashboard = ({ getDashboardData }: PropTypes) => {
+  const { products, stores, users, itemsSold, orderPlaced, ratedStores } = useSelector((state: RootState) => state.dashboard)
   const { t } = useTranslation('translation', { keyPrefix: 'dashboard' });
   const random = (min: number, max: number) => {
     return Math.floor(Math.random() * (max - min + 1) + min)
@@ -75,7 +84,7 @@ const Dashboard = () => {
   //   else return 'danger'
 
   // }
-  const progressExample: progressGroupExample3Type[ ] = [
+  const progressExample: progressGroupExample3Type[] = [
     { title: 'Visits', value: '29.703 Users', percent: 40, color: 'success' },
     { title: 'Unique', value: '24.093 Users', percent: 20, color: 'info' },
     { title: 'Pageviews', value: '78.706 Views', percent: 60, color: 'warning' },
@@ -83,13 +92,13 @@ const Dashboard = () => {
     { title: 'Bounce Rate', value: 'Average Rate', percent: 40.15, color: 'primary' },
   ]
 
-    type progressGroupExample1Type = {
-      title: string
-      value1: number
-      value2: number
+  type progressGroupExample1Type = {
+    title: string
+    value1: number
+    value2: number
 
-    }
-  const progressGroupExample1 :progressGroupExample1Type[] = [
+  }
+  const progressGroupExample1: progressGroupExample1Type[] = [
     { title: 'Monday', value1: 34, value2: 78 },
     { title: 'Tuesday', value1: 56, value2: 94 },
     { title: 'Wednesday', value1: 12, value2: 67 },
@@ -99,18 +108,18 @@ const Dashboard = () => {
     { title: 'Sunday', value1: 9, value2: 69 },
   ]
 
-  const progressGroupExample2 :progressGroupExample3Type[] = [
+  const progressGroupExample2: progressGroupExample3Type[] = [
     { title: 'Male', icon: cilUser, value: 53 },
     { title: 'Female', icon: cilUserFemale, value: 43 },
   ]
   type progressGroupExample3Type = {
     title: string;
-    icon?:any[]
+    icon?: any[]
     percent?: number
     value: string | number
     color?: string
   }
-  const progressGroupExample3 :progressGroupExample3Type[] = [
+  const progressGroupExample3: progressGroupExample3Type[] = [
     { title: 'Organic Search', icon: cibGoogle, percent: 56, value: '191,235' },
     { title: 'Facebook', icon: cibFacebook, percent: 15, value: '51,223' },
     { title: 'Twitter', icon: cibTwitter, percent: 11, value: '37,564' },
@@ -221,12 +230,65 @@ const Dashboard = () => {
       activity: 'Last week',
     },
   ]
-
+  useEffect(() => {
+    getDashboardData()
+  }, [])
   return (
+
     <>
-      <><CCard className="mb-4">
+
+      <CCard className="mb-4">
+
         <CCardBody>
-          <CRow>
+          <CRow className='justify-content-center'>
+            <CCol sm={12} md={6} lg={6} xl={4} >
+              <CWidgetStatsF
+                className="mb-3"
+                title='active users'
+                value={users}
+                icon={<CIcon icon={cilUser} height={24} />}
+                color='info'
+              />
+
+            </CCol>
+            <CCol sm={12} md={6} lg={6} xl={4}>
+              <CWidgetStatsF
+                className="mb-3"
+                title='stores'
+                value={stores}
+                icon={<CIcon icon={cilPeople} height={24} />}
+                color='secondary'
+              />
+            </CCol>
+            <CCol sm={12} md={6} lg={6} xl={4}>
+              <CWidgetStatsF
+                className="mb-3"
+                title='Orders Placed'
+                value={orderPlaced}
+                color='dark'
+                icon={<CIcon icon={cilCart} height={24} />}
+              />
+            </CCol>
+            <CCol sm={12} md={6} lg={6} xl={4}>
+              <CWidgetStatsF
+                className="mb-3"
+                title='items sold'
+                value={itemsSold}
+                color='success'
+                icon={<CIcon icon={cilBarcode} height={24} />}
+              />
+            </CCol>
+            <CCol sm={12} md={6} lg={6} xl={4}>
+              <CWidgetStatsF
+                className="mb-3"
+                title='active products'
+                value={products}
+                icon={<CIcon icon={cilGift} height={24} />}
+                color='primary'
+              />
+            </CCol>
+          </CRow>
+          {/* <CRow>
             <CCol sm={5}>
               <h4 id="traffic" className="card-title mb-0">
                 Traffic
@@ -333,10 +395,10 @@ const Dashboard = () => {
                   hoverBorderWidth: 3,
                 },
               },
-            }} />
+            }} /> */}
         </CCardBody>
         <CCardFooter>
-          <CRow xs={{ cols: 1 }} md={{ cols: 5 }} className="text-center">
+          {/* <CRow xs={{ cols: 1 }} md={{ cols: 5 }} className="text-center">
             {progressExample.map((item, index) => (
               <CCol className="mb-sm-2 mb-0" key={index}>
                 <div className="text-medium-emphasis">{item.title}</div>
@@ -346,154 +408,175 @@ const Dashboard = () => {
                 <CProgress thin className="mt-2" color={item.color} value={item.percent} />
               </CCol>
             ))}
+          </CRow> */}
+          <h3 className='m-3'>
+            <CBadge color='info' className='p-3'>
+
+              top stores
+            </CBadge>
+          </h3>
+          <CRow>
+            {Children.toArray(ratedStores.map(store =>
+              <CCol xs={{ span: 7, offset: 1 }}>
+                <CWidgetStatsF
+                  className="mb-3"
+                  title={store.store_name}
+                  value={`Rating: ${store.store_rating}`}
+                  icon={<CImage rounded src={store.store_picture} alt={store.store_name} height={75} width={75} />}
+                // color='dark'
+                />
+              </CCol>
+            ))}
           </CRow>
         </CCardFooter>
-      </CCard><CRow>
-          <CCol xs>
-            <CCard className="mb-4">
-              <CCardHeader>Traffic {' & '} Sales</CCardHeader>
-              <CCardBody>
-                <CRow>
-                  <CCol xs={12} md={6} xl={6}>
-                    <CRow>
-                      <CCol sm={6}>
-                        <div className="border-start border-start-4 border-start-info py-1 px-3">
-                          <div className="text-medium-emphasis small">New Clients</div>
-                          <div className="fs-5 fw-semibold">9,123</div>
-                        </div>
-                      </CCol>
-                      <CCol sm={6}>
-                        <div className="border-start border-start-4 border-start-danger py-1 px-3 mb-3">
-                          <div className="text-medium-emphasis small">Recurring Clients</div>
-                          <div className="fs-5 fw-semibold">22,643</div>
-                        </div>
-                      </CCol>
-                    </CRow>
-
-                    <hr className="mt-0" />
-                    {progressGroupExample1.map((item, index) => (
-                      <div className="progress-group mb-4" key={index}>
-                        <div className="progress-group-prepend">
-                          <span className="text-medium-emphasis small">{item.title}</span>
-                        </div>
-                        <div className="progress-group-bars">
-                          <CProgress thin color="info" value={item.value1} />
-                          <CProgress thin color="danger" value={item.value2} />
-                        </div>
+      </CCard>
+      <CRow>
+        <CCol xs>
+          <CCard className="mb-4">
+            <CCardHeader>Traffic {' & '} Sales</CCardHeader>
+            <CCardBody>
+              <CRow>
+                <CCol xs={12} md={6} xl={6}>
+                  <CRow>
+                    <CCol sm={6}>
+                      <div className="border-start border-start-4 border-start-info py-1 px-3">
+                        <div className="text-medium-emphasis small">New Clients</div>
+                        <div className="fs-5 fw-semibold">9,123</div>
                       </div>
-                    ))}
-                  </CCol>
-
-                  <CCol xs={12} md={6} xl={6}>
-                    <CRow>
-                      <CCol sm={6}>
-                        <div className="border-start border-start-4 border-start-warning py-1 px-3 mb-3">
-                          <div className="text-medium-emphasis small">Pageviews</div>
-                          <div className="fs-5 fw-semibold">78,623</div>
-                        </div>
-                      </CCol>
-                      <CCol sm={6}>
-                        <div className="border-start border-start-4 border-start-success py-1 px-3 mb-3">
-                          <div className="text-medium-emphasis small">Organic</div>
-                          <div className="fs-5 fw-semibold">49,123</div>
-                        </div>
-                      </CCol>
-                    </CRow>
-
-                    <hr className="mt-0" />
-
-                    {progressGroupExample2.map((item, index) => (
-                      <div className="progress-group mb-4" key={index}>
-                        <div className="progress-group-header">
-                          <CIcon className="me-2" icon={item.icon} size="lg" />
-                          <span>{item.title}</span>
-                          <span className="ms-auto fw-semibold">{item.value}%</span>
-                        </div>
-                        <div className="progress-group-bars">
-                          <CProgress thin color="warning" value={item.value} />
-                        </div>
+                    </CCol>
+                    <CCol sm={6}>
+                      <div className="border-start border-start-4 border-start-danger py-1 px-3 mb-3">
+                        <div className="text-medium-emphasis small">Recurring Clients</div>
+                        <div className="fs-5 fw-semibold">22,643</div>
                       </div>
-                    ))}
+                    </CCol>
+                  </CRow>
 
-                    <div className="mb-5"></div>
-
-                    {progressGroupExample3.map((item, index) => (
-                      <div className="progress-group" key={index}>
-                        <div className="progress-group-header">
-                          <CIcon className="me-2" icon={item.icon} size="lg" />
-                          <span>{item.title}</span>
-                          <span className="ms-auto fw-semibold">
-                            {item.value}{' '}
-                            <span className="text-medium-emphasis small">({item.percent}%)</span>
-                          </span>
-                        </div>
-                        <div className="progress-group-bars">
-                          <CProgress thin color="success" value={item.percent} />
-                        </div>
+                  <hr className="mt-0" />
+                  {progressGroupExample1.map((item, index) => (
+                    <div className="progress-group mb-4" key={index}>
+                      <div className="progress-group-prepend">
+                        <span className="text-medium-emphasis small">{item.title}</span>
                       </div>
-                    ))}
-                  </CCol>
-                </CRow>
+                      <div className="progress-group-bars">
+                        <CProgress thin color="info" value={item.value1} />
+                        <CProgress thin color="danger" value={item.value2} />
+                      </div>
+                    </div>
+                  ))}
+                </CCol>
 
-                <br />
+                <CCol xs={12} md={6} xl={6}>
+                  <CRow>
+                    <CCol sm={6}>
+                      <div className="border-start border-start-4 border-start-warning py-1 px-3 mb-3">
+                        <div className="text-medium-emphasis small">Pageviews</div>
+                        <div className="fs-5 fw-semibold">78,623</div>
+                      </div>
+                    </CCol>
+                    <CCol sm={6}>
+                      <div className="border-start border-start-4 border-start-success py-1 px-3 mb-3">
+                        <div className="text-medium-emphasis small">Organic</div>
+                        <div className="fs-5 fw-semibold">49,123</div>
+                      </div>
+                    </CCol>
+                  </CRow>
 
-                <CTable align="middle" className="mb-0 border" hover responsive>
-                  <CTableHead color="light">
-                    <CTableRow>
-                      <CTableHeaderCell className="text-center">
-                        <CIcon icon={cilPeople} />
-                      </CTableHeaderCell>
-                      <CTableHeaderCell>User</CTableHeaderCell>
-                      <CTableHeaderCell className="text-center">Country</CTableHeaderCell>
-                      <CTableHeaderCell>Usage</CTableHeaderCell>
-                      <CTableHeaderCell className="text-center">Payment Method</CTableHeaderCell>
-                      <CTableHeaderCell>Activity</CTableHeaderCell>
+                  <hr className="mt-0" />
+
+                  {progressGroupExample2.map((item, index) => (
+                    <div className="progress-group mb-4" key={index}>
+                      <div className="progress-group-header">
+                        <CIcon className="me-2" icon={item.icon} size="lg" />
+                        <span>{item.title}</span>
+                        <span className="ms-auto fw-semibold">{item.value}%</span>
+                      </div>
+                      <div className="progress-group-bars">
+                        <CProgress thin color="warning" value={Number(item.value)} />
+                      </div>
+                    </div>
+                  ))}
+
+                  <div className="mb-5"></div>
+
+                  {progressGroupExample3.map((item, index) => (
+                    <div className="progress-group" key={index}>
+                      <div className="progress-group-header">
+                        <CIcon className="me-2" icon={item.icon} size="lg" />
+                        <span>{item.title}</span>
+                        <span className="ms-auto fw-semibold">
+                          {item.value}{' '}
+                          <span className="text-medium-emphasis small">({item.percent}%)</span>
+                        </span>
+                      </div>
+                      <div className="progress-group-bars">
+                        <CProgress thin color="success" value={item.percent} />
+                      </div>
+                    </div>
+                  ))}
+                </CCol>
+              </CRow>
+
+              <br />
+
+              <CTable align="middle" className="mb-0 border" hover responsive>
+                <CTableHead color="light">
+                  <CTableRow>
+                    <CTableHeaderCell className="text-center">
+                      <CIcon icon={cilPeople} />
+                    </CTableHeaderCell>
+                    <CTableHeaderCell>User</CTableHeaderCell>
+                    <CTableHeaderCell className="text-center">Country</CTableHeaderCell>
+                    <CTableHeaderCell>Usage</CTableHeaderCell>
+                    <CTableHeaderCell className="text-center">Payment Method</CTableHeaderCell>
+                    <CTableHeaderCell>Activity</CTableHeaderCell>
+                  </CTableRow>
+                </CTableHead>
+                <CTableBody>
+                  {tableExample.map((item, index) => (
+                    <CTableRow v-for="item in tableItems" key={index}>
+                      <CTableDataCell className="text-center">
+                        <CAvatar size="md" src={item.avatar.src} status={item.avatar.status} />
+                      </CTableDataCell>
+                      <CTableDataCell>
+                        <div>{item.user.name}</div>
+                        <div className="small text-medium-emphasis">
+                          <span>{item.user.new ? 'New' : 'Recurring'}</span> | Registered:{' '}
+                          {item.user.registered}
+                        </div>
+                      </CTableDataCell>
+                      <CTableDataCell className="text-center">
+                        <CIcon size="xl" icon={item.country.flag} title={item.country.name} />
+                      </CTableDataCell>
+                      <CTableDataCell>
+                        <div className="clearfix">
+                          <div className="float-start">
+                            <strong>{item.usage.value}%</strong>
+                          </div>
+                          <div className="float-end">
+                            <small className="text-medium-emphasis">{item.usage.period}</small>
+                          </div>
+                        </div>
+                        <CProgress thin color={item.usage.color} value={item.usage.value} />
+                      </CTableDataCell>
+                      <CTableDataCell className="text-center">
+                        <CIcon size="xl" icon={item.payment.icon} />
+                      </CTableDataCell>
+                      <CTableDataCell>
+                        <div className="small text-medium-emphasis">Last login</div>
+                        <strong>{item.activity}</strong>
+                      </CTableDataCell>
                     </CTableRow>
-                  </CTableHead>
-                  <CTableBody>
-                    {tableExample.map((item, index) => (
-                      <CTableRow v-for="item in tableItems" key={index}>
-                        <CTableDataCell className="text-center">
-                          <CAvatar size="md" src={item.avatar.src} status={item.avatar.status} />
-                        </CTableDataCell>
-                        <CTableDataCell>
-                          <div>{item.user.name}</div>
-                          <div className="small text-medium-emphasis">
-                            <span>{item.user.new ? 'New' : 'Recurring'}</span> | Registered:{' '}
-                            {item.user.registered}
-                          </div>
-                        </CTableDataCell>
-                        <CTableDataCell className="text-center">
-                          <CIcon size="xl" icon={item.country.flag} title={item.country.name} />
-                        </CTableDataCell>
-                        <CTableDataCell>
-                          <div className="clearfix">
-                            <div className="float-start">
-                              <strong>{item.usage.value}%</strong>
-                            </div>
-                            <div className="float-end">
-                              <small className="text-medium-emphasis">{item.usage.period}</small>
-                            </div>
-                          </div>
-                          <CProgress thin color={item.usage.color} value={item.usage.value} />
-                        </CTableDataCell>
-                        <CTableDataCell className="text-center">
-                          <CIcon size="xl" icon={item.payment.icon} />
-                        </CTableDataCell>
-                        <CTableDataCell>
-                          <div className="small text-medium-emphasis">Last login</div>
-                          <strong>{item.activity}</strong>
-                        </CTableDataCell>
-                      </CTableRow>
-                    ))}
-                  </CTableBody>
-                </CTable>
-              </CCardBody>
-            </CCard>
-          </CCol>
-        </CRow></>
+                  ))}
+                </CTableBody>
+              </CTable>
+            </CCardBody>
+          </CCard>
+        </CCol>
+      </CRow>
     </>
+
   )
 }
 
-export default Dashboard
+export default connect(null, { getDashboardData })(Dashboard)

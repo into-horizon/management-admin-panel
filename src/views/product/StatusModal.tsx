@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { FormEvent, useState } from "react";
 import { connect } from "react-redux";
 import { cilCheck } from "@coreui/icons";
 import CIcon from "@coreui/icons-react";
@@ -15,16 +15,21 @@ import {
   CFormTextarea,
 } from "@coreui/react";
 import {updateProductStatus} from '../../store/product'
+import { ProductType } from "src/types";
 
-const StatusModal = ({product={},updateProductStatus}) => {
+
+type PropTypes ={
+  product:ProductType,
+  updateProductStatus: (p: {status: string, id:string}, status: 'overview'| 'pending') => Promise<void>
+}
+const StatusModal = ({product,updateProductStatus}:PropTypes) => {
     const [visible, setVisible] =  useState(false)
     const [status, setStatus] = useState(product.status)
-    const submitHandler = e =>{
+    const submitHandler = (e: FormEvent<HTMLFormElement>&{target: {rejection_reason?: HTMLInputElement, status: HTMLSelectElement}}) =>{
         e.preventDefault()
-        let data = {id: product.id, status:  e.target.status.value}
+        let data = {id: product.id, status:  e.target.status.value, rejection_reason:''}
         data.rejection_reason =  e.target.rejection_reason?.value ?? ''
         updateProductStatus(data, 'overview').then(()=> setVisible(false))
-        
 
     }
   return (
@@ -47,7 +52,7 @@ const StatusModal = ({product={},updateProductStatus}) => {
               </CFormSelect>
             </CCol>
            { status === 'rejected' && <CCol xs={10}>
-              <CFormTextarea placeholder="rejection reason" id="rejection_reason" defaultValue={product.rejection_reason} required/>
+              <CFormTextarea placeholder="rejection reason" id="rejection_reason" defaultValue={product.rejection_reason??''} required/>
             </CCol>}
           </CRow>
           <CModalFooter>
@@ -60,8 +65,7 @@ const StatusModal = ({product={},updateProductStatus}) => {
   );
 };
 
-const mapStateToProps = (state) => ({});
 
 const mapDispatchToProps = {updateProductStatus};
 
-export default connect(mapStateToProps, mapDispatchToProps)(StatusModal);
+export default connect(null, mapDispatchToProps)(StatusModal);

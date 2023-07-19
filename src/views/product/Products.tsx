@@ -1,18 +1,18 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, ChangeEvent } from 'react';
 import { CNav, CNavItem, CNavLink, CTabContent, CTabPane } from '@coreui/react'
 import ProductsRender from 'src/views/product/ProductsRender';
 import cookie from 'react-cookies'
 import { useTranslation } from 'react-i18next';
 
-const Products = props => {
+const Products = () => {
     const [activeKey, setActiveKey] = useState(cookie.load('status') || 'approved')
     const { t, i18n } = useTranslation('translation', { keyPrefix: 'addProduct' });
 
 
-    const changeStatus = (e,status) =>{
+    const changeStatus = (e : React.MouseEvent<HTMLAnchorElement| HTMLButtonElement, MouseEvent>,status : string ) =>{
         e.preventDefault();
         setActiveKey(status)
-        cookie.save('status', status)
+        cookie.save('status', status,{path:'/'})
     }
     return (
         <div className="products">

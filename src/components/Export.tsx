@@ -3,6 +3,7 @@ import React, { CSSProperties, useState } from "react";
 import * as XLSX from "xlsx";
 import CIcon from "@coreui/icons-react";
 import { cilCloudDownload } from "@coreui/icons";
+import { ParamsType } from "src/types";
 
 type PropTypes = {
   title?: string,

@@ -245,6 +245,12 @@ input[type=number]:out-of-range {
     /* box-shadow: 1px 5px lightblue; */
 }
 
+.deleteBtn{
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
 .deleteBtnEn {
     position: relative !important;
     top: -50px;
@@ -480,6 +486,7 @@ input[type=number]:out-of-range {
     z-index: 20;
     opacity: 0.5;
     padding: 1rem;
+    /* max-width: 75%; */
 }
 .filter:hover{
     opacity: 1;
@@ -537,3 +544,5 @@ input[type=number]:out-of-range {
     flex-direction: column;
     row-gap: 1rem;
 }
+
+

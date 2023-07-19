@@ -3,6 +3,7 @@ import { updateToast } from './globalToasts'
 import Employee from 'src/services/Employee'
 import { AppDispatch, RootState } from '.'
 import { DialogResponseTypes } from 'src/enums'
+import { EmployeeStateType, ParamsType, EmployeeType } from 'src/types'
 
 
 

@@ -11,6 +11,7 @@ import { getWithdrawalsHandler, addWithdrawalHandler, updateWithdrawalHandler } 
 import AccountModal from './components/AccountModal';
 import Table from '../../components/Table';
 import { RootState } from 'src/store';
+import { ParamsType, WithdrawalType } from 'src/types';
 
 
 type PropTypes = {

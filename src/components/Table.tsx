@@ -6,14 +6,15 @@ import PropTypes from 'prop-types'
 import CIcon from '@coreui/icons-react'
 import { cilCheck, cilPen, cilX } from '@coreui/icons'
 import TableEditCell from './TableEditCell'
+import { ParamsType } from 'src/types'
 
 type PropTypes = {
     updateLoading: React.Dispatch<React.SetStateAction<boolean>>
     params: {limit?:number, offset?: number} & {}
     count: number
-    columns: {header: string, field?: string | undefined, body?: React.FC<any>  , edit?: {inputType: string, options: {value: string, name: string}[]}}[]
+    columns: {header: string, field?: string , body?: React.FC<any> | ((a:any) => React.JSX.Element)  , edit?: {inputType: string, options?: {value: string, name: string}[]}}[]
     data: {id?: string}[]
-    changeData: (p:ParamsType)=> Promise<void>
+    changeData : (p:ParamsType)=> Promise<void>
     cookieName: string
     style?: React.CSSProperties
     emptyMessage?: string
@@ -24,8 +25,8 @@ type PropTypes = {
     displayedItems?: boolean
     pagination?: boolean
     editable?: boolean | undefined
-    editFn?:  ({}) => {}
-    Actions?: typeof Component
+    editFn? :  Function
+    Actions?: typeof Component | ((a:any) => React.JSX.Element)
 
 }
 export const Table = ({ updateLoading, params, count, columns, data , changeData, cookieName, style, emptyMessage, checkbox, onSelect, updateParams, loading, displayedItems, pagination = true, editable, editFn, Actions }:PropTypes)  => {

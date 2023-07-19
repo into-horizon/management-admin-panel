@@ -1,4 +1,4 @@
-import React, { ForwardRefExoticComponent } from 'react'
+import React, { ForwardRefExoticComponent, ReactElement } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import { useTranslation } from 'react-i18next';
@@ -9,14 +9,14 @@ import { RootState } from 'src/store';
 type ItemType = {
   name: string,
   component: ForwardRefExoticComponent<any>,
-  to: string,
-  icon?: ForwardRefExoticComponent<any>
+  to?: string,
+  icon?: ReactElement<any,any>
   badge?: { color: string, text: string }
   items?: ItemType[]
 }
 export const AppSidebarNav = ({ items }: { items: ItemType[] }) => {
   const location = useLocation()
-  const navLink = (name:string,icon?: ForwardRefExoticComponent<any>, badge?: { color: string, text: string }) => {
+  const navLink = (name:string,icon?: ReactElement<any,any>, badge?: { color: string, text: string }) => {
     return (
       <>
         {icon && icon}
@@ -55,7 +55,7 @@ export const AppSidebarNav = ({ items }: { items: ItemType[] }) => {
         idx={String(index)}
         key={index}
         toggler={navLink(name,icon)}
-        visible={location.pathname.startsWith(to)}
+        visible={to &&location.pathname.startsWith(to)}
         {...rest}
       >
         {item.items?.map((item, index) =>

@@ -8,7 +8,7 @@ import {
   CFormSelect,
   CFormLabel,
 } from "@coreui/react";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, FormEvent } from "react";
 import { connect, useSelector } from "react-redux";
 import FilterCard from "src/components/FilterCard";
 import Table from "src/components/Table";
@@ -20,14 +20,22 @@ import {
 import CIcon from "@coreui/icons-react";
 import { cilTrash, cilSearch, cilFilterX } from "@coreui/icons";
 import EditableCell from "src/components/EditableCell";
+import { GetFunctionType, ParamsType, UserType } from "src/types";
+import { RootState } from "src/store";
 
+
+type PropTypes ={
+  getUsersHandler : GetFunctionType,
+  updateProfileHandler : (payload: UserType) => Promise<void>,
+  updateUserHandler : (payload: UserType) => Promise<void> ,
+}
 export const UsersOverview = ({
   getUsersHandler,
   updateProfileHandler,
   updateUserHandler,
-}) => {
-  const { count, data } = useSelector((state) => state.user);
-  const [params, setParams] = useState({ limit: 10, offset: 0 });
+}:PropTypes) => {
+  const { count, data } = useSelector((state: RootState) => state.user);
+  const [params, setParams] = useState<ParamsType>({ limit: 10, offset: 0 });
   // const Verified =  data => data.Verified ? <span>yes</span>: <span>no</span>
 
   const [loading, setLoading] = useState(false);
@@ -35,7 +43,7 @@ export const UsersOverview = ({
     {
       header: "first name",
       field: "first_name",
-      body: (data) => (
+      body: (data : UserType ) => (
         <EditableCell
           data={data}
           field="first_name"
@@ -46,7 +54,7 @@ export const UsersOverview = ({
     {
       header: "last name",
       field: "last_name",
-      body: (data) => (
+      body: (data : UserType) => (
         <EditableCell
           data={data}
           field="last_name"
@@ -54,11 +62,10 @@ export const UsersOverview = ({
         />
       ),
     },
-    ,
     {
       header: "email",
       field: "email",
-      body: (data) => (
+      body: (data : UserType) => (
         <EditableCell
           data={{ ...data }}
           field="email"
@@ -69,7 +76,7 @@ export const UsersOverview = ({
     {
       header: "mobile number",
       field: "mobile",
-      body: (data) => (
+      body: (data : UserType) => (
         <EditableCell
           data={{ ...data }}
           field="mobile"
@@ -80,7 +87,7 @@ export const UsersOverview = ({
     {
       header: "account status",
       field: "status",
-      body: (data) => (
+      body: (data : UserType) => (
         <EditableCell
           data={data}
           field="status"
@@ -96,7 +103,7 @@ export const UsersOverview = ({
     {
       header: "verified",
       field: "verified",
-      body: (data) => (
+      body: (data : UserType) => (
         <EditableCell
           data={{ ...data }}
           field="verified"
@@ -111,22 +118,28 @@ export const UsersOverview = ({
     },
   ];
 
-  const submitHandler = (e) => {
+  const submitHandler = (e : FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
-    let data = { limit: 10, offset: 0 };
-
-    e.target.query.value && (data["query"] = e.target.query.value);
-    e.target.status.value !== "false" &&
-      (data["status"] = e.target.status.value);
-    e.target.verified.value !== "" &&
-      (data["verified"] = e.target.verified.value);
+    let data : ParamsType = { limit: 10, offset: 0 };
+    type InputTypes = {
+      query: HTMLInputElement
+      status: HTMLSelectElement
+      verified: HTMLSelectElement
+    }
+    const target = e.target as typeof e.target & InputTypes
+    target.query.value && (data["query"] = target.query.value);
+    target.status.value !== "false" &&
+      (data["status"] = target.status.value);
+    target.verified.value !== "" &&
+      (data["verified"] = target.verified.value);
 
     setParams(data);
     getUsersHandler(data).then(() => setLoading(false));
   };
-  const resetTable = (e) => {
-    e.target.reset();
+  const resetTable = (e : FormEvent<HTMLFormElement>) => {
+    const target =  e.target as typeof e.target & {reset(): void}
+    target.reset();
     setParams({ limit: 10, offset: 0 });
   };
   
@@ -144,7 +157,7 @@ export const UsersOverview = ({
             <CCol xs="auto">
               <CFormLabel htmlFor="status">status</CFormLabel>
               <CFormSelect name="status" id="status">
-                <option value={false}>all</option>
+                <option value={'false'}>all</option>
                 <option value="active">active</option>
                 <option value="banned">banned</option>
                 <option value="deactivated">deactivated</option>
@@ -156,8 +169,8 @@ export const UsersOverview = ({
               </CFormLabel>
               <CFormSelect name="verified">
                 <option value="">all</option>
-                <option value={true}>verified</option>
-                <option value={false}>unverified</option>
+                <option value={'true'}>verified</option>
+                <option value={'false'}>unverified</option>
               </CFormSelect>
             </CCol>
             <CCol xs={12}></CCol>
@@ -195,7 +208,6 @@ export const UsersOverview = ({
   );
 };
 
-const mapStateToProps = (state) => ({});
 
 const mapDispatchToProps = {
   getUsersHandler,
@@ -203,4 +215,4 @@ const mapDispatchToProps = {
   updateUserHandler,
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(UsersOverview);
+export default connect(null, mapDispatchToProps)(UsersOverview);

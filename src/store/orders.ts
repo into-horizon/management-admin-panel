@@ -4,6 +4,7 @@ import Orders from '../services/Orders'
 import { updateToast } from "./globalToasts";
  import { AppDispatch, RootState } from ".";
 import { DialogResponseTypes } from "src/enums";
+import { ParamsType, OrderItemType, OrderType } from "src/types";
 const orders = createSlice({
     name: 'orders',
     initialState: {pendingOrders: {data: [], count: 0 } , ordersOverview:{data: [], count: 0} , messages:'', statuses: []},

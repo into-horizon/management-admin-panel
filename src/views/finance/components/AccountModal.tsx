@@ -3,12 +3,13 @@ import { connect } from 'react-redux'
 import { useTranslation } from 'react-i18next';
 import { CButton, CModal, CModalHeader, CModalTitle, CModalFooter, CForm, CFormInput, CFormSelect, CRow, CCol } from '@coreui/react'
 import { addAccountHandler, updateAccountHandler } from 'src/store/bankAccount'
+import { AccountType } from 'src/types';
 
 type PropsTypes = {
     add?: boolean,
     update?: boolean,
-    addAccountHandler?: (a: { type: string, title: string, reference: string }) => void,
-    updateAccountHandler?: (a: { type: string, title: string, reference: string, id: string }) => void,
+    addAccountHandler?: (a: AccountType) => void,
+    updateAccountHandler?: (a:  AccountType) => void,
     account?: AccountType,
     onClose: () => void
 }
@@ -22,8 +23,11 @@ export const AccountModal = ({ add, update, addAccountHandler, updateAccountHand
             referenceNumber: { value: string }
         };
         e.preventDefault()
-        let obj: { type: string, title: string, reference: string } = { title: target.title.value, type: target.type.value, reference: target.referenceNumber.value }
-        Promise.all([update && account ? updateAccountHandler?.({ ...obj, id: account?.id }) : addAccountHandler?.(obj)]).then(() => onClose())
+        let obj: { type: string, title: string, reference: string, id: string } = {
+            title: target.title.value, type: target.type.value, reference: target.referenceNumber.value,
+            id: ''
+        }
+        Promise.all([update && account ? updateAccountHandler?.({ ...obj, id: account?.id! }) : addAccountHandler?.(obj)]).then(() => onClose())
     }
     
     return (
@@ -63,8 +67,7 @@ export const AccountModal = ({ add, update, addAccountHandler, updateAccountHand
     )
 }
 
-const mapStateToProps = (state) => ({})
 
 const mapDispatchToProps = { addAccountHandler, updateAccountHandler }
 
-export default connect(mapStateToProps, mapDispatchToProps)(AccountModal)
+export default connect(null, mapDispatchToProps)(AccountModal)

@@ -6,7 +6,7 @@ import {
   CFormLabel,
   CFormSelect,
 } from "@coreui/react";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, FormEvent } from "react";
 import { connect, useSelector } from "react-redux";
 import EditableCell from "src/components/EditableCell";
 import FilterCard from "src/components/FilterCard";
@@ -17,12 +17,19 @@ import {
   updateDiscountCodeHandler,
 } from "../../store/discountCode";
 import CreateCodeModal from "./CreateCodeModal";
-export const PromoCodes = ({
+import { DiscountCodeType, GetFunctionType, ParamsType } from "src/types";
+import { RootState } from "src/store";
+
+type PropTypes = {
+  getDiscountCodesHandler: GetFunctionType,
+  updateDiscountCodeHandler: (payload: DiscountCodeType) => Promise<void>,
+}
+const PromoCodes = ({
   getDiscountCodesHandler,
   updateDiscountCodeHandler,
-}) => {
+}: PropTypes) => {
   const initialState = { limit: 10, offset: 0 };
-  const { data, count } = useSelector((state) => state.discountCode);
+  const { data, count } = useSelector((state: RootState) => state.discountCode);
   const [params, setParams] = useState(initialState);
   const [loading, setLoading] = useState(true);
   useEffect(() => {
@@ -41,13 +48,13 @@ export const PromoCodes = ({
     {
       header: "max counter",
       field: "max_counter",
-      body: (data) => (
+      body: (data: DiscountCodeType) =>
         <EditableCell
           data={data}
           field="max_counter"
           action={updateDiscountCodeHandler}
         />
-      ),
+
     },
     {
       header: "discount",
@@ -56,77 +63,77 @@ export const PromoCodes = ({
     {
       header: "max discount",
       field: "max_discount",
-      body: (data) => (
+      body: (data: DiscountCodeType) =>
         <EditableCell
           data={data}
           field="max_discount"
           action={updateDiscountCodeHandler}
         />
-      ),
     },
     {
       header: "max usage per user",
       field: "number_of_time",
-      body: (data) => (
+      body: (data: DiscountCodeType) =>
         <EditableCell
           data={data}
           field="number_of_time"
           action={updateDiscountCodeHandler}
         />
-      ),
     },
     {
       header: "expiry data",
       field: "expiry_date",
-      body: (data) => (
+      body: (data: DiscountCodeType) =>
         <EditableCell
           data={data}
           field="expiry_date"
           type="date"
           action={updateDiscountCodeHandler}
         />
-      ),
     },
     {
       header: "min order amount",
       field: "min_order_amount",
-      body: (data) => (
+      body: (data: DiscountCodeType) =>
         <EditableCell
           data={data}
           field="min_order_amount"
           action={updateDiscountCodeHandler}
         />
-      ),
     },
-    ,
     {
       header: "active",
       field: "active",
-      body: (data) => (
+      body: (data: DiscountCodeType) =>
         <EditableCell
           data={data}
           field="active"
           type="dropdown"
           options={[
-            { value: false, name: "deactivate" },
-            { value: true, name: "activate" },
+            { value: 'false', name: "deactivate" },
+            { value: 'true', name: "activate" },
           ]}
           action={updateDiscountCodeHandler}
         />
-      ),
     },
   ];
-  const submitHandler= e =>{
+  const submitHandler = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setLoading(true);
-    const params =['discount_code','expiry_date', 'active']
-    let data ={...initialState}
-    params.forEach(param =>{
-      if(e.target[param].value && e.target[param].value !== '') {
-        data[param] = e.target[param].value
+    const params: string[] = ['discount_code', 'expiry_date', 'active']
+    type InputTypes = {
+      discount_code: HTMLInputElement,
+      expiry_date: HTMLInputElement,
+      active: HTMLSelectElement
+    }
+    const target = e.target as typeof e.target & InputTypes
+    let data: ParamsType = { ...initialState }
+    params.forEach(param => {
+      if (target[param as keyof InputTypes].value && target[param as keyof InputTypes].value !== '') {
+        data[param] = target[param as keyof InputTypes].value
       }
     })
-    getDiscountCodesHandler(data).then(()=>{
+    getDiscountCodesHandler(data).then(() => {
       setLoading(false)
     })
   }
@@ -140,19 +147,19 @@ export const PromoCodes = ({
             xs={{ gutterY: 3 }}
           >
             <CCol xs="auto">
-              <CFormInput placeholder="code name" id="discount_code"/>
+              <CFormInput placeholder="code name" id="discount_code" />
             </CCol>
             <CCol xs="auto">
               <CFormLabel htmlFor="active">Active</CFormLabel>
               <CFormSelect name="active" id="active">
                 <option value="">All</option>
-                <option value={true}>true</option>
-                <option value={false}>false</option>
+                <option value={'true'}>true</option>
+                <option value={'false'}>false</option>
               </CFormSelect>
             </CCol>
             <CCol xs="auto">
               <CFormLabel htmlFor="expiry_date">Expiry Date Before</CFormLabel>
-              <CFormInput name="expiry_date" type="date" id="expiry_date"/>
+              <CFormInput name="expiry_date" type="date" id="expiry_date" />
             </CCol>
             <CCol xs={12}>
               <FormButtons />
@@ -168,6 +175,7 @@ export const PromoCodes = ({
         count={count}
         cookieName="codes"
         changeData={getDiscountCodesHandler}
+        updateLoading={setLoading}
       />
     </>
   );

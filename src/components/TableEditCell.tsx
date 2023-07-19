@@ -10,7 +10,7 @@ import {
 
 type PropTypes = {
     type: string
-    options: {name:string, value: string}[]
+    options?: {name:string, value: string}[]
     onChange:  (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void
     value: string
     id: string

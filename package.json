@@ -112,6 +112,7 @@
     "@types/jsonwebtoken": "^9.0.2",
     "@types/lodash": "^4.14.195",
     "@types/react-cookies": "^0.1.0",
+    "@types/react-star-ratings": "^2.3.0",
     "ajv": "^7.2.4",
     "auto-changelog": "~2.3.0",
     "eslint": "^7.32.0",

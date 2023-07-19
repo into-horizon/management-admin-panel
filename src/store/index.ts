@@ -15,6 +15,7 @@ import discountCode from './discountCode';
 import filter from './filter';
 import employee from './employee';
 import dialog from './globalDialog'
+import dashboard from './dashboard';
 const initialState = {
   sidebarShow: true,
 }
@@ -29,7 +30,7 @@ const changeState = (state = initialState, { type, ...rest }:{type:string}) => {
   }
 }
 
-const reducers = combineReducers({changeState, login:login, category: category, products:products, orders:orders, finance:finance,bankAccount:bankAccount,withdrawals:withdrawals,globalToasts:globalToasts,user:user,stores:stores,discountCode:discountCode ,filter, employee,dialog })
+const reducers = combineReducers({changeState, login:login, category: category, products:products, orders:orders, finance:finance,bankAccount:bankAccount,withdrawals:withdrawals,globalToasts:globalToasts,user:user,stores:stores,discountCode:discountCode ,filter, employee,dialog, dashboard })
 
 const store = configureStore({reducer: reducers,
   middleware(getDefaultMiddleware) {

@@ -21,16 +21,15 @@ import GlobalDialog from "./components/GlobalDialog";
 
 
 import Toaster from "./components/Toaster";
-import { CCol, CRow } from "@coreui/react";
+import { CCol, CContainer, CRow } from "@coreui/react";
 import { RootState } from "./store";
-import { log } from "console";
+import { ParamsType } from "./types";
 
 // Containers
 const DefaultLayout = React.lazy(() => import("./layout/DefaultLayout"));
 
 // Pages
 const Login = React.lazy(() => import("./views/pages/login/Login"));
-const Register = React.lazy(() => import("./views/pages/register/Register"));
 const Page404 = React.lazy(() => import("./views/pages/page404/Page404"));
 const Page500 = React.lazy(() => import("./views/pages/page500/Page500"));
 const Verify = React.lazy(() => import("./views/pages/verify/verify"));
@@ -55,7 +54,6 @@ const App: FC<PropsTypes> = ({
   } = useSelector((state: RootState) => state.login);
 
   const navigate = useNavigate();
-  const to = useParams().token;
   const { t, i18n } = useTranslation();
   const [load, setLoad] = useState(true);
   const checkUnAuth = (route: string) => {
@@ -67,32 +65,32 @@ const App: FC<PropsTypes> = ({
       return true;
     } else return false;
   };
-  socket.on('connect', () => {
+  socket?.on('connect', () => {
     console.log('connected successfully');
     notificationsOffers.emit('offerNotification', { id: '123' })
   })
   useEffect(() => {
     let token = cookie.load("access_token");
-    
+
     Promise.all([new Auth().checkAPI(), new Auth().checkManagementAPI(), socket.connect()]).then(() => {
       let tabID = sessionStorage.tabID
         ? sessionStorage.tabID
         : (sessionStorage.tabID = (Math.random() * 1000).toFixed(0));
-        window.location.pathname === '/500' && navigate('/')
-        cookie.save(
-          `current_path${sessionStorage.tabID}`,
-          window.location.pathname,
-          { path: '/' }
-          );
-          
-          let lang = localStorage.getItem("i18nextLng");
+      window.location.pathname === '/500' && navigate('/')
+      cookie.save(
+        `current_path${sessionStorage.tabID}`,
+        window.location.pathname,
+        { path: '/' }
+      );
+
+      let lang = localStorage.getItem("i18nextLng");
       if (lang) {
         i18n.changeLanguage(lang);
       } else {
         i18n.changeLanguage("en");
       }
 
-     
+
       let currentPath = cookie.load(`current_path${sessionStorage.tabID}`);
       if (loggedIn) {
         (async () => await getParentCategoriesHandler({ limit: 10, offset: 0 }))()
@@ -105,7 +103,7 @@ const App: FC<PropsTypes> = ({
         setLoad(false);
       }
     }).catch((error) => {
-      
+
       logout()
       navigate('/500')
       setLoad(false)
@@ -118,7 +116,7 @@ const App: FC<PropsTypes> = ({
 
     if (!id && token) {
       try {
-       (async()=> await getUser())()
+        (async () => await getUser())()
       } catch (error) {
         logout()
       }
@@ -151,22 +149,20 @@ const App: FC<PropsTypes> = ({
         <Toaster />
         <GlobalDialog />
         {load && (
-          <CRow className="justify-content-center align-items-center">
-            <CCol xs='auto'>
-              <Rings height="35rem" width="150" color="blue" />
-            </CCol>
-          </CRow>
+          <div className="bg-light min-vh-100 d-flex flex-row align-items-center">
+            <CContainer>
+              <CRow className="justify-content-center">
+                <CCol xs='auto'>
+                  <Rings height="35rem" width="150" color="blue" />
+                </CCol>
+              </CRow>
+            </CContainer>
+          </div>
         )}
 
         {!load && (
           <Routes>
             <Route path="/login" element={<Login />} />
-            <Route
-
-              path="/register"
-
-              element={<Register />}
-            />
             <Route path="/verify" element={<Verify />} />
             <Route path="/500" element={<Page500 />} />
             <Route path="/reference" element={<Reference />} />

@@ -1,6 +1,6 @@
 import { CForm, CRow, CCol, CFormInput, CFormSelect, CFormLabel, CButton, CTooltip } from '@coreui/react'
 import PropTypes from 'prop-types'
-import React, { Fragment, useEffect, useState } from 'react'
+import React, { FormEvent, Fragment, useEffect, useState } from 'react'
 import { connect, useSelector } from 'react-redux'
 import FilterCard from 'src/components/FilterCard'
 import FormButtons from 'src/components/FormButtons'
@@ -10,16 +10,23 @@ import AddEmployee from './components/AddEmployee'
 import CIcon from '@coreui/icons-react'
 import { cilTrash } from '@coreui/icons'
 import DeleteModal from 'src/components/DeleteModal'
+import { RootState } from 'src/store'
+import { ParamsType, EmployeeType } from 'src/types'
 
-export const Overview = ({ getEmployees, updateEmployee, deleteEmployee }) => {
-  const { data, count } = useSelector(state => state.employee)
+type PropTypes = {
+  getEmployees : (p:ParamsType) => Promise<void>,
+  updateEmployee : (p:EmployeeType) => Promise<void>,
+  deleteEmployee : (id: string) => Promise<void>
+}
+export const Overview = ({ getEmployees, updateEmployee, deleteEmployee } :PropTypes) => {
+  const { data, count } = useSelector((state: RootState) => state.employee)
   const [loading, setLoading] = useState(true)
-  const [params, setParams] = useState({ offset: 0, limit: 10 })
+  const [params, setParams] = useState<ParamsType>({ offset: 0, limit: 10 })
   useEffect(() => {
     getEmployees(params)
     setLoading(false)
   }, [])
-  const Actions = ({ id }) => {
+  const Actions = ({ id }: EmployeeType) => {
     const [visible, setVisible] = useState(false)
     return (
       <Fragment>
@@ -28,14 +35,14 @@ export const Overview = ({ getEmployees, updateEmployee, deleteEmployee }) => {
             <CIcon icon={cilTrash} />
           </CButton>
         </CTooltip>
-        <DeleteModal visible={visible} onClose={() => setVisible(false)} onDelete={() => deleteHandler(id)} />
+        <DeleteModal visible={visible} onClose={() => setVisible(false)} onDelete={() =>  deleteHandler(id!)} />
       </Fragment>
     )
   }
   const columns = [{
     header: 'name',
     field: 'name',
-    body: data => <span>{data.name}</span>
+    body: (data: EmployeeType) => <span>{data.name}</span>
   },
   {
     header: 'role',
@@ -51,10 +58,10 @@ export const Overview = ({ getEmployees, updateEmployee, deleteEmployee }) => {
   {
     header: 'active',
     field: 'active',
-    body: data => data.active?.toString(),
+    body: (data: EmployeeType) => data.active?.toString(),
     edit: {
       inputType: 'dropdown',
-      options: [{ value: true, name: 'true' }, { value: false, name: 'false' }]
+      options: [{ value: 'true', name: 'true' }, { value: 'false', name: 'false' }]
     }
   },
   {
@@ -65,23 +72,31 @@ export const Overview = ({ getEmployees, updateEmployee, deleteEmployee }) => {
     }
   },
   ]
-  const submitHandler = e => {
+  const submitHandler = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    const _params = ['key', 'role', 'active']
-    let data = { ...params }
+
+    const _params:  string[] = ['key', 'role', 'active']
+    type PType = {
+      key?: HTMLInputElement; role?: HTMLSelectElement; active?: HTMLOptionElement 
+    }
+    const target = e.target as typeof e.target & {
+      key?: HTMLInputElement; role?: HTMLSelectElement; active?: HTMLSelectElement 
+    }
+    let data : ParamsType & {key?: string, role?: string, active?: string} = { ...params }
     setLoading(true)
-    _params.map(param => {
-      e.target[param].value && (data[param] = e.target[param].value)
+    _params.map((param : string) => {
+      target[param as keyof PType]?.value && ((data[param as keyof PType ] = target[param as keyof PType]?.value))
     })
     setParams(data)
     Promise.all([getEmployees(data)]).then(() => setLoading(false))
 
   }
-  const resetHandler = e => {
-    e.target.reset()
+  const resetHandler = (e: FormEvent<HTMLFormElement>) => {
+    const target =e.target as typeof e.target &{reset(): void} 
+    target.reset()
     setParams({ offset: 0, limit: 10 })
   }
-  const deleteHandler = async (id) => {
+  const deleteHandler = async (id: string) => {
     await deleteEmployee(id)
     await getEmployees(params)
   }
@@ -109,6 +124,7 @@ export const Overview = ({ getEmployees, updateEmployee, deleteEmployee }) => {
                 role
               </CFormLabel>
               <CFormSelect id='role'>
+              <option value="">all</option>
                 <option value="admin">admin</option>
                 <option value="supervisor">supervisor</option>
                 <option value="moderator">moderator</option>
@@ -140,12 +156,9 @@ export const Overview = ({ getEmployees, updateEmployee, deleteEmployee }) => {
   )
 }
 
-Overview.propTypes = {
-  getEmployees: PropTypes.func.isRequired
-}
 
-const mapStateToProps = (state) => ({})
+
 
 const mapDispatchToProps = { getEmployees, updateEmployee, deleteEmployee }
 
-export default connect(mapStateToProps, mapDispatchToProps)(Overview)
+export default connect(null, mapDispatchToProps)(Overview)

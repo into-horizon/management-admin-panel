@@ -19,6 +19,7 @@ import Table from "src/components/Table";
 import { getStoresHandler, updateStoreStatusHandler, updateStoreHandler, updateStoreNameHandler } from "../../store/store";
 import EditableCell from "src/components/EditableCell";
 import { RootState } from "src/store";
+import { ParamsType, StoreType } from "src/types";
 
 type PropTypes = {
   getStoresHandler: (p: ParamsType) => Promise<void>,

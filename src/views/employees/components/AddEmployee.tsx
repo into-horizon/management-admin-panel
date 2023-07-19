@@ -1,27 +1,41 @@
-import React, { useState } from 'react'
+import React, { FormEvent, useState } from 'react'
 import PropTypes from 'prop-types'
 import { CButton, CCol, CForm, CModal, CModalFooter, CModalHeader, CModalTitle, CRow, CFormInput, CFormSelect, CFormLabel } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import { cilPlus } from '@coreui/icons'
 import { addEmployee } from 'src/store/employee'
 import { connect } from 'react-redux'
-const AddEmployee = ({addEmployee, onSuccess, params: _params}) => {
+import { EmployeeType, ParamsType } from 'src/types'
+type PropTypes = {
+    addEmployee: (e: EmployeeType) => Promise<void>,
+    onSuccess: (p: ParamsType) => Promise<void>,
+    params: ParamsType
+}
+const AddEmployee = ({ addEmployee, onSuccess, params: _params }: PropTypes) => {
     const [visible, setVisible] = useState(false)
     const [disabled, setDisabled] = useState(false)
     const closeModal = () => {
         setVisible(false)
         setDisabled(false)
     }
-    const submitHandler = e => {
+    const submitHandler = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault()
-        console.log('right there');
-        const params = ['email', 'password', 'first_name', 'last_name', 'role', 'mobile']
-        const data = {}
+        const params: string[] = ['email', 'password', 'first_name', 'last_name', 'role', 'mobile']
+        const data: EmployeeType = { email: '', password: '', first_name: '', last_name: '', role: '', mobile: '' }
+        type PType = {
+            email: HTMLInputElement,
+            password: HTMLInputElement,
+            first_name: HTMLInputElement,
+            last_name: HTMLInputElement,
+            role: HTMLSelectElement,
+            mobile: HTMLInputElement
+        }       
+        const target = e.target as typeof e.target & PType
         params.forEach(param => {
-            e.target[param].value && (data[param] = e.target[param].value)
+            target[param as keyof PType].value && (data[param as keyof PType] = target[param as keyof PType] .value)
         })
         Promise.all([addEmployee(data)]).then(() => {
-            onSuccess(_params)    
+            onSuccess(_params)
             closeModal()
         })
     }
@@ -31,28 +45,28 @@ const AddEmployee = ({addEmployee, onSuccess, params: _params}) => {
                 <CIcon icon={cilPlus} size='lg' />
                 Add Employee
             </CButton>
-            <CModal visible={visible} onClose={closeModal}>
+            <CModal visible={visible} onClose={closeModal} alignment='center'>
                 <CModalHeader>
                     <CModalTitle>
                         Add Employee
                     </CModalTitle>
                 </CModalHeader>
                 <CForm onSubmit={submitHandler}>
-                    <CRow xs={{ gutter: 3 }} className='justify-content-center'>
+                    <CRow xs={{ gutter: 3 }} className='justify-content-center m-1'>
                         <CCol xs={5}>
-                            <CFormInput placeholder='first name' id='first_name' required/>
+                            <CFormInput placeholder='first name' id='first_name' required />
                         </CCol>
                         <CCol xs={5}>
-                            <CFormInput placeholder='last name' id='last_name' required/>
+                            <CFormInput placeholder='last name' id='last_name' required />
                         </CCol>
                         <CCol xs={5}>
-                            <CFormInput placeholder='email' id='email' required/>
+                            <CFormInput placeholder='email' id='email' required />
                         </CCol>
                         <CCol xs={5}>
-                            <CFormInput placeholder='password' id='password' required/>
+                            <CFormInput placeholder='password' id='password' required />
                         </CCol>
                         <CCol xs={5}>
-                            <CFormInput placeholder='mobile' type='tel' id='mobile' required/>
+                            <CFormInput placeholder='mobile' type='tel' id='mobile' required />
                         </CCol>
                         <CCol xs={5}>
                             <CFormSelect id='role' onClick={() => setDisabled(true)} required>
@@ -77,5 +91,5 @@ AddEmployee.propTypes = {
     onSuccess: PropTypes.func,
     params: PropTypes.object
 }
-const mapDispatchToProps = {addEmployee}
-export default connect(null, mapDispatchToProps) (AddEmployee)
+const mapDispatchToProps = { addEmployee }
+export default connect(null, mapDispatchToProps)(AddEmployee)

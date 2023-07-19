@@ -14,7 +14,7 @@ import {
   CModalFooter,
   CFormTextarea,
 } from "@coreui/react";
-import React, { useState, useEffect, Children } from "react";
+import React, { useState, useEffect, Children, FormEvent } from "react";
 import { connect, useSelector } from "react-redux";
 import Table from "src/components/Table";
 import { getPendingProducts, updateProductStatus } from "../../store/product";
@@ -25,19 +25,26 @@ import {
   cilCheck,
   cilX,
 } from "@coreui/icons";
+import { RootState } from "src/store";
+import { ParamsType, ProductType } from "src/types";
 
-export const PendingProducts = ({
+type PropTypes ={
+  getPendingProducts :( p: ParamsType) => Promise<void>,
+  updateProductStatus : (p: ProductType) => Promise<void> ,
+}
+
+const PendingProducts = ({
   getPendingProducts,
   updateProductStatus,
-}) => {
+}:PropTypes) => {
   const [loading, setLoading] = useState(true);
-  const [params, setParams] = useState({ limit: 10, offset: 0 });
-  const { data, count } = useSelector((state) => state.products.pending);
+  const [params, setParams] = useState<ParamsType>({ limit: 10, offset: 0 });
+  const { data, count } = useSelector((state: RootState) => state.products.pending);
   useEffect(() => {
     getPendingProducts(params).then(() => setLoading(false));
   }, []);
 
-  const Details = (data) => {
+  const Details = (data : ProductType) => {
     const [visible, setVisible] = useState(false);
     return (
       <React.Fragment>
@@ -123,11 +130,12 @@ export const PendingProducts = ({
     );
   };
 
-  const StatusBody = (data) => {
+  const StatusBody = (data : ProductType) => {
     const [visible, setVisible] = useState(false)
-    const submitHandler = e =>{
+    const submitHandler = (e: FormEvent<HTMLFormElement>) =>{
         e.preventDefault()
-        updateProductStatus({...data, status: 'rejected', rejection_reason: e.target.rejection_reason.value})
+        const target = e.target as typeof e.target & {rejection_reason: HTMLSelectElement}
+        updateProductStatus({...data, status: 'rejected', rejection_reason: target.rejection_reason.value})
     }
     return (
       <React.Fragment>
@@ -187,8 +195,8 @@ export const PendingProducts = ({
         params={params}
         updateParams={setParams}
         loading={loading}
-        columns={columns}
-      />
+        columns={columns} 
+        updateLoading={setLoading} changeData={getPendingProducts } cookieName={"pending"}      />
     </>
   );
 };

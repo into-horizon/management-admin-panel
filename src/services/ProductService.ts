@@ -8,7 +8,7 @@ class ProductService extends ApiService {
         this.path = "api/admin/product";
     }
 
-    async addProduct(data : ProductType) {
+    async addProduct(data : ProductType | FormData) {
         try {
             let res = await this.post(this.path, data);
             return res;
@@ -25,7 +25,7 @@ class ProductService extends ApiService {
         }
     }
 
-    async updateProductStatus(data : ProductType){
+    async updateProductStatus(data : {status: string, id:string}){
         try {
             let result =  await this.patch( this.path, data)
             return result
@@ -51,7 +51,7 @@ class ProductService extends ApiService {
         }
     }
 
-    async updateSizeAndQuantity(data : ProductType) {
+    async updateSizeAndQuantity(data : {id: string, quantity: number, size_and_color: string| null}) {
         try {
             let res = await this.patch(`${this.path}/quantityandsize`, data)
             return res;
@@ -59,7 +59,7 @@ class ProductService extends ApiService {
            return error
         }
     }
-    async updateDiscount(data : ProductType) {
+    async updateDiscount(data : {id: string, discount: boolean, discount_rate: number}) {
         try {
             let res = await this.patch(`${this.path}/discount`, data)
             return res;
@@ -69,7 +69,7 @@ class ProductService extends ApiService {
     }
     async getSearchData(data : ProductType){
       try {
-          let res = await this.get(`${this.path}/searchData/${JSON.stringify(data)}`, null);
+          let res = await this.get(`${this.path}/searchData/${JSON.stringify(data)}`);
           return res;
       } catch (error) {
          return error

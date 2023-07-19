@@ -4,14 +4,17 @@ import Category from "../services/CategoryService";
 import { updateToast } from "./globalToasts";
 import { AppDispatch, RootState } from ".";
 import { DialogResponseTypes } from "src/enums";
+import { CategoriesStateType, ParamsType, ChildAndGrandCategoriesType, ParentCategoriesType } from "src/types";
 
+
+const initialState :CategoriesStateType = {
+  parentCategories: { data: [], count: 0 },
+  childCategories: { data: [], count: 0 },
+  grandChildCategories: { data: [], count: 0 },
+}
 const category = createSlice({
   name: "Category",
-  initialState: {
-    parentCategories: { data: [], count: 0 },
-    childCategories: { data: [], count: 0 },
-    grandChildCategories: { data: [], count: 0 },
-  },
+  initialState: initialState,
   reducers: {
     getParentCategories(state, action) {
       return { ...state, parentCategories: action.payload };

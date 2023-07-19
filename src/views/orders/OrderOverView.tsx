@@ -11,6 +11,7 @@ import Export from '../../components/Export';
 import NewOrders from 'src/services/Orders';
 import CopyableText from '../../components/CopyableText';
 import { RootState } from 'src/store';
+import { ParamsType, OrderType } from 'src/types';
 
 
 type PropsTypes = {

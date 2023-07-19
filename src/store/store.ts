@@ -4,6 +4,7 @@ import Store from "../services/Stores";
 import { updateToast } from "./globalToasts";
 import { AppDispatch, RootState } from ".";
 import { DialogResponseTypes } from "src/enums";
+import { ParamsType, StoreType, StoreStateType } from "src/types";
 
 const store = createSlice({
   name: "store",
@@ -11,7 +12,7 @@ const store = createSlice({
     pending: { data: [], count: 0 },
     overview: { data: [], count: 0 },
     searched: [], 
-    populatedStore: load('populated-store')?JSON.parse(load('populated-store')):{}
+    populatedStore: load('populated-store')?load('populated-store'):{}
   },
   reducers: {
     addData(state, action) {

@@ -12,7 +12,7 @@ import {
 
 type PropTypes ={
   data: {[key: string]: any}
-  action?: (d:{[key: string]: any}) => Promise<void>
+  action?: (d?:any) => Promise<void>
   field: string
   type?: HTMLInputTypeAttribute
   options? : Array<{ name:string , value:any }>
