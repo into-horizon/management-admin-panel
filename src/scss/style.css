@@ -5,12 +5,14 @@ h4,
 h5,
 h6,
 strong,
-span,
 th,
-td,
-input::first-letter,
+label,
 button::first-letter {
     text-transform: capitalize;
+}
+
+input[type=number]:out-of-range {
+   color: orangered;
 }
 
 /* label{
@@ -123,8 +125,9 @@ button::first-letter {
     margin: 1rem 0;
 }
 
-.productForm div select {
-    width: 25%;
+.productForm select {
+    /* width: 25%; */
+    margin: .5rem 0;
 }
 
 .thirdCategory {
@@ -240,6 +243,12 @@ button::first-letter {
     max-height: 9rem;
     box-shadow: 1px 5px lightblue;
     /* box-shadow: 1px 5px lightblue; */
+}
+
+.deleteBtn{
+    position: absolute;
+    top: 0;
+    left: 0;
 }
 
 .deleteBtnEn {
@@ -477,11 +486,13 @@ button::first-letter {
     z-index: 20;
     opacity: 0.5;
     padding: 1rem;
+    /* max-width: 75%; */
 }
 .filter:hover{
     opacity: 1;
     background-color: #fff;
-    border: black solid 1px;
+    border: gray solid 1px;
+    border-radius: 2rem;
 
 }
 
@@ -499,3 +510,39 @@ button::first-letter {
 .search-dropdown{
     position: relative;
 }
+
+.move{
+    cursor: move;
+}
+
+/* .paginator{
+    position: absolute;
+    bottom: 2rem;
+}
+.body{
+    position: relative;
+} */
+
+.document{
+    margin: auto;
+    background-color: blueviolet;
+    padding: .5rem;
+    border-radius: 7px;
+    color: #fff !important;
+    cursor: pointer;
+    
+
+}
+.document:hover{
+    background-color: aqua;
+}
+
+.file-label{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    row-gap: 1rem;
+}
+
+

@@ -1,9 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import {CNav,CNavItem ,CNavLink} from '@coreui/react'
-import Account from '../../../components/Account'
-import Address from '../address/Address'
 import { useTranslation } from 'react-i18next';
-import BankAccount from 'src/components/BankAccount';
 
 const Settings = props => {
     const [activeKey, setActiveKey] = useState('settings')
@@ -33,9 +30,8 @@ const Settings = props => {
                     </CNavLink>
                 </CNavItem>
             </CNav>
-                {activeKey === 'settings' && <Account/>}
-                {activeKey === 'address' && <Address/>}
-                {activeKey === 'payment' && <BankAccount/>}
+                {/* {activeKey === 'settings' && <Account/>} */}
+                {/* {activeKey === 'payment' && <BankAccount/>} */}
         </>
     )
 }
