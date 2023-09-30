@@ -35,14 +35,14 @@ import {
 
 } from "@coreui/icons";
 import Paginator from "../../components/Paginator";
-import DiscountModal from "./DiscountModal";
-import SizeAndColorModal from "./SizeAndColorModal";
-import DeleteProductModal from "./DeleteProductModal";
-import StatusModal from "./StatusModal";
+import DiscountModal from "./components/DiscountModal";
+import SizeAndColorModal from "./components/SizeAndColorModal";
+import DeleteProductModal from "./components/DeleteProductModal";
+import StatusModal from "./components/StatusModal";
 import Product from "src/services/ProductService";
 import FilterCard from "src/components/FilterCard";
 import FormButtons from "src/components/FormButtons";
-import FormBody from "./FormBody";
+import FormBody from "./components/FormBody";
 import { RootState } from "src/store";
 import { GetFunctionType, ParamsType, QuantityDetailsType } from "src/types";
 
@@ -469,7 +469,7 @@ const ProductsRender = ({ getProductsByStatus,
                     />
                   </CCol>
                   <CCol xs="auto">
-                    <StatusModal product={product} />
+                    <StatusModal product={product} callback={()=> getProductsByStatus(params)} />
                   </CCol>
                   <CCol xs="auto">
                     <CButton

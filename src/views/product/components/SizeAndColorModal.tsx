@@ -26,8 +26,8 @@ import {
   cilCash,
   cilImagePlus,
 } from "@coreui/icons";
-import ColorSelector from "../../components/ColorSelector";
-import colors from "../../services/colors";
+import ColorSelector from "../../../components/ColorSelector";
+import colors from "../../../services/colors";
 import { useTranslation } from "react-i18next";
 import Multiselect from "multiselect-react-dropdown";
 import { useRef } from "react";

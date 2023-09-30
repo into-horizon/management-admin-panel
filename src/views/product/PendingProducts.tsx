@@ -27,24 +27,29 @@ import {
 } from "@coreui/icons";
 import { RootState } from "src/store";
 import { ParamsType, ProductType } from "src/types";
+import { events } from "src/App";
 
-type PropTypes ={
-  getPendingProducts :( p: ParamsType) => Promise<void>,
-  updateProductStatus : (p: ProductType) => Promise<void> ,
-}
+type PropTypes = {
+  getPendingProducts: (p: ParamsType) => Promise<void>;
+  updateProductStatus: (p: ProductType) => Promise<void>;
+};
 
 const PendingProducts = ({
   getPendingProducts,
   updateProductStatus,
-}:PropTypes) => {
+}: PropTypes) => {
   const [loading, setLoading] = useState(true);
   const [params, setParams] = useState<ParamsType>({ limit: 10, offset: 0 });
-  const { data, count } = useSelector((state: RootState) => state.products.pending);
+  const { data, count } = useSelector(
+    (state: RootState) => state.products.pending
+  );
   useEffect(() => {
     getPendingProducts(params).then(() => setLoading(false));
   }, []);
-
-  const Details = (data : ProductType) => {
+  events.on("pending", () => {
+    console.log("🚀 ~ file: PendingProducts.tsx:50 ~ events.on ~ pending:");
+  });
+  const Details = (data: ProductType) => {
     const [visible, setVisible] = useState(false);
     return (
       <React.Fragment>
@@ -130,53 +135,74 @@ const PendingProducts = ({
     );
   };
 
-  const StatusBody = (data : ProductType) => {
-    const [visible, setVisible] = useState(false)
-    const submitHandler = (e: FormEvent<HTMLFormElement>) =>{
-        e.preventDefault()
-        const target = e.target as typeof e.target & {rejection_reason: HTMLSelectElement}
-        updateProductStatus({...data, status: 'rejected', rejection_reason: target.rejection_reason.value})
-    }
+  const StatusBody = (data: ProductType) => {
+    const [visible, setVisible] = useState(false);
+    const submitHandler = (e: FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+      const target = e.target as typeof e.target & {
+        rejection_reason: HTMLSelectElement;
+      };
+      updateProductStatus({
+        ...data,
+        status: "rejected",
+        rejection_reason: target.rejection_reason.value,
+      });
+    };
     return (
       <React.Fragment>
-        <CModal visible={visible} alignment="center" onClose={()=> setVisible(false)}> 
-            <CModalHeader>
-                <CModalTitle>
-                    Product Rejection
-                </CModalTitle>
-            </CModalHeader>
-            <CForm onSubmit={submitHandler}>
-                <CRow className="justify-content-center align-items-center">
-                    <CCol xs={10}>
-
-                <CFormTextarea label='Rejection Reason' id="rejection_reason" required/>
-                    </CCol>
-                </CRow>
-                <CModalFooter>
-                    <CButton color="danger" type="submit">Reject</CButton>
-                    <CButton color="secondary" onClick={()=> setVisible(false)}>Close</CButton>
-                </CModalFooter>
-            </CForm>
+        <CModal
+          visible={visible}
+          alignment="center"
+          onClose={() => setVisible(false)}
+        >
+          <CModalHeader>
+            <CModalTitle>Product Rejection</CModalTitle>
+          </CModalHeader>
+          <CForm onSubmit={submitHandler}>
+            <CRow className="justify-content-center align-items-center">
+              <CCol xs={10}>
+                <CFormTextarea
+                  label="Rejection Reason"
+                  id="rejection_reason"
+                  required
+                />
+              </CCol>
+            </CRow>
+            <CModalFooter>
+              <CButton color="danger" type="submit">
+                Reject
+              </CButton>
+              <CButton color="secondary" onClick={() => setVisible(false)}>
+                Close
+              </CButton>
+            </CModalFooter>
+          </CForm>
         </CModal>
-        { data.status === 'pending'? 
-        <CRow>
-          <CCol xs="auto">
-            <CTooltip content='Approve'>
-            <CButton color="success" onClick={()=> updateProductStatus({...data, status: 'approved'})}>
-              <CIcon icon={cilCheck} />
-            </CButton>
-
-            </CTooltip>
-          </CCol>
-          <CCol xs="auto">
-            <CTooltip content='Reject' >
-            <CButton color="danger" onClick={()=> setVisible(true)}>
-              <CIcon icon={cilX} />
-            </CButton>
-
-            </CTooltip>
-          </CCol>
-        </CRow>:  <span>{data.status}</span>}
+        {data.status === "pending" ? (
+          <CRow>
+            <CCol xs="auto">
+              <CTooltip content="Approve">
+                <CButton
+                  color="success"
+                  onClick={() =>
+                    updateProductStatus({ ...data, status: "approved" })
+                  }
+                >
+                  <CIcon icon={cilCheck} />
+                </CButton>
+              </CTooltip>
+            </CCol>
+            <CCol xs="auto">
+              <CTooltip content="Reject">
+                <CButton color="danger" onClick={() => setVisible(true)}>
+                  <CIcon icon={cilX} />
+                </CButton>
+              </CTooltip>
+            </CCol>
+          </CRow>
+        ) : (
+          <span>{data.status}</span>
+        )}
       </React.Fragment>
     );
   };
@@ -195,8 +221,11 @@ const PendingProducts = ({
         params={params}
         updateParams={setParams}
         loading={loading}
-        columns={columns} 
-        updateLoading={setLoading} changeData={getPendingProducts } cookieName={"pending"}      />
+        columns={columns}
+        updateLoading={setLoading}
+        changeData={getPendingProducts}
+        cookieName={"pending"}
+      />
     </>
   );
 };

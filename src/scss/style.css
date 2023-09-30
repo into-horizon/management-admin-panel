@@ -12,7 +12,7 @@ button::first-letter {
 }
 
 input[type=number]:out-of-range {
-   color: orangered;
+    color: orangered;
 }
 
 /* label{
@@ -245,7 +245,7 @@ input[type=number]:out-of-range {
     /* box-shadow: 1px 5px lightblue; */
 }
 
-.deleteBtn{
+.deleteBtn {
     position: absolute;
     top: 0;
     left: 0;
@@ -278,9 +278,9 @@ input[type=number]:out-of-range {
 .productRender {
     border: 3px solid #fff;
 
-     /* box-shadow: 1px 5px lightblue;  */
-     /* margin: 1rem 0; */
-    padding: 1rem; 
+    /* box-shadow: 1px 5px lightblue;  */
+    /* margin: 1rem 0; */
+    padding: 1rem;
 }
 
 .productTitles {
@@ -457,6 +457,7 @@ input[type=number]:out-of-range {
 .select-search-container {
     width: 100% !important;
 }
+
 /* .floating-dropdown-show:not(.dropdown-input:focus ){
     display: none;
 } */
@@ -466,20 +467,21 @@ input[type=number]:out-of-range {
     position: absolute;
     visibility: hidden;
 }
+
 /* .dropdown-input:focus +  */
 
 .floating-dropdown-show {
     position: absolute;
     overflow-y: scroll;
     max-height: 10rem;
-    width:13rem ;
+    width: 13rem;
     z-index: 10;
     visibility: visible;
 }
 
 
 
-.filter{
+.filter {
     position: fixed;
     right: 0;
     top: 50%;
@@ -488,7 +490,8 @@ input[type=number]:out-of-range {
     padding: 1rem;
     /* max-width: 75%; */
 }
-.filter:hover{
+
+.filter:hover {
     opacity: 1;
     background-color: #fff;
     border: gray solid 1px;
@@ -496,48 +499,47 @@ input[type=number]:out-of-range {
 
 }
 
-.search-dropdown{
+.search-dropdown {
     position: relative;
-  
+
     right: 0
 }
 
-.overflow-x{
+.overflow-x {
     overflow-x: scroll;
-    max-width: 100%;
 }
 
-.search-dropdown{
+.search-dropdown {
     position: relative;
 }
 
-.move{
+.move {
     cursor: move;
 }
 
-/* .paginator{
-    position: absolute;
-    bottom: 2rem;
+.paginator{
+   max-width: 100%;
 }
-.body{
+/* .body{
     position: relative;
 } */
 
-.document{
+.document {
     margin: auto;
     background-color: blueviolet;
     padding: .5rem;
     border-radius: 7px;
     color: #fff !important;
     cursor: pointer;
-    
+
 
 }
-.document:hover{
+
+.document:hover {
     background-color: aqua;
 }
 
-.file-label{
+.file-label {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -546,3 +548,18 @@ input[type=number]:out-of-range {
 }
 
 
+.text-align-right {
+    text-align: right !important;
+}
+
+.text-align-left {
+    text-align: left !important;
+}
+
+.text-align-center {
+    text-align: center !important;
+}
+
+.w-15 {
+    width: 15rem !important;
+}

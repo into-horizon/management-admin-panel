@@ -10,18 +10,26 @@ type ItemType = {
   name: string,
   component: ForwardRefExoticComponent<any>,
   to?: string,
-  icon?: ReactElement<any,any>
-  badge?: { color: string, text: string }
+  icon?: ReactElement<any, any>
+  badge?: { color: string, text?: string }
   items?: ItemType[]
 }
 export const AppSidebarNav = ({ items }: { items: ItemType[] }) => {
   const location = useLocation()
-  const navLink = (name:string,icon?: ReactElement<any,any>, badge?: { color: string, text: string }) => {
+  const pendingProductsCount = useSelector((state: RootState) => state.products.pending.count)
+  const pendingOrdersCount = useSelector((state: RootState) => state.orders.pendingOrders.count)
+  const navLink = (name: string, icon?: ReactElement<any, any>, badge?: { color: string, text?: string }) => {
     return (
       <>
         {icon && icon}
-        {name&& name}
-        {badge && (
+        {name && name}
+        {badge && (name === "Pending Orders" && pendingOrdersCount > 0) && <CBadge color={badge.color} className="ms-auto">
+          {pendingOrdersCount}
+        </CBadge>}
+        {badge && (name === "Pending Products" && pendingProductsCount > 0) && <CBadge color={badge.color} className="ms-auto">
+          {pendingProductsCount}
+        </CBadge>}
+        {badge && badge.text && (
           <CBadge color={badge.color} className="ms-auto">
             {badge.text}
           </CBadge>
@@ -38,7 +46,7 @@ export const AppSidebarNav = ({ items }: { items: ItemType[] }) => {
         {...(rest.to &&
           !rest.items && {
           component: NavLink,
-          className: 'active',
+          // className: 'active',
         })}
         key={index}
         {...rest}
@@ -47,15 +55,15 @@ export const AppSidebarNav = ({ items }: { items: ItemType[] }) => {
       </Component>
     )
   }
-  const navGroup = (item :ItemType, index: number) => {
+  const navGroup = (item: ItemType, index: number) => {
     const { component, name, icon, to, ...rest } = item
     const Component = component
     return (
       <Component
         idx={String(index)}
         key={index}
-        toggler={navLink(name,icon)}
-        visible={to &&location.pathname.startsWith(to)}
+        toggler={navLink(name, icon)}
+        visible={to && location.pathname.startsWith(to)}
         {...rest}
       >
         {item.items?.map((item, index) =>

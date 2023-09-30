@@ -9,3 +9,13 @@ export enum DialogResponseTypes {
     CONFIRMATION = 'confirmation',
     DEFAULT = ''
 }
+
+
+export enum InputType {
+    TEXT = 'text',
+    NUMBER = "number",
+    DROPDOWN = 'dropdown',
+    DATE = 'date',
+    EMAIL = 'email',
+    PHONE = 'phone'
+} 

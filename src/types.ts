@@ -8,11 +8,13 @@ export type UserType = {
     mobile: string
     created_at?: string
     profile_id?: string
+    verified: boolean
 }
 export type AuthStateType = {
     loggedIn: boolean
     user: UserType
     message: string
+    loading: boolean
 }
 
 export type AccountType = {
@@ -56,7 +58,8 @@ export type DiscountCodeType = {
     discount: number,
     max_discount: number,
     number_of_time: number,
-    created_at?: string
+    created_at?: string,
+    active: boolean
 }
 
 export type DiscountCodeStateType = {

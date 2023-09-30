@@ -88,6 +88,12 @@ const OrderModel = ({ data, updateOrderItemHandler, loading, type }: PropTypes) 
                                         grand total
                                     </CTableHeaderCell>
                                     <CTableHeaderCell>
+                                        place order date
+                                    </CTableHeaderCell>
+                                    <CTableHeaderCell>
+                                        delivery date order date
+                                    </CTableHeaderCell>
+                                    <CTableHeaderCell>
                                         status
                                     </CTableHeaderCell>
                                 </CTableRow>
@@ -103,6 +109,12 @@ const OrderModel = ({ data, updateOrderItemHandler, loading, type }: PropTypes) 
                                     </CTableDataCell>
                                     <CTableDataCell>
                                         {order.grand_total}
+                                    </CTableDataCell>
+                                    <CTableDataCell>
+                                        {new Date(order.created_at).toLocaleDateString()}
+                                    </CTableDataCell>
+                                    <CTableDataCell>
+                                        {new Date(order.updated).toLocaleDateString()}
                                     </CTableDataCell>
                                     <CTableDataCell>
                                         {order.status}

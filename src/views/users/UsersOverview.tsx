@@ -11,7 +11,7 @@ import {
 import React, { useState, useEffect, FormEvent } from "react";
 import { connect, useSelector } from "react-redux";
 import FilterCard from "src/components/FilterCard";
-import Table from "src/components/Table";
+import Table, { ColumnType } from "src/components/Table";
 import {
   getUsersHandler,
   updateProfileHandler,
@@ -22,28 +22,28 @@ import { cilTrash, cilSearch, cilFilterX } from "@coreui/icons";
 import EditableCell from "src/components/EditableCell";
 import { GetFunctionType, ParamsType, UserType } from "src/types";
 import { RootState } from "src/store";
+import { InputType } from "src/enums";
 
-
-type PropTypes ={
-  getUsersHandler : GetFunctionType,
-  updateProfileHandler : (payload: UserType) => Promise<void>,
-  updateUserHandler : (payload: UserType) => Promise<void> ,
-}
+type PropTypes = {
+  getUsersHandler: GetFunctionType;
+  updateProfileHandler: (payload: UserType) => Promise<void>;
+  updateUserHandler: (payload: UserType) => Promise<void>;
+};
 export const UsersOverview = ({
   getUsersHandler,
   updateProfileHandler,
   updateUserHandler,
-}:PropTypes) => {
+}: PropTypes) => {
   const { count, data } = useSelector((state: RootState) => state.user);
   const [params, setParams] = useState<ParamsType>({ limit: 10, offset: 0 });
   // const Verified =  data => data.Verified ? <span>yes</span>: <span>no</span>
 
   const [loading, setLoading] = useState(false);
-  const columns = [
+  const columns: ColumnType[] = [
     {
       header: "first name",
       field: "first_name",
-      body: (data : UserType ) => (
+      body: (data: UserType) => (
         <EditableCell
           data={data}
           field="first_name"
@@ -54,7 +54,7 @@ export const UsersOverview = ({
     {
       header: "last name",
       field: "last_name",
-      body: (data : UserType) => (
+      body: (data: UserType) => (
         <EditableCell
           data={data}
           field="last_name"
@@ -65,84 +65,65 @@ export const UsersOverview = ({
     {
       header: "email",
       field: "email",
-      body: (data : UserType) => (
-        <EditableCell
-          data={{ ...data }}
-          field="email"
-          action={updateUserHandler}
-        />
-      ),
+      edit: {
+        inputType: InputType.EMAIL,
+      },
     },
     {
       header: "mobile number",
       field: "mobile",
-      body: (data : UserType) => (
-        <EditableCell
-          data={{ ...data }}
-          field="mobile"
-          action={updateUserHandler}
-        />
-      ),
+      edit: {
+        inputType: InputType.PHONE,
+      },
     },
     {
       header: "account status",
       field: "status",
-      body: (data : UserType) => (
-        <EditableCell
-          data={data}
-          field="status"
-          type="dropdown"
-          options={[
-            { name: "activate", value: "active" },
-            { name: "ban", value: "banned" },
-          ]}
-          action={updateUserHandler}
-        />
-      ),
+      edit: {
+        inputType: InputType.DROPDOWN,
+        options: [
+          { name: "activate", value: "active" },
+          { name: "ban", value: "banned" },
+        ],
+      },
     },
     {
       header: "verified",
       field: "verified",
-      body: (data : UserType) => (
-        <EditableCell
-          data={{ ...data }}
-          field="verified"
-          type="dropdown"
-          options={[
-            { name: "unverified", value: false },
-            { name: "verified", value: true },
-          ]}
-          action={updateUserHandler}
-        />
-      ),
+      body: (data: UserType) => data.verified.toString(),
+      edit: {
+        inputType: InputType.DROPDOWN,
+        options: [
+          { name: "unverified", value: "false" },
+          { name: "verified", value: "true" },
+        ],
+      },
     },
   ];
 
-  const submitHandler = (e : FormEvent<HTMLFormElement>) => {
+  const submitHandler = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
-    let data : ParamsType = { limit: 10, offset: 0 };
+    let data: ParamsType = { limit: 10, offset: 0 };
     type InputTypes = {
-      query: HTMLInputElement
-      status: HTMLSelectElement
-      verified: HTMLSelectElement
-    }
-    const target = e.target as typeof e.target & InputTypes
+      query: HTMLInputElement;
+      status: HTMLSelectElement;
+      verified: HTMLSelectElement;
+    };
+    const target = e.target as typeof e.target & InputTypes;
     target.query.value && (data["query"] = target.query.value);
-    target.status.value !== "false" &&
-      (data["status"] = target.status.value);
-    target.verified.value !== "" &&
-      (data["verified"] = target.verified.value);
+    target.status.value !== "false" && (data["status"] = target.status.value);
+    target.verified.value !== "" && (data["verified"] = target.verified.value);
 
     setParams(data);
     getUsersHandler(data).then(() => setLoading(false));
   };
-  const resetTable = (e : FormEvent<HTMLFormElement>) => {
-    const target =  e.target as typeof e.target & {reset(): void}
+  const resetTable = (e: FormEvent<HTMLFormElement>) => {
+    const target = e.target as typeof e.target & { reset(): void };
     target.reset();
     setParams({ limit: 10, offset: 0 });
   };
-  
+
   return (
     <>
       <FilterCard>
@@ -157,7 +138,7 @@ export const UsersOverview = ({
             <CCol xs="auto">
               <CFormLabel htmlFor="status">status</CFormLabel>
               <CFormSelect name="status" id="status">
-                <option value={'false'}>all</option>
+                <option value={"false"}>all</option>
                 <option value="active">active</option>
                 <option value="banned">banned</option>
                 <option value="deactivated">deactivated</option>
@@ -169,8 +150,8 @@ export const UsersOverview = ({
               </CFormLabel>
               <CFormSelect name="verified">
                 <option value="">all</option>
-                <option value={'true'}>verified</option>
-                <option value={'false'}>unverified</option>
+                <option value={"true"}>verified</option>
+                <option value={"false"}>unverified</option>
               </CFormSelect>
             </CCol>
             <CCol xs={12}></CCol>
@@ -202,12 +183,13 @@ export const UsersOverview = ({
         loading={loading}
         updateParams={setParams}
         updateLoading={setLoading}
-        cookieName='users'
+        cookieName="users"
+        editable
+        editFn={updateUserHandler}
       />
     </>
   );
 };
-
 
 const mapDispatchToProps = {
   getUsersHandler,
