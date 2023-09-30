@@ -7,7 +7,7 @@ import { ParamsType } from "src/types";
 
 type PropTypes = {
   title?: string,
-  data: (p: ParamsType)=> any ,
+  data: (p?: ParamsType)=> any ,
   fileName?: string,
   sheetName?: string ,
   style?: CSSProperties,
