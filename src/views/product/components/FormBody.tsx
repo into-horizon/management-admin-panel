@@ -5,7 +5,7 @@ import {
     CCol,
     CFormSelect,
   } from "@coreui/react";
-  import {getChildCategoriesHandler,getGrandChildCategoriesHandler,getGrandChildCategories} from '../../store/category'
+  import {getChildCategoriesHandler,getGrandChildCategoriesHandler,getGrandChildCategories} from '../../../store/category'
 import { RootState } from 'src/store';
 import { ParamsType, ParentCategoriesType, ChildAndGrandCategoriesType } from 'src/types';
 

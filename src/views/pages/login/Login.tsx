@@ -23,22 +23,22 @@ import cookie from 'react-cookies'
 import { useTranslation } from 'react-i18next';
 import { RootState } from 'src/store'
 
-type PropTypes ={
-  loginHandler: (p: {password:string, email: string})=> Promise<void>
+type PropTypes = {
+  loginHandler?: (p: { password: string, email: string }) => Promise<void>
 }
-const Login = ({loginHandler}:PropTypes) => {
+const Login = ({ }: PropTypes) => {
   const { t, i18n } = useTranslation('translation', { keyPrefix: 'login' });
   const dispatch = useDispatch()
-  const login = useSelector((state:RootState)=> state.login)
+  const login = useSelector((state: RootState) => state.login)
   const [load, setLoad] = useState(true)
-  
+
   const { showAlert } = usePopup();
   const navigate = useNavigate()
-  const submitHandler = async (e : FormEvent<HTMLFormElement>) => {
+  const submitHandler = async (e: FormEvent<HTMLFormElement>) => {
     setLoad(true)
     e.preventDefault()
-    const target = e.target as typeof e.target & {email: HTMLInputElement, password: HTMLInputElement}
-    await loginHandler({ email: target.email.value, password: target.password.value })
+    const target = e.target as typeof e.target & { email: HTMLInputElement, password: HTMLInputElement }
+    dispatch(loginHandler({ email: target.email.value, password: target.password.value }))
     setLoad(false)
   }
   let currentPath = cookie.load(`current_path${sessionStorage.tabID}`)
@@ -53,35 +53,6 @@ const Login = ({loginHandler}:PropTypes) => {
       navigate(currentPath === '/login' ? '/' : currentPath)
     }
   }, [login.loggedIn])
-  useEffect(() => {
-    if (login.message) {
-      if (login.message.includes('password')) {
-        showAlert({
-          title: "incorrect credentials",
-          type: DialogType.WARNING,
-          text: login.message
-        });
-        setLoad(false)
-      } else if (login.message.includes('unauthorized')) {
-        if (login.message) {
-          showAlert({
-            title: "unauthorized",
-            type: DialogType.WARNING,
-            text: login.message
-          });
-          setLoad(false)
-        }
-      } else if (login.message.includes('verified')) {
-        showAlert({
-          title: "Verified",
-          type: DialogType.INFO,
-          text: `${login.message}, please login now`
-        });
-        setLoad(false)
-      }
-     
-    }
-  }, [login.message])
   useEffect(() => {
     cookie.save(`current_path${sessionStorage.tabID}`, window.location.pathname, { path: '/' })
   }, [])

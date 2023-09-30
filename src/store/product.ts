@@ -98,7 +98,7 @@ export const getPendingProducts = (payload: ParamsType) => async (dispatch: AppD
     }
 }
 
-export const updateProductStatus = (payload: {status: string, id:string}, type: 'pending' | 'overview' = 'pending') => async (dispatch: AppDispatch, state: () => RootState) => {
+export const updateProductStatus = (payload: { status: string, id: string }, type: 'pending' | 'overview' = 'pending') => async (dispatch: AppDispatch, state: () => RootState) => {
     try {
         let { status, data, message } = await Product.updateProductStatus(payload)
         if (status === 200) {
@@ -107,7 +107,7 @@ export const updateProductStatus = (payload: {status: string, id:string}, type: 
                 if (product.id === data.id) return { ...product, ...data }
                 return product
             })
-            dispatch(addData({ [type]: { data: newState, count: count } }))
+            dispatch(addData({ [type]: { data: newState, count: type === 'pending' ? count - 1 : count } }))
             dispatch(updateToast({ status: status, message: message, type: DialogResponseTypes.UPDATE }))
         } else dispatch(updateToast({ status: status, message: message, type: DialogResponseTypes.ERROR }))
     } catch (error) {
@@ -183,7 +183,7 @@ export const deleteProductPictureHandler = (payload: { picture_id: string }) => 
         }
     }
 }
-export const updateSizeAndQuantity = (payload: {id: string, quantity: number, size_and_color: string| null}) => async (dispatch: AppDispatch, state: () => RootState) => {
+export const updateSizeAndQuantity = (payload: { id: string, quantity: number, size_and_color: string | null }) => async (dispatch: AppDispatch, state: () => RootState) => {
     try {
         let { result, message, status } = await Product.updateSizeAndQuantity(payload)
         if (status === 200) {
@@ -210,7 +210,7 @@ export const updateSizeAndQuantity = (payload: {id: string, quantity: number, si
 
 
 
-export const updateDiscount = (payload: {id: string, discount: boolean, discount_rate: number}) => async (dispatch: AppDispatch, state: () => RootState) => {
+export const updateDiscount = (payload: { id: string, discount: boolean, discount_rate: number }) => async (dispatch: AppDispatch, state: () => RootState) => {
     try {
         let { result, message, status } = await Product.updateDiscount(payload)
         if (status === 200) {

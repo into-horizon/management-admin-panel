@@ -1,6 +1,6 @@
-import React, { useState, useEffect, FormEvent } from "react";
+import React, { useState, useEffect, FormEvent, Fragment } from "react";
 import { connect, useSelector } from "react-redux";
-import Table from "../../components/Table";
+import Table, { ColumnType } from "../../components/Table";
 import EditableCell from "src/components/EditableCell";
 import {
   getChildCategoriesHandler,
@@ -10,50 +10,65 @@ import {
 } from "src/store/category";
 import AddCategoryModal from "src/views/category/components/AddCategoryModal";
 import DeleteModal from "src/components/DeleteModal";
-import { CButton, CCol, CForm, CFormInput, CRow, CTooltip } from "@coreui/react";
+import {
+  CButton,
+  CCol,
+  CForm,
+  CFormInput,
+  CRow,
+  CTooltip,
+} from "@coreui/react";
 import CIcon from "@coreui/icons-react";
 import { cilTrash, cilSearch, cilFilterX } from "@coreui/icons";
 import Category from "src/services/CategoryService";
 import SearchDropdown from "src/components/SearchDropdown";
 import FilterCard from "src/components/FilterCard";
 import { RootState } from "src/store";
-import { ParamsType, ChildAndGrandCategoriesType, ParentCategoriesType } from "src/types";
-
+import {
+  ParamsType,
+  ChildAndGrandCategoriesType,
+  ParentCategoriesType,
+} from "src/types";
+import { InputType } from "src/enums";
 
 type PropTypes = {
-  getChildCategoriesHandler : (p: ParamsType & {}) => Promise<void>,
-  updateChildCategory : (p:ChildAndGrandCategoriesType) =>  Promise<void>,
-  addChildCategoryHandler : (p:ChildAndGrandCategoriesType) =>  Promise<void>,
-  deleteChildCategoryHandler : (id: string) =>  Promise<void>,
-}
- const Child = ({
+  getChildCategoriesHandler: (p: ParamsType & {}) => Promise<void>;
+  updateChildCategory: (p: ChildAndGrandCategoriesType) => Promise<void>;
+  addChildCategoryHandler: (p: ChildAndGrandCategoriesType) => Promise<void>;
+  deleteChildCategoryHandler: (id: string) => Promise<void>;
+};
+const Child = ({
   getChildCategoriesHandler,
   updateChildCategory,
   addChildCategoryHandler,
   deleteChildCategoryHandler,
-} :PropTypes) => {
+}: PropTypes) => {
   const {
-    childCategories: { data, count }, parentCategories: { data: parentCategories, }
-  } = useSelector((state : RootState) => state.category);
+    childCategories: { data, count },
+    parentCategories: { data: parentCategories },
+  } = useSelector((state: RootState) => state.category);
   const [params, setParams] = useState<ParamsType>({ limit: 10, offset: 0 });
   const [parentData, setParentData] = useState<ParentCategoriesType[]>([]);
   const [loading, setLoading] = useState(false);
-  const [tableLoading, setTableLoading] = useState(true)
-  const [selectedValue, setSelectedValue] = useState<ParentCategoriesType| null>(null)
-  const [reset,setReset] = useState<boolean>(false)
-  useEffect(()=>{
-    !selectedValue?.id && setReset(true)
-  },[selectedValue?.id])
+  const [tableLoading, setTableLoading] = useState(true);
+  const [selectedValue, setSelectedValue] =
+    useState<ParentCategoriesType | null>(null);
+  const [reset, setReset] = useState<boolean>(false);
   useEffect(() => {
-    Promise.all([getChildCategoriesHandler(params)]).then(() => setTableLoading(false))
-  }, [])
-  const DeleteButton = ({ id } : {id: string}) => {
+    !selectedValue?.id && setReset(true);
+  }, [selectedValue?.id]);
+  useEffect(() => {
+    Promise.all([getChildCategoriesHandler(params)]).then(() =>
+      setTableLoading(false)
+    );
+  }, []);
+  const DeleteButton = ({ id }: { id: string }) => {
     const [visible, setVisible] = useState(false);
-    const deleteHandler =async () => {
-        await deleteChildCategoryHandler(id)
-        await getChildCategoriesHandler(params)
-        setVisible(false)
-    }
+    const deleteHandler = async () => {
+      await deleteChildCategoryHandler(id);
+      await getChildCategoriesHandler(params);
+      setVisible(false);
+    };
     return (
       <React.Fragment>
         <DeleteModal
@@ -69,37 +84,41 @@ type PropTypes = {
       </React.Fragment>
     );
   };
-  const columns = [
+  const columns: ColumnType[] = [
     {
       header: "english title",
       field: "entitle",
-      body: (e : ChildAndGrandCategoriesType) => (
-        <EditableCell data={e} field="entitle" action={updateChildCategory} />
-      ),
+      edit: {
+        inputType: InputType.TEXT,
+      },
     },
     {
       header: "arabic title",
       field: "artitle",
-      body: (e : ChildAndGrandCategoriesType) => (
-        <EditableCell data={e} field="artitle" action={updateChildCategory} />
-      ),
+      edit: {
+        inputType: InputType.TEXT,
+      },
     },
-    // { header: "parent english title", field: "p_entitle" },
-    // { header: "parent arabic title", field: "p_artitle" },
-    { header: "parent title", field: "p_artitle", body: (e :ChildAndGrandCategoriesType)=> `${e.p_entitle} - ${e.p_artitle}`  },
+    {
+      header: "parent title",
+      field: "p_artitle",
+      body: (e: ChildAndGrandCategoriesType) =>
+        `${e.p_entitle} - ${e.p_artitle}`,
+    },
     {
       header: "meta title",
       field: "metatitle",
-      body: (e : ChildAndGrandCategoriesType) => (
-        <EditableCell data={e} field="metatitle" action={updateChildCategory} />
-      ),
+      body: (data: ChildAndGrandCategoriesType) =>
+        data.metatitle ? data.metatitle : "-",
+      edit: {
+        inputType: InputType.TEXT,
+      },
     },
-    { header: "actions", body: DeleteButton },
   ];
-  const onSelect = (e : ParentCategoriesType) => {
-    setSelectedValue(e)
+  const onSelect = (e: ParentCategoriesType) => {
+    setSelectedValue(e);
   };
-  const getParent = async (title : string) => {
+  const getParent = async (title: string) => {
     setLoading(true);
     let {
       data: { data },
@@ -109,50 +128,53 @@ type PropTypes = {
     setLoading(false);
     setParentData(data);
   };
-  const onChange = (e : string) => {
+  const onChange = (e: string) => {
     setTimeout(() => getParent(e), 1000);
   };
 
-
-  const submitHandler = (e: FormEvent<HTMLFormElement>)  => {
-    e.preventDefault()
+  const submitHandler = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     const target = e.target as typeof e.target & {
-      title: {value: string}
-      reset(): void
-    }
-    let data :{parent_id?: string, title?: string} = {}
-    selectedValue?.id && (data['parent_id'] = selectedValue.id)
-    target.title.value && (data['title'] = target.title.value)
-    getChildCategoriesHandler(data)
-  }
-  const resetFilter = (e : FormEvent<HTMLFormElement> ) => {
+      title: { value: string };
+      reset(): void;
+    };
+    let data: { parent_id?: string; title?: string } = {};
+    selectedValue?.id && (data["parent_id"] = selectedValue.id);
+    target.title.value && (data["title"] = target.title.value);
+    getChildCategoriesHandler(data);
+  };
+  const resetFilter = (e: FormEvent<HTMLFormElement>) => {
     const target = e.target as typeof e.target & {
-      title: {value: string}
-      reset(): void
-    }
-    setSelectedValue(null)
-    target.reset()
-    getChildCategoriesHandler(params)
-  }
+      title: { value: string };
+      reset(): void;
+    };
+    setSelectedValue(null);
+    target.reset();
+    getChildCategoriesHandler(params);
+  };
   useEffect(() => {
-    setParentData(parentCategories)
-  }, [])
+    setParentData(parentCategories);
+  }, []);
+
+  const Actions = (data: ChildAndGrandCategoriesType) => {
+    return (
+      <Fragment>
+        <DeleteButton {...data} />
+      </Fragment>
+    );
+  };
   return (
     <>
-      <AddCategoryModal
-        action={addChildCategoryHandler}
-        type="child"
-       
-      />
+      <AddCategoryModal action={addChildCategoryHandler} type="child" />
       <FilterCard>
         <CForm onSubmit={submitHandler} onReset={resetFilter}>
           <CRow className="justify-content-center align-items-end">
-            <CCol xs='auto'>
+            <CCol xs="auto">
               <CFormInput id="title" placeholder="title" />
             </CCol>
-            <CCol xs='auto'>
+            <CCol xs="auto">
               <SearchDropdown
-                options={parentData.map((x : ParentCategoriesType) => {
+                options={parentData.map((x: ParentCategoriesType) => {
                   return { id: x.id, title: `${x.entitle} - ${x.artitle}` };
                 })}
                 onSelect={onSelect}
@@ -172,12 +194,11 @@ type PropTypes = {
             </CCol>
             <CCol xs="auto">
               <CTooltip content="clear filter">
-                <CButton color="secondary" type='reset'>
+                <CButton color="secondary" type="reset">
                   <CIcon icon={cilFilterX} />
                 </CButton>
               </CTooltip>
             </CCol>
-
           </CRow>
         </CForm>
       </FilterCard>
@@ -188,15 +209,17 @@ type PropTypes = {
         cookieName="child"
         columns={columns}
         params={params}
-        checkbox={true}
+        // checkbox={true}
         loading={tableLoading}
         updateLoading={setTableLoading}
         updateParams={setParams}
+        editFn={updateChildCategory}
+        editable
+        Actions={Actions}
       />
     </>
   );
 };
-
 
 const mapDispatchToProps = {
   getChildCategoriesHandler,
