@@ -1,4 +1,4 @@
-import React, { useState, useEffect, Fragment, Children } from "react";
+import React, { useState, useEffect, Fragment, Children, ChangeEvent, FormEvent } from "react";
 import { useSelector, connect, useDispatch } from "react-redux";
 import {
   CButton,
@@ -18,7 +18,6 @@ import {
   deleteProductHandler,
 } from "src/store/product";
 import { useTranslation } from "react-i18next";
-import cookie from "react-cookies";
 import { useNavigate } from "react-router-dom";
 import { updateSizeAndQuantity, updateDiscount } from "../../store/product";
 import Export from "../../components/Export";
@@ -36,16 +35,32 @@ import {
 
 } from "@coreui/icons";
 import Paginator from "../../components/Paginator";
-import DiscountModal from "./DiscountModal";
-import SizeAndColorModal from "./SizeAndColorModal";
-import DeleteProductModal from "./DeleteProductModal";
-import StatusModal from "./StatusModal";
+import DiscountModal from "./components/DiscountModal";
+import SizeAndColorModal from "./components/SizeAndColorModal";
+import DeleteProductModal from "./components/DeleteProductModal";
+import StatusModal from "./components/StatusModal";
 import Product from "src/services/ProductService";
 import FilterCard from "src/components/FilterCard";
 import FormButtons from "src/components/FormButtons";
-import FormBody from "./FormBody";
-const ProductsRender = (props) => {
-  const { updateSizeAndQuantity, updateDiscount, deleteProductHandler } = props;
+import FormBody from "./components/FormBody";
+import { RootState } from "src/store";
+import { GetFunctionType, ParamsType, QuantityDetailsType } from "src/types";
+
+type PropTypes = {
+  getProductsByStatus: GetFunctionType,
+  addProductPictureHandler: (p: FormData) => Promise<void>,
+  deleteProductPictureHandler: (id: { picture_id: string }) => Promise<void>,
+  updateSizeAndQuantity: (p: {id: string, quantity: number, size_and_color: string| null}) => Promise<void>,
+  updateDiscount: (p: {id:string, discount: boolean, discount_rate: number}) => Promise<void>,
+  deleteProductHandler: (id: { id: string }) => Promise<void>,
+  status: string
+}
+const ProductsRender = ({ getProductsByStatus,
+  addProductPictureHandler,
+  deleteProductPictureHandler,
+  updateSizeAndQuantity,
+  updateDiscount,
+  deleteProductHandler, status }: PropTypes) => {
   // let sizeSymbols = ["XXS", "XS", "S", "M", "L", "XL", "XXL", "XXXL"];
   // let sizeNumbers = [];
   // if (sizeNumbers.length === 0) {
@@ -53,15 +68,15 @@ const ProductsRender = (props) => {
   //     sizeNumbers.push(i);
   //   }
   // }
-  
+
   const navigate = useNavigate();
   const {
     overview: { count, data: products },
-  } = useSelector((state) => state.products);
+  } = useSelector((state: RootState) => state.products);
 
-  
-  const [params, setParams] = useState({
-    status: props.status,
+
+  const [params, setParams] = useState<ParamsType>({
+    status: status,
     limit: 5,
     offset: 0,
   });
@@ -69,24 +84,24 @@ const ProductsRender = (props) => {
     keyPrefix: "addProduct",
   });
   const [loading, setLoading] = useState(true);
-  
-  
+
+
   useEffect(() => {
-    props.getProductsByStatus(params).then(() => setLoading(false));
+    getProductsByStatus(params).then(() => setLoading(false));
   }, []);
 
-  const completeArray = (x) => {
+  const completeArray = (x: number) => {
     let arr = [];
     for (let i = 0; i < 5 - x; i++) {
       arr.push({ id: "i" + 1, product_picture: null });
     }
     return arr;
   };
-  const addProductPicture = (e, id) => {
+  const addProductPicture = (e: ChangeEvent<HTMLInputElement>, id: string) => {
     let formData = new FormData();
-    formData.append("image", e.target.files[0]);
+    formData.append("image", e.target.files?.[0]!);
     formData.append("id", id);
-    props.addProductPictureHandler(formData);
+    addProductPictureHandler(formData);
   };
   const changeBtnAlign = () => {
     let deleteBtn = document.querySelectorAll(".deleteBtn");
@@ -107,13 +122,15 @@ const ProductsRender = (props) => {
       i18n.language === "ar" &&
       document.querySelectorAll(".productTitles").length > 0
     ) {
-      let div = document.querySelectorAll(".productTitles");
+      let div = Array.from(document.getElementsByClassName('productTitles') as HTMLCollectionOf<HTMLElement>)
+
+      // let div = document.querySelectorAll(".productTitles") as HTMLCollectionOf<HTMLElement>;
       div.forEach((item) => (item.style.flexDirection = "row-reverse"));
     } else if (
       i18n.language === "en" &&
       document.querySelectorAll(".productTitles").length > 0
     ) {
-      let div = document.querySelectorAll(".productTitles");
+      let div = Array.from(document.getElementsByClassName('productTitles') as HTMLCollectionOf<HTMLElement>)
       div.forEach((item) => (item.style.flexDirection = ""));
     }
   };
@@ -128,30 +145,38 @@ const ProductsRender = (props) => {
     reverseTitles();
   }, [document.querySelectorAll(".deleteBtn")]);
 
-  const getProducts = async (params) => {
+  const getProducts = async (params: ParamsType) => {
     let {
       data: { data },
     } = await Product.getProducts(params);
     return data;
   };
-  const submitHandler = e =>{
+  const submitHandler = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setLoading(true);
-    let queries = ['key', 'parent_category_id', 'child_category_id', 'grandchild_category_id', 'discount']
-    let data ={...params}
-    queries.forEach(query =>{
-      if(e.target[query].value && e.target[query].value !== ''){
-        data[query] = e.target[query].value
+    type QueriesType = {
+      key: HTMLInputElement
+      parent_category_id: HTMLSelectElement,
+      child_category_id: HTMLSelectElement,
+      grandchild_category_id:  HTMLSelectElement
+      discount: HTMLSelectElement
+    }
+    const target = e.target as typeof e.target & QueriesType
+    let queries: string[] = ['key', 'parent_category_id', 'child_category_id', 'grandchild_category_id', 'discount']
+    let data : ParamsType = { ...params }
+    queries.forEach(query => {
+      if (target[query as keyof QueriesType].value && target[query as keyof QueriesType].value !== '') {
+        data[query ] = target[query as keyof QueriesType].value
       }
     })
     setParams(data)
-    props.getProductsByStatus(data).then(()=> setLoading(false))
+    getProductsByStatus(data).then(() => setLoading(false))
 
   }
-  const onReset = e=>{
+  const onReset = (e: FormEvent<HTMLFormElement>& {target :{reset(): void}} )  => {
     e.target.reset()
     setParams({
-      status: props.status,
+      status: status,
       limit: 5,
       offset: 0,
     })
@@ -163,7 +188,7 @@ const ProductsRender = (props) => {
           <Export
             data={getProducts}
             // onClick={Product.getProducts}
-            params={{ status: props.status }}
+            params={{ status: status }}
             title="download products"
             fileName="products"
           />
@@ -176,15 +201,15 @@ const ProductsRender = (props) => {
                 xs={{ gutterY: 5 }}
               >
                 <CCol xs="auto">
-                  <CFormInput placeholder="product name" id="key"/>
+                  <CFormInput placeholder="product name" id="key" />
                 </CCol>
-                <FormBody/>
+                <FormBody />
                 <CCol xs="auto">
                   <CFormLabel htmlFor="discount" >discount</CFormLabel>
                   <CFormSelect name="discount" id="discount">
                     <option value="">All</option>
-                    <option value={true}>true</option>
-                    <option value={false}>false</option>
+                    <option value={'true'}>true</option>
+                    <option value={'false'}>false</option>
                   </CFormSelect>
                 </CCol>
                 <CCol xs={12}></CCol>
@@ -199,7 +224,7 @@ const ProductsRender = (props) => {
           </CCol>
         )}
         {!loading && products.length === 0 && (
-          <h4 className="productStatusHead">{t(`no${props.status}`)}</h4>
+          <h4 className="productStatusHead">{t(`no${status}`)}</h4>
         )}
         {!loading &&
           products?.map((product, idx) => (
@@ -209,34 +234,32 @@ const ProductsRender = (props) => {
               key={product.entitle + idx}
             >
               <div className="productTitles">
-                <h3 className="productTitle">{`${t("englishTitle")}: ${
-                  product.entitle
-                }`}</h3>
-                <h3 className="productTitle">{`${t("arabicTitle")}: ${
-                  product.artitle
-                }`}</h3>
+                <h3 className="productTitle">{`${t("englishTitle")}: ${product.entitle
+                  }`}</h3>
+                <h3 className="productTitle">{`${t("arabicTitle")}: ${product.artitle
+                  }`}</h3>
               </div>
               <div className="productPictures">
                 {React.Children.toArray(
-                  product.pictures.length > 0 || props.status !== "pending" ? (
+                  product.pictures.length > 0 || status !== "pending" ? (
                     [
                       ...product.pictures,
                       ...completeArray(product.pictures.length),
                     ]?.map((picture, i) => (
-                      <div key={picture.id + Math.random()}>
+                      <div style={{position: 'relative', width: 'fit-content'}}>
                         {picture.product_picture ? (
                           <>
                             <CButton
                               color="light"
                               className="deleteBtn"
                               onClick={() =>
-                                props.deleteProductPictureHandler({
-                                  picture_id: picture.id,
+                                deleteProductPictureHandler({
+                                  picture_id: picture.id!,
                                 })
                               }
                               style={{
                                 visibility:
-                                  props.status === "pending"
+                                  status === "pending"
                                     ? "hidden"
                                     : "visible",
                               }}
@@ -263,7 +286,7 @@ const ProductsRender = (props) => {
                               className="uploadLabel"
                               style={{
                                 visibility:
-                                  props.status === "pending"
+                                  status === "pending"
                                     ? "hidden"
                                     : "visible",
                               }}
@@ -332,7 +355,7 @@ const ProductsRender = (props) => {
                       <strong> :{t("SKU")}</strong>
                     </h5>
                   )))}
-              {!product.size ? (
+              {!product.size_and_color ? (
                 <h5>
                   <strong>{t("quantity")}: </strong>
                   {product.quantity}
@@ -369,10 +392,10 @@ const ProductsRender = (props) => {
                 <h6>
                   <strong>{`Rate: `}</strong>
                   {Number(product.rate).toFixed(2)}
-                  <CButton color="link" onClick={()=> navigate(`/product/reviews/${product.id}`)}>
-                    <CIcon icon={cilExternalLink}/>
+                  <CButton color="link" onClick={() => navigate(`/product/reviews/${product.id}`)}>
+                    <CIcon icon={cilExternalLink} />
                     Reviews
-                    </CButton>
+                  </CButton>
                 </h6>
               ) : null}
               <h6>
@@ -394,19 +417,19 @@ const ProductsRender = (props) => {
                     <thead>
                       <tr>
                         {JSON.parse(product.size_and_color)
-                          .map((val) => val.color)
-                          .filter((val) => val).length > 0 && <th>Color</th>}
+                          .map((val : QuantityDetailsType) => val.color)
+                          .filter((val : QuantityDetailsType) => val).length > 0 && <th>Color</th>}
                         {JSON.parse(product.size_and_color)
-                          .map((val) => val.size)
-                          .filter((val) => val).length > 0 && (
-                          <th>{t("size")}</th>
-                        )}
+                          .map((val : QuantityDetailsType) => val.size)
+                          .filter((val : QuantityDetailsType) => val).length > 0 && (
+                            <th>{t("size")}</th>
+                          )}
                         <th>{t("quantity")}</th>
                       </tr>
                     </thead>
                     <tbody>
                       {React.Children.toArray(
-                        JSON.parse(product.size_and_color).map((val) => (
+                        JSON.parse(product.size_and_color).map((val: QuantityDetailsType) => (
                           <tr key={Math.random()}>
                             {val.color && <td>{val.color}</td>}
                             {val.size && <td>{val.size}</td>}
@@ -424,7 +447,7 @@ const ProductsRender = (props) => {
                   </table>
                 </div>
               ) : null}
-              {props.status !== "pending" && (
+              {status !== "pending" && (
                 <CRow className="justify-content-between">
                   <CCol xs="auto">
                     <DiscountModal
@@ -446,7 +469,7 @@ const ProductsRender = (props) => {
                     />
                   </CCol>
                   <CCol xs="auto">
-                    <StatusModal product={product} />
+                    <StatusModal product={product} callback={()=> getProductsByStatus(params)} />
                   </CCol>
                   <CCol xs="auto">
                     <CButton
@@ -467,14 +490,12 @@ const ProductsRender = (props) => {
           count={count}
           params={params}
           updateParams={setParams}
-          changeData={props.getProductsByStatus}
-          cookieName={props.status}
-        />
+          changeData={getProductsByStatus}
+          cookieName={status} updateLoading={setLoading }        />
       </CRow>
     </>
   );
 };
-const mapStateToProps = (state) => ({});
 
 const mapDispatchToProps = {
   getProductsByStatus,
@@ -484,7 +505,7 @@ const mapDispatchToProps = {
   updateDiscount,
   deleteProductHandler,
 };
-export default connect(mapStateToProps, mapDispatchToProps)(ProductsRender);
+export default connect(null, mapDispatchToProps)(ProductsRender);
 
 
 

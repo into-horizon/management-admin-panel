@@ -6,12 +6,16 @@ import FilterCard from '../../components/FilterCard'
 import FormButtons from '../../components/FormButtons'
 import { CCol, CForm, CFormInput, CFormLabel, CFormSelect, CRow } from '@coreui/react'
 import { RootState } from 'src/store'
+import { GetFunctionType, ParamsType, TransactionType } from 'src/types'
 
+type PropTypes = {
+    getTransactions: GetFunctionType
+}
 
-export const Statement = ({ getTransactions }) => {
-    const { transactions: { data, count } } = useSelector((state : RootState) => state.finance)
+export const Statement = ({ getTransactions }: PropTypes) => {
+    const { transactions: { data, count } } = useSelector((state: RootState) => state.finance)
     let initialParams = { limit: 20, offset: 0 }
-    const [params, setParams] = useState(initialParams)
+    const [params, setParams] = useState<ParamsType>(initialParams)
     const [loading, setLoading] = useState(true)
     useEffect(() => {
         Promise.all([getTransactions(params)]).then(() => setLoading(false))
@@ -29,10 +33,24 @@ export const Statement = ({ getTransactions }) => {
     ]
     const submitHandler = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
-        const _params = ['type', 'description', 'status', 'customer_order_id']
-        let _data = {}
+        const _params: string[] = ['type', 'description', 'status', 'customer_order_id']
+        type QueryType = {
+            type?: HTMLSelectElement,
+            description?: HTMLSelectElement,
+            status?: HTMLSelectElement,
+            customer_order_id?: HTMLInputElement
+        }
+        const target = e.target as typeof e.target & QueryType
+
+        type DataType = {
+            type?: string,
+            description?: string,
+            status?: string,
+            customer_order_id?: string
+        }
+        let _data: DataType = {}
         _params.forEach((param) => {
-            if (e.target[param]?.value && e.target[param]?.value !== '') _data[param] = e.target[param].value
+            if (target[param as keyof QueryType]?.value && target[param as keyof QueryType]?.value !== '') _data[param as keyof DataType] =   target[param as keyof QueryType]?.value
         })
         setParams(() => {
             let newData = { ...initialParams, ..._data }
@@ -50,7 +68,7 @@ export const Statement = ({ getTransactions }) => {
             return initialParams
         })
     }
-    
+
     return (
         <>
             <FilterCard >
@@ -59,9 +77,9 @@ export const Statement = ({ getTransactions }) => {
 
 
                         <CCol xs='auto'>
-                        <CFormLabel >
-                            order number
-                        </CFormLabel>
+                            <CFormLabel >
+                                order number
+                            </CFormLabel>
                             <CFormInput placeholder='enter order number' id='customer_order_id' />
                         </CCol>
                         <CCol xs='auto'>
@@ -108,7 +126,7 @@ export const Statement = ({ getTransactions }) => {
                     </CRow>
                 </CForm>
             </FilterCard>
-            <Table columns={columns} data={data} count={count} changeData={getTransactions} params={params} cookieName='transactions' loading={loading} updateParams={setParams}  updateLoading={setLoading}/>
+            <Table columns={columns} data={data} count={count} changeData={getTransactions} params={params} cookieName='transactions' loading={loading} updateParams={setParams} updateLoading={setLoading} />
 
         </>
     )

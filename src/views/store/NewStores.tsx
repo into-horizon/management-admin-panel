@@ -6,6 +6,7 @@ import Table from "src/components/Table";
 
 import ActionModal from "./ActionModal";
 import { RootState } from "src/store";
+import { ParamsType } from "src/types";
 
 type PropTypes = {
   getPendingStores: (p:ParamsType) => Promise<void>

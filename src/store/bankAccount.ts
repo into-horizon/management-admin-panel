@@ -1,6 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import BankAccount from '../services/BankAccount'
 import { AppDispatch } from ".";
+import { BankAccountStateType, AccountType } from "src/types";
 
 
 const initialState : BankAccountStateType = {

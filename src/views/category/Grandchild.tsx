@@ -1,6 +1,12 @@
-import React, { useState, useEffect, Children, FormEvent, ChangeEvent } from "react";
+import React, {
+  useState,
+  useEffect,
+  Children,
+  FormEvent,
+  ChangeEvent,
+} from "react";
 import { connect, useSelector } from "react-redux";
-import Table from "../../components/Table";
+import Table, { ColumnType } from "../../components/Table";
 import {
   getGrandChildCategoriesHandler,
   updateGrandChildCategory,
@@ -18,51 +24,60 @@ import {
   CTooltip,
 } from "@coreui/react";
 import EditableCell from "src/components/EditableCell";
-import AddCategoryModal from "src/components/AddCategoryModal";
+import AddCategoryModal from "src/views/category/components/AddCategoryModal";
 import DeleteModal from "src/components/DeleteModal";
 import Category from "src/services/CategoryService";
 import SearchDropdown from "src/components/SearchDropdown";
 import { RootState } from "src/store";
+import { ParamsType, ChildAndGrandCategoriesType } from "src/types";
+import { InputType } from "src/enums";
 
-
-type PropTypes ={
-  getGrandChildCategoriesHandler : (p: ParamsType) => Promise<void>,
-  updateGrandChildCategory : (c: ChildAndGrandCategoriesType) => Promise<void>,
-  addGrandchildCategoryHandler : (c: ChildAndGrandCategoriesType) => Promise<void>,
-  deleteGrandchildCategoryHandler : (id: string) => Promise<void>,
-}
- const Grandchild = ({
+type PropTypes = {
+  getGrandChildCategoriesHandler: (p: ParamsType) => Promise<void>;
+  updateGrandChildCategory: (c: ChildAndGrandCategoriesType) => Promise<void>;
+  addGrandchildCategoryHandler: (
+    c: ChildAndGrandCategoriesType
+  ) => Promise<void>;
+  deleteGrandchildCategoryHandler: (id: string) => Promise<void>;
+};
+const Grandchild = ({
   getGrandChildCategoriesHandler,
   updateGrandChildCategory,
   addGrandchildCategoryHandler,
   deleteGrandchildCategoryHandler,
- } :PropTypes) => {
+}: PropTypes) => {
   const {
     grandChildCategories: { data, count },
-  } = useSelector((state : RootState) => state.category);
-  const [params, setParams] = useState<ParamsType & {}>({ limit: 10, offset: 0 });
-  const [visible, setVisible] = useState(false);
+  } = useSelector((state: RootState) => state.category);
+  const [params, setParams] = useState<ParamsType & {}>({
+    limit: 10,
+    offset: 0,
+  });
   const [childData, setChildData] = useState<ChildAndGrandCategoriesType[]>([]);
-  const [value, setValue] = useState<{id?:string}>({})
+  const [value, setValue] = useState<{ id?: string }>({});
   const [loading, setLoading] = useState(true);
-  const [searchLoading, setSearchLoading] = useState(false)
+  const [searchLoading, setSearchLoading] = useState(false);
+  const [reset, setReset] = useState<boolean>(false);
   useEffect(() => {
-    getGrandChildCategoriesHandler(params).then(() => setLoading(false))
-  }, [])
-  const DeleteButton = ({ id  }: {id: string}) => {
-
-    const deleteHandler = async () =>{
-      await deleteGrandchildCategoryHandler(id)
-      await getGrandChildCategoriesHandler(params)
-      setVisible(false)
-    }
+    !value.id && setReset(true);
+  }, [value.id]);
+  useEffect(() => {
+    getGrandChildCategoriesHandler(params).then(() => setLoading(false));
+  }, []);
+  const DeleteButton = ({ id }: { id: string }) => {
+    const [visible, setVisible] = useState(false);
+    const deleteHandler = async () => {
+      await deleteGrandchildCategoryHandler(id);
+      await getGrandChildCategoriesHandler(params);
+      setVisible(false);
+    };
     return (
       <React.Fragment>
         <DeleteModal
           visible={visible}
           onClose={() => setVisible(false)}
           onDelete={deleteHandler}
-          id={undefined}    
+          id={undefined}
         />
         <CTooltip content="Delete">
           <CButton color="danger" onClick={() => setVisible(true)}>
@@ -72,77 +87,80 @@ type PropTypes ={
       </React.Fragment>
     );
   };
-  const columns = [
+  const columns: ColumnType[] = [
     {
       header: "english title",
       field: "entitle",
-      body: (e : ChildAndGrandCategoriesType) => (
-        <EditableCell
-          data={e}
-          field="entitle"
-          action={updateGrandChildCategory}
-        />
-      ),
+      edit: {
+        inputType: InputType.TEXT,
+      },
     },
     {
       header: "arabic title",
       field: "artitle",
-      body: (e : ChildAndGrandCategoriesType) => (
-        <EditableCell
-          data={e}
-          field="artitle"
-          action={updateGrandChildCategory}
-        />
-      ),
+      edit: {
+        inputType: InputType.TEXT,
+      },
     },
-    { header: "parent english title", field: "p_entitle" },
-    { header: "parent arabic title", field: "p_artitle" },
+
+    {
+      header: "parent title",
+      field: "p_artitle",
+      body: (e: ChildAndGrandCategoriesType) =>
+        `${e.p_entitle} - ${e.p_artitle}`,
+    },
+
     {
       header: "meta title",
       field: "metatitle",
-      body: (e : ChildAndGrandCategoriesType) => (
-        <EditableCell
-          data={e}
-          field="metatitle"
-          action={updateGrandChildCategory}
-        />
-      ),
+      body: (data:ChildAndGrandCategoriesType) => data.metatitle ? data.metatitle: '-',
+      edit:{
+        inputType :InputType.TEXT ,
+      }
     },
-    { header: "actions", body: DeleteButton },
+    
   ];
 
-  const getChild = async (title : string) => {
+  const getChild = async (title: string) => {
     let {
-      data: { data  },
+      data: { data },
     } = await Category.getAllChildCategoires({ title: title });
     setChildData(data);
-    setSearchLoading(false)
-  }
+    setSearchLoading(false);
+  };
   const submitHandler = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const target = e.target as typeof e.target & {title: {value: string}}
-    let data :{title?: string, parent_id?: string} = {}
-    target.title.value && (data.title = target.title.value)
-    value.id && (data.parent_id = value.id)
-    getGrandChildCategoriesHandler({ ...params, ...data })
-  }
+    const target = e.target as typeof e.target & { title: { value: string } };
+    let data: { title?: string; parent_id?: string } = {};
+    target.title.value && (data.title = target.title.value);
+    value.id && (data.parent_id = value.id);
+    getGrandChildCategoriesHandler({ ...params, ...data });
+  };
 
-  const clearFilter = (e:FormEvent<HTMLFormElement>) => {
-    const target  = e.target as typeof e.target & {reset: ()=> void}
-    target.reset()
-    getGrandChildCategoriesHandler(params)
-    setValue({})
-  }
-  const onChange = (e : string ) => {
-    setSearchLoading(true)
+  const clearFilter = (e: FormEvent<HTMLFormElement>) => {
+    const target = e.target as typeof e.target & { reset: () => void };
+    target.reset();
+    getGrandChildCategoriesHandler(params);
+    setValue({});
+  };
+  const onChange = (e: string) => {
+    setSearchLoading(true);
     setTimeout(() => getChild(e), 1000);
+  };
+  const addCategoryHandler = async (c: ChildAndGrandCategoriesType) => {
+    await addGrandchildCategoryHandler(c);
+    await getGrandChildCategoriesHandler(params);
+  };
+  const Actions = (data: ChildAndGrandCategoriesType) => {
+    return (
+      <>
+        <DeleteButton {...data} />
+      </>
+    );
   };
   return (
     <>
-      <AddCategoryModal
-        type="grandchild"
-        action={addGrandchildCategoryHandler}
-      />
+      <AddCategoryModal type="grand" action={addCategoryHandler} />
       <div className="card padding mrgn25">
         <CForm onSubmit={submitHandler} onReset={clearFilter}>
           <CRow
@@ -163,8 +181,9 @@ type PropTypes ={
                   })}
                   placeholder="select child category"
                   onChange={onChange}
-                  reset={!value.id}
-                  onSelect={e => setValue(e)}
+                  reset={reset}
+                  resetCallback={setReset}
+                  onSelect={(e) => setValue(e)}
                   loading={searchLoading}
                 />
               )}
@@ -193,15 +212,16 @@ type PropTypes ={
         cookieName="grandchild"
         columns={columns}
         params={params}
-        checkbox={true}
         loading={loading}
         updateLoading={setLoading}
         updateParams={setParams}
+        Actions={Actions}
+        editable
+        editFn={updateGrandChildCategory}
       />
     </>
   );
 };
-
 
 const mapDispatchToProps = {
   getGrandChildCategoriesHandler,

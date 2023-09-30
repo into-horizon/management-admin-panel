@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, FormEvent } from 'react';
+import React, { useState, useEffect, useRef, FormEvent, Children } from 'react';
 import { getPendingOrdersHandler, updateOrderItemHandler } from 'src/store/orders';
 import { connect } from 'react-redux'
 import defaultProductImg from '../../assets/images/default-store-350x350.jpg'
@@ -6,13 +6,15 @@ import { CTable, CTableHead, CTableRow, CTableHeaderCell, CTableDataCell, CTable
 import Pdf from '../../components/Pdf'
 import CopyableText from '../../components/CopyableText';
 import { RootState } from 'src/store';
+import { OrderType, OrderItemType } from 'src/types';
 
 type PropTypes = {
     data: OrderType[],
     updateOrderItemHandler: (item: OrderItemType) => Promise<void>,
     loading?: boolean
+    type?: string
 }
-const OrderModel = ({ data, updateOrderItemHandler, loading }: PropTypes) => {
+const OrderModel = ({ data, updateOrderItemHandler, loading, type }: PropTypes) => {
 
 
     const [itemAction, setItemAction] = useState<string>('')
@@ -86,6 +88,12 @@ const OrderModel = ({ data, updateOrderItemHandler, loading }: PropTypes) => {
                                         grand total
                                     </CTableHeaderCell>
                                     <CTableHeaderCell>
+                                        place order date
+                                    </CTableHeaderCell>
+                                    <CTableHeaderCell>
+                                        delivery date order date
+                                    </CTableHeaderCell>
+                                    <CTableHeaderCell>
                                         status
                                     </CTableHeaderCell>
                                 </CTableRow>
@@ -103,48 +111,54 @@ const OrderModel = ({ data, updateOrderItemHandler, loading }: PropTypes) => {
                                         {order.grand_total}
                                     </CTableDataCell>
                                     <CTableDataCell>
+                                        {new Date(order.created_at).toLocaleDateString()}
+                                    </CTableDataCell>
+                                    <CTableDataCell>
+                                        {new Date(order.updated).toLocaleDateString()}
+                                    </CTableDataCell>
+                                    <CTableDataCell>
                                         {order.status}
                                     </CTableDataCell>
                                 </CTableRow>
                             </CTableBody>
                         </CTable>
-                        {order.items.map((item, i) =>
-                            <div key={i}>
+                        <h6>order items</h6>
+                        <div >
 
-                                <h6>order items</h6>
-                                <CTable key={i} align='middle'>
-                                    <CTableHead>
-                                        <CTableRow>
-                                            <CTableHeaderCell>
-                                                image
-                                            </CTableHeaderCell>
-                                            <CTableHeaderCell>
-                                                Title
-                                            </CTableHeaderCell>
-                                            <CTableHeaderCell>
-                                                price
-                                            </CTableHeaderCell>
-                                            <CTableHeaderCell>
-                                                quantity
-                                            </CTableHeaderCell>
-                                            {item.size && <CTableHeaderCell>
-                                                size
-                                            </CTableHeaderCell>}
-                                            {item.color && <CTableHeaderCell>
-                                                size
-                                            </CTableHeaderCell>}
-                                            <CTableHeaderCell>
-                                                store
-                                            </CTableHeaderCell>
-                                            <CTableHeaderCell>
-                                                status
-                                            </CTableHeaderCell>
-                                            {item.status === 'pending' && <CTableHeaderCell>
-                                                action
-                                            </CTableHeaderCell>}
-                                        </CTableRow>
-                                    </CTableHead>
-                                    <CTableBody>
+                            <CTable align='middle'>
+                                <CTableHead>
+                                    <CTableRow>
+                                        <CTableHeaderCell>
+                                            image
+                                        </CTableHeaderCell>
+                                        <CTableHeaderCell>
+                                            Title
+                                        </CTableHeaderCell>
+                                        <CTableHeaderCell>
+                                            price
+                                        </CTableHeaderCell>
+                                        <CTableHeaderCell>
+                                            quantity
+                                        </CTableHeaderCell>
+                                        <CTableHeaderCell>
+                                            size
+                                        </CTableHeaderCell>
+                                        <CTableHeaderCell>
+                                            size
+                                        </CTableHeaderCell>
+                                        <CTableHeaderCell>
+                                            store
+                                        </CTableHeaderCell>
+                                        <CTableHeaderCell>
+                                            status
+                                        </CTableHeaderCell>
+                                        {type === 'pending' && <CTableHeaderCell>
+                                            action
+                                        </CTableHeaderCell>}
+                                    </CTableRow>
+                                </CTableHead>
+                                <CTableBody>
+                                    {Children.toArray( order.items.map((item) =>
                                         <CTableRow>
                                             <CTableDataCell>
 
@@ -159,12 +173,12 @@ const OrderModel = ({ data, updateOrderItemHandler, loading }: PropTypes) => {
                                             <CTableDataCell>
                                                 {item.quantity}
                                             </CTableDataCell>
-                                            {item.size && <CTableDataCell>
-                                                {item.size}
-                                            </CTableDataCell>}
-                                            {item.color && <CTableDataCell>
-                                                {item.color}
-                                            </CTableDataCell>}
+                                             <CTableDataCell>
+                                                {item.size ?? '-'}
+                                            </CTableDataCell>
+                                            <CTableDataCell>
+                                                {item.color ?? '-'}
+                                            </CTableDataCell>
                                             <CTableDataCell>
                                                 {item.store_name}
                                             </CTableDataCell>
@@ -179,17 +193,13 @@ const OrderModel = ({ data, updateOrderItemHandler, loading }: PropTypes) => {
 
                                             </CTableDataCell>}
                                         </CTableRow>
-                                    </CTableBody>
-                                </CTable>
-                            </div>
+                                    ))}
+                                </CTableBody>
+                            </CTable>
+                        </div>
 
-                        )}
                         <Pdf order={order} />
-
-
-
                     </div>
-
                 )}
 
 
@@ -197,9 +207,9 @@ const OrderModel = ({ data, updateOrderItemHandler, loading }: PropTypes) => {
     )
 }
 
-const mapStateToProps = (state : RootState) => ({
+const mapStateToProps = (state: RootState) => ({
     pendingOrders: state.orders.pendingOrders
 })
 
-const mapDispatchToProps = {  updateOrderItemHandler }
+const mapDispatchToProps = { updateOrderItemHandler }
 export default connect(mapStateToProps, mapDispatchToProps)(OrderModel)

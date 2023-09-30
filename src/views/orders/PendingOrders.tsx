@@ -5,6 +5,7 @@ import OrdersModel from './OrdersModel'
 import { CSpinner } from '@coreui/react';
 import Paginator from '../../components/Paginator';
 import { RootState } from 'src/store';
+import { OrderType, ParamsType } from 'src/types';
 
 type PropTypes = {
     orders: OrderType[],
@@ -21,7 +22,7 @@ const PendingOrders = ({ orders, getPendingOrdersHandler, count }: PropTypes) =>
     return (
         <>
             <h2>pending orders</h2>
-            {loading ? <CSpinner /> : <OrdersModel data={orders} />}
+            {loading ? <CSpinner /> : <OrdersModel data={orders} type='pending'/>}
             <Paginator params={params} updateParams={setParams} count={Number(count)} changeData={getPendingOrdersHandler} cookieName='pendingOrder' updateLoading={setLoading} />
         </>
     )

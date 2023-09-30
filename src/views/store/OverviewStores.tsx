@@ -15,21 +15,38 @@ import { cilTrash, cilSearch, cilFilterX } from "@coreui/icons";
 import React, { FormEvent, useEffect, useState } from "react";
 import { connect, useSelector } from "react-redux";
 import FilterCard from "src/components/FilterCard";
-import Table from "src/components/Table";
-import { getStoresHandler, updateStoreStatusHandler, updateStoreHandler, updateStoreNameHandler } from "../../store/store";
+import Table, { ColumnType } from "src/components/Table";
+import {
+  getStoresHandler,
+  updateStoreStatusHandler,
+  updateStoreHandler,
+  updateStoreNameHandler,
+} from "../../store/store";
 import EditableCell from "src/components/EditableCell";
 import { RootState } from "src/store";
+import { ParamsType, StoreType } from "src/types";
+import { InputType } from "src/enums";
 
 type PropTypes = {
-  getStoresHandler: (p: ParamsType) => Promise<void>,
-  updateStoreStatusHandler: (s: StoreType, status: 'overview' | 'pending') => Promise<void>,
-  updateStoreHandler: (s: StoreType) => Promise<void>,
-  updateStoreNameHandler: (s: StoreType) => Promise<void>
-}
+  getStoresHandler: (p: ParamsType) => Promise<void>;
+  updateStoreStatusHandler: (
+    s: StoreType,
+    status: "overview" | "pending"
+  ) => Promise<void>;
+  updateStoreHandler: (s: StoreType) => Promise<void>;
+  updateStoreNameHandler: (s: StoreType) => Promise<void>;
+};
 
-const OverviewStores = ({ getStoresHandler, updateStoreStatusHandler, updateStoreHandler, updateStoreNameHandler }: PropTypes) => {
-  const initialParams = { limit: 10, offset: 0 }
-  const { data, count } = useSelector((state: RootState) => state.stores.overview);
+const OverviewStores = ({
+  getStoresHandler,
+  updateStoreStatusHandler,
+  updateStoreHandler,
+  updateStoreNameHandler,
+}: PropTypes) => {
+  const initialParams = { limit: 10, offset: 0 };
+  const { data, count } = useSelector(
+    (state: RootState) => state.stores.overview
+  );
   const [loading, setLoading] = useState(true);
   const [params, setParams] = useState<ParamsType>({ limit: 10, offset: 0 });
   useEffect(() => {
@@ -46,16 +63,57 @@ const OverviewStores = ({ getStoresHandler, updateStoreStatusHandler, updateStor
       </React.Fragment>
     );
   };
-  const columns = [
+  const columns: ColumnType[] = [
     {
-      header: "store name", field: "store_name",
-      body: (data: StoreType) => !data.name_is_changed ? <EditableCell data={data} field='store_name' action={updateStoreNameHandler} /> : <span>{data.store_name}</span>
-
+      header: "store name",
+      field: "store_name",
+      body: (data: StoreType) =>
+        !data.name_is_changed ? (
+          <EditableCell
+            data={data}
+            field="store_name"
+            action={updateStoreNameHandler}
+          />
+        ) : (
+          <span>{data.store_name}</span>
+        ),
     },
     { header: "city", field: "city" },
-    { header: "email verified", field: "verified_email", body: (e: StoreType) => <EditableCell data={e} field='verified_email' type='dropdown' options={[{ value: false, name: 'false' }, { value: true, name: 'true' }]} action={updateStoreHandler} /> },
-    { header: "mobile", field: "mobile", body: (data: StoreType) => <EditableCell data={data} field='mobile' action={updateStoreHandler} /> },
-    { header: "status", field: "status", body: (e: StoreType) => <EditableCell data={e} field='status' type='dropdown' options={[{ value: 'approved', name: 'approved' }, { value: 'rejected', name: 'rejected' }, { value: 'pending', name: 'pending' }]} action={(e: StoreType) => updateStoreStatusHandler(e, 'overview')} /> },
+    {
+      header: "email verified",
+      field: "verified_email",
+      edit: {
+        inputType: InputType.DROPDOWN,
+        options : [
+          { value: 'false', name: "false" },
+          { value: 'true', name: "true" },
+        ],
+      },
+    },
+    {
+      header: "mobile",
+      field: "mobile",
+      edit: {
+        inputType: InputType.TEXT,
+      },
+    },
+    {
+      header: "status",
+      field: "status",
+      body: (e: StoreType) => (
+        <EditableCell
+          data={e}
+          field="status"
+          type="dropdown"
+          options={[
+            { value: "approved", name: "approved" },
+            { value: "rejected", name: "rejected" },
+            { value: "pending", name: "pending" },
+          ]}
+          action={(e: StoreType) => updateStoreStatusHandler(e, "overview")}
+        />
+      ),
+    },
     { header: "verification code", field: "verification_code" },
     { header: "performance rating%", field: "performance_rate" },
     { header: "sales rating", field: "sales_rate" },
@@ -72,36 +130,44 @@ const OverviewStores = ({ getStoresHandler, updateStoreStatusHandler, updateStor
   ];
   const submitHandler = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setLoading(true)
+    setLoading(true);
     type pType = {
       performance_rate: { value: string };
-      sales_rate: { value: string },
-      query: { value: string },
-      status: { value: string },
-      verified_email: { value: string }
-    }
-    const target = e.target as typeof e.target & pType
+      sales_rate: { value: string };
+      query: { value: string };
+      status: { value: string };
+      verified_email: { value: string };
+    };
+    const target = e.target as typeof e.target & pType;
     let data: {
       performance_rate?: string;
-      sales_rate?: string,
-      query?: string,
-      status?: string,
-      verified_email?: string
-    } = {
-    }
-    let params: string[] = ['performance_rate', 'sales_rate', 'query', 'status', 'verified_email']
+      sales_rate?: string;
+      query?: string;
+      status?: string;
+      verified_email?: string;
+    } = {};
+    let params: string[] = [
+      "performance_rate",
+      "sales_rate",
+      "query",
+      "status",
+      "verified_email",
+    ];
     params.forEach((param) => {
-      if (target[param as keyof pType]?.value && target[param as keyof pType]?.value !== '' && typeof param === 'string') {
-        data[param as keyof typeof data] = target[param as keyof pType]?.value
+      if (
+        target[param as keyof pType]?.value &&
+        target[param as keyof pType]?.value !== "" &&
+        typeof param === "string"
+      ) {
+        data[param as keyof typeof data] = target[param as keyof pType]?.value;
       }
-    })
-    getStoresHandler(data).then(() => setLoading(false))
-
+    });
+    getStoresHandler(data).then(() => setLoading(false));
   };
   const resetTable = (e: FormEvent<HTMLFormElement>) => {
     const target = e.target as typeof e.target & {
-      reset(): void
-    }
+      reset(): void;
+    };
     target.reset();
     setParams(initialParams);
   };
@@ -117,9 +183,7 @@ const OverviewStores = ({ getStoresHandler, updateStoreStatusHandler, updateStor
               />
             </CCol>
             <CCol xs="auto">
-              <CFormLabel htmlFor="performance" >
-                Performance Rating
-              </CFormLabel>
+              <CFormLabel htmlFor="performance">Performance Rating</CFormLabel>
               <CFormSelect name="performance" id="performance_rate">
                 <option value="">All</option>
                 <option value="90-100">90-100</option>
@@ -185,13 +249,20 @@ const OverviewStores = ({ getStoresHandler, updateStoreStatusHandler, updateStor
         params={params}
         changeData={getStoresHandler}
         updateParams={setParams}
-        cookieName='stores'
+        cookieName="stores"
         updateLoading={setLoading}
+        editable
+        editFn={updateStoreHandler}
       />
     </>
   );
 };
 
-const mapDispatchToProps = { getStoresHandler, updateStoreStatusHandler, updateStoreHandler, updateStoreNameHandler };
+const mapDispatchToProps = {
+  getStoresHandler,
+  updateStoreStatusHandler,
+  updateStoreHandler,
+  updateStoreNameHandler,
+};
 
 export default connect(null, mapDispatchToProps)(OverviewStores);

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, Fragment } from "react";
+import React, { useState, useEffect, Fragment, ChangeEvent, FormEvent } from "react";
 import { useSelector, connect, useDispatch } from "react-redux";
 import {
   CButton,
@@ -21,22 +21,26 @@ import {
 
 } from "@coreui/icons";
 import { useTranslation } from "react-i18next";
+import { ProductType } from "src/types";
 
-
-const DiscountModal = ({ data, updateDiscount }) => {
+type PropTypes ={
+  data: ProductType
+  updateDiscount:(payload:{id:string, discount: boolean, discount_rate: number})=> Promise<void>
+}
+const DiscountModal = ({ data, updateDiscount }:PropTypes) => {
     const { t } = useTranslation("translation", {
         keyPrefix: "addProduct",
       });
     const [visible, setVisible] = useState(false);
 
     const [discountValue, setDiscountValue] = useState(data.discount)
-    const updateDiscountHandler = (e) => {
+    const updateDiscountHandler = (e : FormEvent<HTMLFormElement>) => {
       e.preventDefault();
-
+      const target = e.target as typeof e.target & {discountRate: HTMLInputElement}
       updateDiscount({
         id: data.id,
         discount: discountValue,
-        discount_rate: e.target.discountRate.value,
+        discount_rate: Number(target.discountRate.value),
       }).then(() => setVisible(false));
     };
     return (
@@ -94,7 +98,7 @@ const DiscountModal = ({ data, updateDiscount }) => {
                 {t("submit")}
               </CButton>
 
-              <CButton color="danger" onClick={() => setDiscountForm("")}>
+              <CButton color="danger" >
                 {t("cancel")}
               </CButton>
             </CModalFooter>

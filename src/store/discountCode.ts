@@ -3,6 +3,7 @@ import DiscountCode from "src/services/DiscountCode";
 import { updateToast } from "./globalToasts";
 import { AppDispatch, RootState } from ".";
 import { DialogResponseTypes } from "src/enums";
+import { DiscountCodeStateType, ParamsType, DiscountCodeType } from "src/types";
 
 
 const initialState : DiscountCodeStateType = {

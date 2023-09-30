@@ -1,21 +1,22 @@
-import React, {  useRef, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import Logo from '../assets/images/h.png'
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import { CButton, CCol, CModal, CModalFooter, CModalHeader, CModalTitle, CRow, CButtonGroup, CFormCheck, CTooltip } from '@coreui/react';
 import Table from './Table';
-import CIcon  from '@coreui/icons-react'
-import {cilCloudDownload, cilDescription} from '@coreui/icons';
+import CIcon from '@coreui/icons-react'
+import { cilCloudDownload, cilDescription } from '@coreui/icons';
+import { OrderType, OrderItemType, ParamsType } from 'src/types';
 
-const Pdf = ({ order }: {order:OrderType}) => {
+const Pdf = ({ order }: { order: OrderType }) => {
     const template = useRef<HTMLDivElement>(null)
-    const [locale, setLocale] = useState<'en'| 'ar'>('en')
-    const [visible, setVisible] = useState(false)
-   
-    type DetailedLocType ={
+    const [locale, setLocale] = useState<'en' | 'ar'>('en')
+    const [visible, setVisible] = useState<boolean>(false)
+
+    type DetailedLocType = {
         [key: string]: string
     }
-    const localization :{en: DetailedLocType, ar: DetailedLocType} = {
+    const localization: { en: DetailedLocType, ar: DetailedLocType } = {
         en: {
             orderNumber: 'Order#',
             customerName: 'Customer Name',
@@ -51,59 +52,48 @@ const Pdf = ({ order }: {order:OrderType}) => {
         { header: localization[locale].productColor, field: `color` },
         { header: localization[locale].totalPrice, body: (data: OrderItemType) => <span>{data.quantity * data.price}</span> }
     ]
-    const printDocument = () => {
+    const printDocument = (count:number) => {
+    console.log("🚀 ~ file: Pdf.tsx:55 ~ printDocument ~ count:", count)
 
-     html2canvas(template?.current ?? new HTMLDivElement())
+        html2canvas(template!.current!)
             .then((canvas) => {
                 const imgData = canvas.toDataURL(Logo);
                 const pdf = new jsPDF({
                     format: 'a4',
                     unit: 'px',
                 });
-                pdf.addImage(imgData, 'PNG', 0, 0,100,100,'logo');
+                pdf.addImage(imgData, 'PNG', 0, 0, 650, 200 + ( 40 * count) );
                 pdf.save(`${order.customer_order_id}.pdf`);
             })
-            ;
+            
     }
+
     return (
         <>
-            <CButton onClick={() => setVisible(true)} color='secondary'> 
-            <CIcon icon={cilDescription}/>{' '}
-            Receipt
+            <CButton onClick={() => setVisible(true)} color='secondary'>
+                <CIcon icon={cilDescription} />{' '}
+                Receipt
             </CButton>
             <CModal size='xl' visible={visible} onClose={() => setVisible(false)} scrollable>
                 <CModalHeader>
-                  
+
                     <CTooltip content='download receipt'>
 
-                       <CButton onClick={printDocument} color='secondary'>
+                        <CButton onClick={()=>printDocument(order.items.length)} color='secondary'>
 
-                        <CIcon icon={cilCloudDownload} size="lg" />
-                    
-                    </CButton>
+                            <CIcon icon={cilCloudDownload} size="lg" />
+
+                        </CButton>
                     </CTooltip>
                 </CModalHeader>
                 <CButtonGroup role="group" aria-label="Basic checkbox toggle button group" className='m-2-1rem'>
-                <CFormCheck
-                    type="radio"
-                    button={{ color: 'primary', variant: 'outline' }}
-                    name="locale"
-                    checked={locale === 'en'}
-                    id='en'
-                    label="English"
-                
-                    onChange={()=> setLocale('en')}
-                />
-                <CFormCheck
-                    type="radio"
-                    button={{ color: 'primary', variant: 'outline' }}
-                    name="locale"
-                    id='ar'
-                    checked={locale === 'ar'}
-                    label="Arabic"
-                    onChange={()=> setLocale('ar')}
-                />
-            </CButtonGroup>
+                  
+                    <input type="radio" className='btn-check' name='check' id='English' onChange={() => setLocale('en')} checked={locale === 'en'}/> 
+                    <label htmlFor="English" className='btn btn-outline-primary'>English</label>
+                    <input type="radio" className='btn-check' name='check' id='Arabic' onChange={() => setLocale('ar')} checked={locale === 'ar'}/> 
+                    <label htmlFor="Arabic" className='btn btn-outline-primary'>Arabic</label>
+                    
+                </CButtonGroup>
                 <CRow ref={template} className='justify-content-right padding' style={{ margin: 'auto 0' }} >
                     <CCol xs={12} sm={12} md={12} lg={12} xl={8} style={{ direction: locale === 'en' ? 'ltr' : 'rtl' }}>
                         <CRow className='justify-content-between' xs={{ gutterY: 5 }}>
@@ -123,12 +113,12 @@ const Pdf = ({ order }: {order:OrderType}) => {
                             <CCol xs={12}>
                                 <Table pagination={false} columns={columns} data={order.items} updateLoading={function (value: React.SetStateAction<boolean>): void {
                                     throw new Error('Function not implemented.');
-                                } } params={{
+                                }} params={{
                                     limit: undefined,
                                     offset: undefined
                                 }} count={0} changeData={function (p: ParamsType): Promise<void> {
                                     throw new Error('Function not implemented.');
-                                } } cookieName={''} />
+                                }} cookieName={''} />
                             </CCol>
                         </CRow>
 

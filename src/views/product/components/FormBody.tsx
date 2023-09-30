@@ -5,12 +5,18 @@ import {
     CCol,
     CFormSelect,
   } from "@coreui/react";
-  import {getChildCategoriesHandler,getGrandChildCategoriesHandler,getGrandChildCategories} from '../../store/category'
+  import {getChildCategoriesHandler,getGrandChildCategoriesHandler,getGrandChildCategories} from '../../../store/category'
+import { RootState } from 'src/store';
+import { ParamsType, ParentCategoriesType, ChildAndGrandCategoriesType } from 'src/types';
 
 
- const FormBody = ({getChildCategoriesHandler,getGrandChildCategoriesHandler}) => {
+ type PropTypes ={
+  getChildCategoriesHandler :( p: ParamsType) => Promise<void>,
+  getGrandChildCategoriesHandler :( p: ParamsType) => Promise<void>
+ } 
+ const FormBody = ({getChildCategoriesHandler,getGrandChildCategoriesHandler}: PropTypes) => {
   const dispatch = useDispatch()
-    const {parentCategories:{data:parentCategories}, childCategories:{data:childCategories},grandChildCategories:{data:grandChildCategories}} = useSelector(state=>state.category)
+    const {parentCategories:{data:parentCategories}, childCategories:{data:childCategories},grandChildCategories:{data:grandChildCategories}} = useSelector((state: RootState)=>state.category)
     const [secondCategories, setSecondCategories] = useState({parent_id: '',data:[]})
     const [thirdCategories, setThirdCategories] = useState({parent_id: '',data:[]})
     useEffect(()=>{
@@ -34,19 +40,19 @@ import {
       <CCol xs={12}>
         <CFormSelect onChange={e=> setSecondCategories(x=> {return{...x, parent_id: e.target.value}})} id='parent_category_id'>
           <option value={''}>Select first category</option>
-          {Children.toArray(parentCategories.map(category => <option value={category.id}>{`${category.entitle} - ${category.artitle}`}</option>))}
+          {Children.toArray(parentCategories.map((category: ParentCategoriesType) => <option value={category.id}>{`${category.entitle} - ${category.artitle}`}</option>))}
         </CFormSelect >
       </CCol>
       <CCol xs={12}>
         <CFormSelect disabled={childCategories.length === 0} onChange={e=> setThirdCategories(x=> {return{...x, parent_id: e.target.value}})} id='child_category_id' defaultValue={''}>
           <option value={''}>Select second category</option>
-          {Children.toArray(childCategories.map(category => <option value={category.id}>{`${category.entitle} - ${category.artitle}`}</option>))}
+          {Children.toArray(childCategories.map((category: ChildAndGrandCategoriesType) => <option value={category.id}>{`${category.entitle} - ${category.artitle}`}</option>))}
         </CFormSelect>
       </CCol>
       <CCol xs={12}>
         <CFormSelect disabled={grandChildCategories.length === 0 || childCategories.length === 0}  id='grandchild_category_id' defaultValue={''}>
           <option value=''>Select third category</option>
-          {Children.toArray(grandChildCategories.map(category => <option value={category.id}>{`${category.entitle} - ${category.artitle}`}</option>))}
+          {Children.toArray(grandChildCategories.map((category: ChildAndGrandCategoriesType) => <option value={category.id}>{`${category.entitle} - ${category.artitle}`}</option>))}
         </CFormSelect>
       </CCol>
     </CRow>
@@ -54,8 +60,7 @@ import {
   )
 }
 
-const mapStateToProps = (state) => ({})
 
 const mapDispatchToProps = {getChildCategoriesHandler,getGrandChildCategoriesHandler}
 
-export default connect(mapStateToProps, mapDispatchToProps)(FormBody)
+export default connect(null, mapDispatchToProps)(FormBody)

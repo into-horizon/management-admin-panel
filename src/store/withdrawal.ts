@@ -4,6 +4,7 @@ import { updateWithdrawn } from './finance'
 import { updateToast } from "./globalToasts";
 import { AppDispatch, RootState } from ".";
 import { DialogResponseTypes } from "src/enums";
+import { ParamsType, WithdrawalType } from "src/types";
 
 
 const withdrawal = createSlice({

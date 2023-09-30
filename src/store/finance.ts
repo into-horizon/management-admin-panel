@@ -4,6 +4,7 @@ import Finance from "../services/Finance";
 import { updateToast } from "./globalToasts";
 import { AppDispatch, RootState } from ".";
 import { DialogResponseTypes } from "src/enums";
+import { ParamsType } from "src/types";
 
 const finance = createSlice({
     name: 'finance',

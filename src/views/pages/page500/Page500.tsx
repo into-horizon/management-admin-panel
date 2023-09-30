@@ -25,7 +25,7 @@ const Page500 = () => {
               </p>
             </span>
             <CInputGroup className="input-prepend">
-              <CButton color="info" onClick={()=> window.location.reload(false)}>Reload</CButton>
+              <CButton color="info" onClick={()=> window.location.reload()}>Reload</CButton>
               {/* <CInputGroupText>
                 <CIcon icon={cilMagnifyingGlass} />
               </CInputGroupText>

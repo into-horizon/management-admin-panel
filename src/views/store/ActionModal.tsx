@@ -15,6 +15,7 @@ import React, { FormEvent, useState } from "react";
 import CIcon from "@coreui/icons-react";
 import { cilPencil } from "@coreui/icons";
 import { connect } from "react-redux";
+import { StoreType } from "src/types";
 const ActionModal = (data : StoreType & {updateStoreStatusHandler:  (s:StoreType, status: 'overview' | 'pending') => Promise<void>}) => {
   const [visible, setVisible] = useState(false);
   const [status, setStatus] = useState("");

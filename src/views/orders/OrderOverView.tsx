@@ -11,17 +11,18 @@ import Export from '../../components/Export';
 import NewOrders from 'src/services/Orders';
 import CopyableText from '../../components/CopyableText';
 import { RootState } from 'src/store';
+import { ParamsType, OrderType } from 'src/types';
 
 
 type PropsTypes = {
-    bulkStatusUpdate : (p: {id: string, status: string})=> Promise<void>,
+    bulkStatusUpdate: (p: { id: string, status: string }) => Promise<void>,
     getOverviewOrdersHandler: (p: ParamsType) => Promise<void>,
-    orders : OrderType[],
-    count : number,
-    getStatuesHandler : ()=> Promise<void>,
-    statuses : string[]
+    orders: OrderType[],
+    count: number,
+    getStatuesHandler: () => Promise<void>,
+    statuses: string[]
 }
-const OrdersOverview = ({ bulkStatusUpdate, getOverviewOrdersHandler, orders, count, getStatuesHandler, statuses }:PropsTypes) => {
+const OrdersOverview = ({ bulkStatusUpdate, getOverviewOrdersHandler, orders, count, getStatuesHandler, statuses }: PropsTypes) => {
     const initialParams = { limit: 5, offset: 0 }
     const [params, setParams] = useState<ParamsType>(initialParams)
     const [selected, setSelected] = useState<any[]>([])
@@ -105,11 +106,11 @@ const OrdersOverview = ({ bulkStatusUpdate, getOverviewOrdersHandler, orders, co
                 </CCol>
                 <CCol md={2}>
 
-                    <CFormCheck type='radio' name='search' value="status" label="order status" defaultChecked onChange={e => setSearchType(e.target.value)} />
+                    <CFormCheck type='radio' name='search' value="status" label="order status" checked={searchType === 'status'} onChange={e => setSearchType(e.target.value)} />
                 </CCol>
                 <CCol md={2}>
 
-                    <CFormCheck type='radio' name='search' value="number" label="order number" onChange={e => setSearchType(e.target.value)} />
+                    <CFormCheck type='radio' name='search' value="number" label="order number" checked={searchType === 'number'} onChange={e => setSearchType(e.target.value)} />
                 </CCol>
 
                 {searchType === 'status' && <CForm onSubmit={submitHandler} className='mgn-top50'>
@@ -148,7 +149,7 @@ const OrdersOverview = ({ bulkStatusUpdate, getOverviewOrdersHandler, orders, co
 
             {view === 'card' && <>
                 <OrdersModel data={orders} loading={loading} />
-                <Paginator count={Number(count)} params={params} changeData={getOverviewOrdersHandler} cookieName='orderOverview' updateLoading={setLoading } />
+                <Paginator count={Number(count)} params={params} changeData={getOverviewOrdersHandler} cookieName='orderOverview' updateLoading={setLoading} />
             </>
             }
 
@@ -215,7 +216,7 @@ const OrdersOverview = ({ bulkStatusUpdate, getOverviewOrdersHandler, orders, co
     )
 }
 
-const mapStateToProps = (state : RootState) => ({
+const mapStateToProps = (state: RootState) => ({
     orders: state.orders.ordersOverview.data,
     count: state.orders.ordersOverview?.count,
     statuses: state.orders.statuses

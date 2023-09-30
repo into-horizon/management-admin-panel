@@ -4,6 +4,7 @@ import User from "src/services/User";
 import { updateToast } from "./globalToasts";
 import { AppDispatch, RootState } from ".";
 import { DialogResponseTypes } from "src/enums";
+import { ParamsType, UserType } from "src/types";
 
 const user = createSlice({
     name: 'user',

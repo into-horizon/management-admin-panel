@@ -14,7 +14,7 @@ import {
   CModalFooter,
   CFormTextarea,
 } from "@coreui/react";
-import React, { useState, useEffect, Children } from "react";
+import React, { useState, useEffect, Children, FormEvent } from "react";
 import { connect, useSelector } from "react-redux";
 import Table from "src/components/Table";
 import { getPendingProducts, updateProductStatus } from "../../store/product";
@@ -25,19 +25,31 @@ import {
   cilCheck,
   cilX,
 } from "@coreui/icons";
+import { RootState } from "src/store";
+import { ParamsType, ProductType } from "src/types";
+import { events } from "src/App";
 
-export const PendingProducts = ({
+type PropTypes = {
+  getPendingProducts: (p: ParamsType) => Promise<void>;
+  updateProductStatus: (p: ProductType) => Promise<void>;
+};
+
+const PendingProducts = ({
   getPendingProducts,
   updateProductStatus,
-}) => {
+}: PropTypes) => {
   const [loading, setLoading] = useState(true);
-  const [params, setParams] = useState({ limit: 10, offset: 0 });
-  const { data, count } = useSelector((state) => state.products.pending);
+  const [params, setParams] = useState<ParamsType>({ limit: 10, offset: 0 });
+  const { data, count } = useSelector(
+    (state: RootState) => state.products.pending
+  );
   useEffect(() => {
     getPendingProducts(params).then(() => setLoading(false));
   }, []);
-
-  const Details = (data) => {
+  events.on("pending", () => {
+    console.log("🚀 ~ file: PendingProducts.tsx:50 ~ events.on ~ pending:");
+  });
+  const Details = (data: ProductType) => {
     const [visible, setVisible] = useState(false);
     return (
       <React.Fragment>
@@ -123,52 +135,74 @@ export const PendingProducts = ({
     );
   };
 
-  const StatusBody = (data) => {
-    const [visible, setVisible] = useState(false)
-    const submitHandler = e =>{
-        e.preventDefault()
-        updateProductStatus({...data, status: 'rejected', rejection_reason: e.target.rejection_reason.value})
-    }
+  const StatusBody = (data: ProductType) => {
+    const [visible, setVisible] = useState(false);
+    const submitHandler = (e: FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+      const target = e.target as typeof e.target & {
+        rejection_reason: HTMLSelectElement;
+      };
+      updateProductStatus({
+        ...data,
+        status: "rejected",
+        rejection_reason: target.rejection_reason.value,
+      });
+    };
     return (
       <React.Fragment>
-        <CModal visible={visible} alignment="center" onClose={()=> setVisible(false)}> 
-            <CModalHeader>
-                <CModalTitle>
-                    Product Rejection
-                </CModalTitle>
-            </CModalHeader>
-            <CForm onSubmit={submitHandler}>
-                <CRow className="justify-content-center align-items-center">
-                    <CCol xs={10}>
-
-                <CFormTextarea label='Rejection Reason' id="rejection_reason" required/>
-                    </CCol>
-                </CRow>
-                <CModalFooter>
-                    <CButton color="danger" type="submit">Reject</CButton>
-                    <CButton color="secondary" onClick={()=> setVisible(false)}>Close</CButton>
-                </CModalFooter>
-            </CForm>
+        <CModal
+          visible={visible}
+          alignment="center"
+          onClose={() => setVisible(false)}
+        >
+          <CModalHeader>
+            <CModalTitle>Product Rejection</CModalTitle>
+          </CModalHeader>
+          <CForm onSubmit={submitHandler}>
+            <CRow className="justify-content-center align-items-center">
+              <CCol xs={10}>
+                <CFormTextarea
+                  label="Rejection Reason"
+                  id="rejection_reason"
+                  required
+                />
+              </CCol>
+            </CRow>
+            <CModalFooter>
+              <CButton color="danger" type="submit">
+                Reject
+              </CButton>
+              <CButton color="secondary" onClick={() => setVisible(false)}>
+                Close
+              </CButton>
+            </CModalFooter>
+          </CForm>
         </CModal>
-        { data.status === 'pending'? 
-        <CRow>
-          <CCol xs="auto">
-            <CTooltip content='Approve'>
-            <CButton color="success" onClick={()=> updateProductStatus({...data, status: 'approved'})}>
-              <CIcon icon={cilCheck} />
-            </CButton>
-
-            </CTooltip>
-          </CCol>
-          <CCol xs="auto">
-            <CTooltip content='Reject' >
-            <CButton color="danger" onClick={()=> setVisible(true)}>
-              <CIcon icon={cilX} />
-            </CButton>
-
-            </CTooltip>
-          </CCol>
-        </CRow>:  <span>{data.status}</span>}
+        {data.status === "pending" ? (
+          <CRow>
+            <CCol xs="auto">
+              <CTooltip content="Approve">
+                <CButton
+                  color="success"
+                  onClick={() =>
+                    updateProductStatus({ ...data, status: "approved" })
+                  }
+                >
+                  <CIcon icon={cilCheck} />
+                </CButton>
+              </CTooltip>
+            </CCol>
+            <CCol xs="auto">
+              <CTooltip content="Reject">
+                <CButton color="danger" onClick={() => setVisible(true)}>
+                  <CIcon icon={cilX} />
+                </CButton>
+              </CTooltip>
+            </CCol>
+          </CRow>
+        ) : (
+          <span>{data.status}</span>
+        )}
       </React.Fragment>
     );
   };
@@ -188,6 +222,9 @@ export const PendingProducts = ({
         updateParams={setParams}
         loading={loading}
         columns={columns}
+        updateLoading={setLoading}
+        changeData={getPendingProducts}
+        cookieName={"pending"}
       />
     </>
   );

@@ -14,7 +14,7 @@ import { useTranslation } from "react-i18next";
 type PropTypes = {
   visible: boolean,
   onClose: () => void,
-  onDelete: (s?: string | { id?: string }) => void,
+  onDelete: Function,
   id?: string ,
 }
 export const DeleteModal = ({ visible, onClose, onDelete, id }:PropTypes)  => {
