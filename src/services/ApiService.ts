@@ -1,9 +1,9 @@
 import axios from "axios";
 import cookie from "react-cookies";
-import jwt from "jsonwebtoken";
 import { ParamsType } from "src/types";
 let api = process.env.REACT_APP_API;
 let managementAPI = process.env.REACT_APP_MANAGEMENT_API;
+import { isJwtExpired } from "jwt-check-expiration";
 
 export default class ApiService {
   async get(
@@ -163,10 +163,9 @@ export default class ApiService {
   async token(): Promise<string | Error | void> {
     let token = cookie.load("access_token");
     if (!token) return;
-    try {
-      jwt.verify(token, process.env.REACT_APP_SECRET!);
+    if (!isJwtExpired(token)) {
       return token;
-    } catch (error) {
+    } else {
       try {
         await ApiService.refresh();
       } catch (error) {

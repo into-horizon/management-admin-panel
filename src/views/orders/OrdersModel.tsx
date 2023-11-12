@@ -114,7 +114,7 @@ const OrderModel = ({ data, updateOrderItemHandler, loading, type }: PropTypes) 
                                         {new Date(order.created_at).toLocaleDateString()}
                                     </CTableDataCell>
                                     <CTableDataCell>
-                                        {new Date(order.updated).toLocaleDateString()}
+                                        {order.updated?new Date(order.updated).toLocaleDateString():'-'}
                                     </CTableDataCell>
                                     <CTableDataCell>
                                         {order.status}

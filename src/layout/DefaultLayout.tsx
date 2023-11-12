@@ -9,7 +9,7 @@ import {
   CTooltip,
 } from "@coreui/react";
 import React, { FormEvent, useEffect, useState } from "react";
-import { connect, useSelector } from "react-redux";
+import { connect, useDispatch, useSelector } from "react-redux";
 import { Navigate, useLocation, useNavigate } from "react-router-dom";
 import {
   AppContent,
@@ -29,8 +29,13 @@ import SearchDropdown from "src/components/SearchDropdown";
 import { searchForStore } from "../store/store";
 import { populateStore } from "src/store/filter";
 import { RootState } from "src/store";
-import { StoreType } from "src/types";
+import { ProductType, StoreType } from "src/types";
 import { setDate as _setDate } from "../services/helpers";
+import { notifications, products, socket } from "src/socket";
+import { events } from "src/App";
+import { getNotifications } from "src/store/notification";
+import { updateToast } from "src/store/globalToasts";
+import { DialogResponseTypes } from "src/enums";
 type PropTypes = {
   searchForStore(q: { query: string }): Promise<void>;
   populateStore: (p?: {
@@ -43,38 +48,9 @@ const DefaultLayout = ({ searchForStore, populateStore }: PropTypes) => {
   const [selectedStore, setSelectedStore] = useState({});
   const { searched } = useSelector((state: RootState) => state.stores);
   const { duration, store } = useSelector((state: RootState) => state.filter);
+  const { user, loggedIn } = useSelector((state: RootState) => state.login);
+  const dispatch = useDispatch();
   const location = useLocation();
-  const setDateByDays = (days = 0) => {
-    const months = [
-      "01",
-      "02",
-      "03",
-      "04",
-      "05",
-      "06",
-      "07",
-      "08",
-      "09",
-      "10",
-      "11",
-      "12",
-    ];
-    let date = new Date(Date.now() - 1000 * 60 * 60 * 24 * days);
-    console.log(
-      Intl.DateTimeFormat("en", {
-        month: "2-digit",
-        year: "numeric",
-        day: "2-digit",
-      }).format(date)
-    );
-
-    const formattedDate = Intl.DateTimeFormat("en", {
-      month: "2-digit",
-      year: "numeric",
-      day: "2-digit",
-    }).format(date);
-    return formattedDate;
-  };
   const setDate = (_date: string) => {
     const date = new Date(_date);
     const formattedDate = Intl.DateTimeFormat("en", {
@@ -102,6 +78,35 @@ const DefaultLayout = ({ searchForStore, populateStore }: PropTypes) => {
     target.reset();
     populateStore();
   };
+  useEffect(() => {
+    if (socket && loggedIn && !!user && products) {
+      socket.emit("role", user.role);
+      // products.on("connect", () => {
+      //   console.log("user connected");
+      // });
+      // notifications.on("connect", () => {
+      //   console.log("user connected");
+      // });
+      products.emit("products:role", user.role);
+      notifications.emit("notifications:role", user.role);
+      notifications.on("admin:notifications", () => {
+        console.log("notification received");
+        dispatch(getNotifications({ limit: 5, offset: 0 }));
+        dispatch(
+          updateToast({
+            message: "you have new notifications",
+            type: DialogResponseTypes.INFO,
+          })
+        );
+      });
+      products.on("products:updateStatus", (data: ProductType) => {
+        events.emit("pending");
+        return new Notification(
+          `${data.entitle} status has been updated to ${data.status}`
+        );
+      });
+    }
+  }, [socket, products, notifications, loggedIn, user.id]);
   return (
     <div>
       <AppSidebar />
@@ -164,7 +169,7 @@ const DefaultLayout = ({ searchForStore, populateStore }: PropTypes) => {
                           <CFormInput
                             name="from"
                             type="date"
-                            defaultValue={setDate(duration?.split("&")[0])}
+                            defaultValue={duration?.split("&")[0]}
                             max={_setDate()}
                           />
                         </CCol>
@@ -173,7 +178,7 @@ const DefaultLayout = ({ searchForStore, populateStore }: PropTypes) => {
                           <CFormInput
                             name="to"
                             type="date"
-                            defaultValue={setDate(duration?.split("&")[1])}
+                            defaultValue={duration?.split("&")[1]}
                             max={_setDate()}
                           />
                         </CCol>

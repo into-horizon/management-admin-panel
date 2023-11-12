@@ -26,7 +26,7 @@ import { RootState } from 'src/store'
 type PropTypes = {
   loginHandler?: (p: { password: string, email: string }) => Promise<void>
 }
-const Login = ({ }: PropTypes) => {
+const Login = ({}: PropTypes) => {
   const { t, i18n } = useTranslation('translation', { keyPrefix: 'login' });
   const dispatch = useDispatch()
   const login = useSelector((state: RootState) => state.login)
@@ -86,8 +86,8 @@ const Login = ({ }: PropTypes) => {
                     </CInputGroup>
                     <CRow className="justify-content-between">
                       <CCol xs='auto'>
-                        <CButton color="primary" className="px-4" type="submit" disabled={load}>
-                          {load ? <CSpinner color="light" size="sm" /> : t('login')}
+                        <CButton color="primary" className="px-4" type="submit" disabled={login.loading}>
+                          {login.loading ? <CSpinner color="light" size="sm" /> : t('login')}
                         </CButton>
                       </CCol>
                       <CCol xs='auto' className="text-right">
@@ -131,4 +131,4 @@ const Login = ({ }: PropTypes) => {
 
 
 const mapDispatchToProps = { loginHandler };
-export default connect(null, mapDispatchToProps)(Login)
+export default connect(null, null)(Login)

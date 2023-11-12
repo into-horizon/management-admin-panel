@@ -1,5 +1,5 @@
-import jwt from "jsonwebtoken";
 import cookie from "react-cookies";
+import { isJwtExpired } from "jwt-check-expiration";
 
 export const setDate = (days: number = 0): string => {
   let date = new Date(Date.now() - 1000 * 60 * 60 * 24 * days);
@@ -12,11 +12,6 @@ export const setDate = (days: number = 0): string => {
 };
 
 export const isTokenValid = (): boolean => {
-  try {
-    let token = cookie.load("access_token");
-    jwt.verify(token, process.env.REACT_APP_SECRET!);
-    return true;
-  } catch (error) {
-    return false;
-  }
+  let token = cookie.load("access_token");
+  return isJwtExpired(token);
 };

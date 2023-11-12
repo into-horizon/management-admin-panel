@@ -24,7 +24,9 @@ export default class Auth extends ApiService {
       let response = await this.get({ management: true, endpoint: this.path });
       return response;
     } catch (error) {
-      return error;
+      if (error instanceof Error) {
+        throw new Error(error.message);
+      }
     }
   }
 

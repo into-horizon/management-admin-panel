@@ -1,4 +1,11 @@
-import React, { useState, useEffect, Fragment, Children, ChangeEvent, FormEvent } from "react";
+import React, {
+  useState,
+  useEffect,
+  Fragment,
+  Children,
+  ChangeEvent,
+  FormEvent,
+} from "react";
 import { useSelector, connect, useDispatch } from "react-redux";
 import {
   CButton,
@@ -32,7 +39,6 @@ import {
   cilImagePlus,
   cilWarning,
   cilExternalLink,
-
 } from "@coreui/icons";
 import Paginator from "../../components/Paginator";
 import DiscountModal from "./components/DiscountModal";
@@ -47,33 +53,35 @@ import { RootState } from "src/store";
 import { GetFunctionType, ParamsType, QuantityDetailsType } from "src/types";
 
 type PropTypes = {
-  getProductsByStatus: GetFunctionType,
-  addProductPictureHandler: (p: FormData) => Promise<void>,
-  deleteProductPictureHandler: (id: { picture_id: string }) => Promise<void>,
-  updateSizeAndQuantity: (p: {id: string, quantity: number, size_and_color: string| null}) => Promise<void>,
-  updateDiscount: (p: {id:string, discount: boolean, discount_rate: number}) => Promise<void>,
-  deleteProductHandler: (id: { id: string }) => Promise<void>,
-  status: string
-}
-const ProductsRender = ({ getProductsByStatus,
+  getProductsByStatus: GetFunctionType;
+  addProductPictureHandler: (p: FormData) => Promise<void>;
+  deleteProductPictureHandler: (id: { picture_id: string }) => Promise<void>;
+  updateSizeAndQuantity: (p: {
+    id: string;
+    quantity: number;
+    size_and_color: string | null;
+  }) => Promise<void>;
+  updateDiscount: (p: {
+    id: string;
+    discount: boolean;
+    discount_rate: number;
+  }) => Promise<void>;
+  deleteProductHandler: (id: { id: string }) => Promise<void>;
+  status: string;
+};
+const ProductsRender = ({
+  getProductsByStatus,
   addProductPictureHandler,
   deleteProductPictureHandler,
   updateSizeAndQuantity,
   updateDiscount,
-  deleteProductHandler, status }: PropTypes) => {
-  // let sizeSymbols = ["XXS", "XS", "S", "M", "L", "XL", "XXL", "XXXL"];
-  // let sizeNumbers = [];
-  // if (sizeNumbers.length === 0) {
-  //   for (let i = 30; i <= 50; i++) {
-  //     sizeNumbers.push(i);
-  //   }
-  // }
-
+  deleteProductHandler,
+  status,
+}: PropTypes) => {
   const navigate = useNavigate();
   const {
     overview: { count, data: products },
   } = useSelector((state: RootState) => state.products);
-
 
   const [params, setParams] = useState<ParamsType>({
     status: status,
@@ -84,7 +92,6 @@ const ProductsRender = ({ getProductsByStatus,
     keyPrefix: "addProduct",
   });
   const [loading, setLoading] = useState(true);
-
 
   useEffect(() => {
     getProductsByStatus(params).then(() => setLoading(false));
@@ -122,7 +129,11 @@ const ProductsRender = ({ getProductsByStatus,
       i18n.language === "ar" &&
       document.querySelectorAll(".productTitles").length > 0
     ) {
-      let div = Array.from(document.getElementsByClassName('productTitles') as HTMLCollectionOf<HTMLElement>)
+      let div = Array.from(
+        document.getElementsByClassName(
+          "productTitles"
+        ) as HTMLCollectionOf<HTMLElement>
+      );
 
       // let div = document.querySelectorAll(".productTitles") as HTMLCollectionOf<HTMLElement>;
       div.forEach((item) => (item.style.flexDirection = "row-reverse"));
@@ -130,7 +141,11 @@ const ProductsRender = ({ getProductsByStatus,
       i18n.language === "en" &&
       document.querySelectorAll(".productTitles").length > 0
     ) {
-      let div = Array.from(document.getElementsByClassName('productTitles') as HTMLCollectionOf<HTMLElement>)
+      let div = Array.from(
+        document.getElementsByClassName(
+          "productTitles"
+        ) as HTMLCollectionOf<HTMLElement>
+      );
       div.forEach((item) => (item.style.flexDirection = ""));
     }
   };
@@ -152,35 +167,45 @@ const ProductsRender = ({ getProductsByStatus,
     return data;
   };
   const submitHandler = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
+    e.preventDefault();
     setLoading(true);
     type QueriesType = {
-      key: HTMLInputElement
-      parent_category_id: HTMLSelectElement,
-      child_category_id: HTMLSelectElement,
-      grandchild_category_id:  HTMLSelectElement
-      discount: HTMLSelectElement
-    }
-    const target = e.target as typeof e.target & QueriesType
-    let queries: string[] = ['key', 'parent_category_id', 'child_category_id', 'grandchild_category_id', 'discount']
-    let data : ParamsType = { ...params }
-    queries.forEach(query => {
-      if (target[query as keyof QueriesType].value && target[query as keyof QueriesType].value !== '') {
-        data[query ] = target[query as keyof QueriesType].value
+      key: HTMLInputElement;
+      parent_category_id: HTMLSelectElement;
+      child_category_id: HTMLSelectElement;
+      grandchild_category_id: HTMLSelectElement;
+      discount: HTMLSelectElement;
+    };
+    const target = e.target as typeof e.target & QueriesType;
+    let queries: string[] = [
+      "key",
+      "parent_category_id",
+      "child_category_id",
+      "grandchild_category_id",
+      "discount",
+    ];
+    let data: ParamsType = { ...params };
+    queries.forEach((query) => {
+      if (
+        target[query as keyof QueriesType].value &&
+        target[query as keyof QueriesType].value !== ""
+      ) {
+        data[query] = target[query as keyof QueriesType].value;
       }
-    })
-    setParams(data)
-    getProductsByStatus(data).then(() => setLoading(false))
-
-  }
-  const onReset = (e: FormEvent<HTMLFormElement>& {target :{reset(): void}} )  => {
-    e.target.reset()
+    });
+    setParams(data);
+    getProductsByStatus(data).then(() => setLoading(false));
+  };
+  const onReset = (
+    e: FormEvent<HTMLFormElement> & { target: { reset(): void } }
+  ) => {
+    e.target.reset();
     setParams({
       status: status,
       limit: 5,
       offset: 0,
-    })
-  }
+    });
+  };
   return (
     <>
       <CRow xs={{ gutterY: 10 }} className="justify-content-end">
@@ -205,11 +230,11 @@ const ProductsRender = ({ getProductsByStatus,
                 </CCol>
                 <FormBody />
                 <CCol xs="auto">
-                  <CFormLabel htmlFor="discount" >discount</CFormLabel>
+                  <CFormLabel htmlFor="discount">discount</CFormLabel>
                   <CFormSelect name="discount" id="discount">
                     <option value="">All</option>
-                    <option value={'true'}>true</option>
-                    <option value={'false'}>false</option>
+                    <option value={"true"}>true</option>
+                    <option value={"false"}>false</option>
                   </CFormSelect>
                 </CCol>
                 <CCol xs={12}></CCol>
@@ -234,10 +259,12 @@ const ProductsRender = ({ getProductsByStatus,
               key={product.entitle + idx}
             >
               <div className="productTitles">
-                <h3 className="productTitle">{`${t("englishTitle")}: ${product.entitle
-                  }`}</h3>
-                <h3 className="productTitle">{`${t("arabicTitle")}: ${product.artitle
-                  }`}</h3>
+                <h3 className="productTitle">{`${t("englishTitle")}: ${
+                  product.entitle
+                }`}</h3>
+                <h3 className="productTitle">{`${t("arabicTitle")}: ${
+                  product.artitle
+                }`}</h3>
               </div>
               <div className="productPictures">
                 {React.Children.toArray(
@@ -246,7 +273,9 @@ const ProductsRender = ({ getProductsByStatus,
                       ...product.pictures,
                       ...completeArray(product.pictures.length),
                     ]?.map((picture, i) => (
-                      <div style={{position: 'relative', width: 'fit-content'}}>
+                      <div
+                        style={{ position: "relative", width: "fit-content" }}
+                      >
                         {picture.product_picture ? (
                           <>
                             <CButton
@@ -259,9 +288,7 @@ const ProductsRender = ({ getProductsByStatus,
                               }
                               style={{
                                 visibility:
-                                  status === "pending"
-                                    ? "hidden"
-                                    : "visible",
+                                  status === "pending" ? "hidden" : "visible",
                               }}
                             >
                               X
@@ -286,9 +313,7 @@ const ProductsRender = ({ getProductsByStatus,
                               className="uploadLabel"
                               style={{
                                 visibility:
-                                  status === "pending"
-                                    ? "hidden"
-                                    : "visible",
+                                  status === "pending" ? "hidden" : "visible",
                               }}
                             >
                               <CIcon icon={cilImagePlus}></CIcon>
@@ -380,7 +405,9 @@ const ProductsRender = ({ getProductsByStatus,
               </h6>
               <h6>
                 <strong>Commission per sold item</strong>{" "}
-                {(product.price * product.commission).toFixed(2) + " " + t(`${product.currency}`)}
+                {(product.price * product.commission).toFixed(2) +
+                  " " +
+                  t(`${product.currency}`)}
               </h6>
               {product.brand_name ? (
                 <h6>
@@ -392,7 +419,10 @@ const ProductsRender = ({ getProductsByStatus,
                 <h6>
                   <strong>{`Rate: `}</strong>
                   {Number(product.rate).toFixed(2)}
-                  <CButton color="link" onClick={() => navigate(`/product/reviews/${product.id}`)}>
+                  <CButton
+                    color="link"
+                    onClick={() => navigate(`/product/reviews/${product.id}`)}
+                  >
                     <CIcon icon={cilExternalLink} />
                     Reviews
                   </CButton>
@@ -417,25 +447,27 @@ const ProductsRender = ({ getProductsByStatus,
                     <thead>
                       <tr>
                         {JSON.parse(product.size_and_color)
-                          .map((val : QuantityDetailsType) => val.color)
-                          .filter((val : QuantityDetailsType) => val).length > 0 && <th>Color</th>}
+                          .map((val: QuantityDetailsType) => val.color)
+                          .filter((val: QuantityDetailsType) => val).length >
+                          0 && <th>Color</th>}
                         {JSON.parse(product.size_and_color)
-                          .map((val : QuantityDetailsType) => val.size)
-                          .filter((val : QuantityDetailsType) => val).length > 0 && (
-                            <th>{t("size")}</th>
-                          )}
+                          .map((val: QuantityDetailsType) => val.size)
+                          .filter((val: QuantityDetailsType) => val).length >
+                          0 && <th>{t("size")}</th>}
                         <th>{t("quantity")}</th>
                       </tr>
                     </thead>
                     <tbody>
                       {React.Children.toArray(
-                        JSON.parse(product.size_and_color).map((val: QuantityDetailsType) => (
-                          <tr key={Math.random()}>
-                            {val.color && <td>{val.color}</td>}
-                            {val.size && <td>{val.size}</td>}
-                            <td>{val.quantity}</td>
-                          </tr>
-                        ))
+                        JSON.parse(product.size_and_color).map(
+                          (val: QuantityDetailsType) => (
+                            <tr key={Math.random()}>
+                              {val.color && <td>{val.color}</td>}
+                              {val.size && <td>{val.size}</td>}
+                              <td>{val.quantity}</td>
+                            </tr>
+                          )
+                        )
                       )}
                     </tbody>
                     <thead>
@@ -457,7 +489,7 @@ const ProductsRender = ({ getProductsByStatus,
                   </CCol>
                   <CCol xs="auto">
                     <DeleteProductModal
-                      deleteHandler={deleteProductHandler}
+                      deleteHandler={() => deleteProductHandler({id:product.id})}
                       product={product}
                     />
                   </CCol>
@@ -469,7 +501,10 @@ const ProductsRender = ({ getProductsByStatus,
                     />
                   </CCol>
                   <CCol xs="auto">
-                    <StatusModal product={product} callback={()=> getProductsByStatus(params)} />
+                    <StatusModal
+                      product={product}
+                      callback={() => getProductsByStatus(params)}
+                    />
                   </CCol>
                   <CCol xs="auto">
                     <CButton
@@ -491,7 +526,9 @@ const ProductsRender = ({ getProductsByStatus,
           params={params}
           updateParams={setParams}
           changeData={getProductsByStatus}
-          cookieName={status} updateLoading={setLoading }        />
+          cookieName={status}
+          updateLoading={setLoading}
+        />
       </CRow>
     </>
   );
@@ -506,6 +543,3 @@ const mapDispatchToProps = {
   deleteProductHandler,
 };
 export default connect(null, mapDispatchToProps)(ProductsRender);
-
-
-

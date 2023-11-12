@@ -8,3 +8,4 @@ export const productReview = io(`${process.env.REACT_APP_API}/productReview`);
 export const storeReview = io(`${process.env.REACT_APP_API}/storeReview`);
 export const orders = io(`${process.env.REACT_APP_API}/orders`);
 export const products = io(`${process.env.REACT_APP_API}/products`);
+export const notifications = io(`${process.env.REACT_APP_API}/administrationNotifications`);
