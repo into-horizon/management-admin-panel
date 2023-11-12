@@ -1,5 +1,5 @@
-import React, { useEffect, useRef, useState } from "react";
-import { NavLink } from "react-router-dom";
+import React, { Children, useEffect, useRef, useState } from "react";
+import { Link, NavLink } from "react-router-dom";
 import { useSelector, useDispatch, connect } from "react-redux";
 import {
   CContainer,
@@ -16,6 +16,8 @@ import {
   CListGroup,
   CCol,
   CRow,
+  CBadge,
+  CSpinner,
 } from "@coreui/react";
 import CIcon from "@coreui/icons-react";
 import { cilBell, cilEnvelopeOpen, cilList, cilMenu } from "@coreui/icons";
@@ -25,6 +27,11 @@ import { AppHeaderDropdown } from "./header/index";
 import { logo } from "src/assets/brand/logo";
 import { populateStore } from "src/store/filter";
 import { RootState } from "src/store";
+import _ from "lodash";
+import {
+  getNotifications,
+  updateNotificationsAsSeen,
+} from "src/store/notification";
 
 type PropTypes = {
   populateStore: () => void;
@@ -32,6 +39,12 @@ type PropTypes = {
 const AppHeader = ({ populateStore }: PropTypes) => {
   const dispatch = useDispatch();
   const [visible, setVisible] = useState<boolean>(false);
+  const {
+    data: notifications,
+    count,
+    loading,
+    types: notificationTypes,
+  } = useSelector((state: RootState) => state.notifications);
   const dropdown = useRef<HTMLDivElement>(null);
   const sidebarShow = useSelector(
     (state: RootState) => state.changeState.sidebarShow
@@ -39,6 +52,18 @@ const AppHeader = ({ populateStore }: PropTypes) => {
   const { store } = useSelector((state: RootState) => state.filter);
   const onClose = () => {
     populateStore();
+  };
+
+  const notificationActions = {
+    [notificationTypes?.PRODUCT]: (id: string) => `/product/products?id=${id}`,
+    [notificationTypes?.ORDER]: (id: string) => `/order/overview?id=${id}`,
+    [notificationTypes?.ORDER_ITEM]: (id: string) => `/order/overview?id=${id}`,
+    [notificationTypes?.STORE]: (id: string) => `/seller/overview?id=${id}`,
+  } as const;
+
+  const notificationsPaths = {
+    [notificationTypes?.OVERALL_PENDING_ORDERS]: "/order/pendingOrders",
+    [notificationTypes?.OVERALL_PENDING_PRODUCTS]: "/product/pending",
   };
   useEffect(() => {
     if (visible) {
@@ -55,6 +80,19 @@ const AppHeader = ({ populateStore }: PropTypes) => {
       });
     }
   }, [visible]);
+
+  useEffect(() => {
+    if (visible) {
+      updateNotificationsAsSeen();
+    }
+  }, [notifications]);
+  useEffect(() => {
+    dispatch(getNotifications({ offset: 0, limit: 10 }));
+  }, []);
+  const notificationButtonClickHandler = () => {
+    setVisible(!visible);
+    dispatch(updateNotificationsAsSeen());
+  };
   return (
     <CHeader position="sticky" className="mb-4">
       <CContainer fluid>
@@ -90,75 +128,86 @@ const AppHeader = ({ populateStore }: PropTypes) => {
         >
           {`Populated store: ${store?.title ?? "store"}`}
         </CAlert>
-
-        {/* <CButton
-          color="primary"
-          onClick={() =>
-            i18n.changeLanguage(i18n.language === "en" ? "ar" : "en")
-          }
-        >
-          {t("lang")}
-        </CButton> */}
         <CHeaderNav>
           <CNavItem className="position-relative">
             <div ref={dropdown}>
               <CNavLink
                 component="button"
-                className=" border-0 bg-transparent"
-                onClick={() => setVisible((visible) => !visible)}
+                className=" border-0 bg-transparent p-1"
+                onClick={() => notificationButtonClickHandler()}
               >
-                <CIcon icon={cilBell} size="lg" />
-                {visible && (
-                  <CListGroup className="position-absolute end-0">
-                    <CListGroupItem component="a" href="#" className="w-15">
-                      <CRow className="justify-content-between">
-                        <CCol xs={12}>
-                          <p className="text-align-left m-0">
-                            <span>
-                              Lorem, ipsum dolor sit amet consectetur
-                              adipisicing elit. Vel, suscipit?
-                            </span>
-                          </p>
-                        </CCol>
-                        <CCol xs={12}>
-                          <p className="m-0 text-align-right">
-                            <sub>
-                              {Intl.DateTimeFormat("en", {
-                                minute: "2-digit",
-                                hourCycle: "h12",
-                                hour: "2-digit",
-                              }).format(new Date())}
-                            </sub>
-                          </p>
-                        </CCol>
-                      </CRow>
-                    </CListGroupItem>
-                    <CListGroupItem component="a" href="#">
-                      Dapibus ac facilisis in
-                    </CListGroupItem>
-                    <CListGroupItem component="a" href="#">
-                      Morbi leo risus
-                    </CListGroupItem>
-                    <CListGroupItem component="a" href="#">
-                      Porta ac consectetur ac
-                    </CListGroupItem>
-                    <CListGroupItem component="a" href="#">
-                      Vestibulum at eros
-                    </CListGroupItem>
-                  </CListGroup>
+                {count > 0 && (
+                  <CBadge
+                    color="danger"
+                    position="top-end"
+                    shape="rounded-pill"
+                  >
+                    {count}
+                    <span className="visually-hidden">unread messages</span>
+                  </CBadge>
                 )}
+                <CIcon icon={cilBell} size="lg" />
               </CNavLink>
+              {visible && (
+                <CListGroup
+                  className="position-absolute end-0 notification-list"
+                  style={{ overflowY: "scroll", maxHeight: "20rem" }}
+                >
+                  {Children.toArray(
+                    notifications.map((notification) => (
+                      <Link
+                        to={
+                          notification.item_id
+                            ? notificationActions[
+                                notification.type as keyof typeof notificationActions
+                              ](notification.item_id)
+                            : notificationsPaths[
+                                notification.type as keyof typeof notificationsPaths
+                              ]
+                        }
+                        className="w-15 list-group-item list-group-item-action"
+                        onClick={() => setVisible(false)}
+                      >
+                        <CRow className="justify-content-between">
+                          <CCol xs={12}>
+                            <p className="text-align-left m-0">
+                              <span>{notification.text}</span>
+                            </p>
+                          </CCol>
+                          <CCol xs={12}>
+                            <p className="m-0 text-align-right">
+                              <sub>
+                                {Intl.DateTimeFormat("en", {
+                                  minute: "2-digit",
+                                  hourCycle: "h12",
+                                  hour: "2-digit",
+                                }).format(new Date(notification.created_at))}
+                              </sub>
+                            </p>
+                          </CCol>
+                        </CRow>
+                      </Link>
+                    ))
+                  )}
+                  <CListGroupItem
+                    component="button"
+                    className="text-align-center"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      dispatch(
+                        getNotifications({
+                          offset: notifications.length,
+                          limit: 10,
+                        })
+                      );
+                    }}
+                    disabled={loading}
+                  >
+                    {loading ? <CSpinner color="primary" /> : "show more"}
+                  </CListGroupItem>
+                </CListGroup>
+              )}
             </div>
-          </CNavItem>
-          <CNavItem>
-            <CNavLink href="#">
-              <CIcon icon={cilList} size="lg" />
-            </CNavLink>
-          </CNavItem>
-          <CNavItem>
-            <CNavLink href="#">
-              <CIcon icon={cilEnvelopeOpen} size="lg" />
-            </CNavLink>
           </CNavItem>
         </CHeaderNav>
         <CHeaderNav className="ms-3">

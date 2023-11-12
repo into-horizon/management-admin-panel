@@ -76,6 +76,7 @@ export const getUser = createAsyncThunk(
       if (user?.id) {
         dispatch(loginAction({ loggedIn: true, user: { ...user } }));
       } else {
+        dispatch(loginAction(initialState));
         rejectWithValue("invalid token");
       }
     } catch (error) {

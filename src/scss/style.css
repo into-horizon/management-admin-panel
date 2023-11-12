@@ -563,3 +563,13 @@ input[type=number]:out-of-range {
 .w-15 {
     width: 15rem !important;
 }
+
+.notification-list{
+    max-height: 20rem;
+    overflow-y: scroll;
+}
+
+.lg-spinner {
+    height: 3rem !important;
+    width: 3rem !important;
+}

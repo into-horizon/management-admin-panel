@@ -31,12 +31,7 @@ export type ColumnType = {
   body?: React.FC<any> | ((a: any) => React.JSX.Element);
   edit?:
     | {
-        inputType:
-          | InputType.DATE
-          | InputType.EMAIL
-          | InputType.NUMBER
-          | InputType.PHONE
-          | InputType.TEXT;
+        inputType: Exclude<InputType, "dropdown">;  
       }
     | {
         inputType: InputType.DROPDOWN;

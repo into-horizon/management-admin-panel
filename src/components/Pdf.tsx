@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import React, {  useRef, useState } from 'react'
 import Logo from '../assets/images/h.png'
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
@@ -53,8 +53,6 @@ const Pdf = ({ order }: { order: OrderType }) => {
         { header: localization[locale].totalPrice, body: (data: OrderItemType) => <span>{data.quantity * data.price}</span> }
     ]
     const printDocument = (count:number) => {
-    console.log("🚀 ~ file: Pdf.tsx:55 ~ printDocument ~ count:", count)
-
         html2canvas(template!.current!)
             .then((canvas) => {
                 const imgData = canvas.toDataURL(Logo);

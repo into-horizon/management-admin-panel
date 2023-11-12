@@ -15,7 +15,13 @@ import {
 } from "./store/category";
 import "react-select-search/style.css";
 import Auth from "./services/Auth";
-import { socket, notificationsOffers, orders, products } from "./socket";
+import {
+  socket,
+  notificationsOffers,
+  orders,
+  products,
+  notifications,
+} from "./socket";
 import GlobalDialog from "./components/GlobalDialog";
 import Toaster from "./components/Toaster";
 import { CCol, CContainer, CRow } from "@coreui/react";
@@ -47,7 +53,7 @@ type PropsTypes = {
 const App: FC<PropsTypes> = ({ getParentCategoriesHandler, logout }) => {
   const dispatch = useDispatch();
   notificationsOffers.on("welcome", (data) => {
-    Notification.requestPermission().then(() => {
+    Notification.requestPermission().then((data) => {
       // console.log({ data });
       // new Notification(data)
     });
@@ -112,25 +118,12 @@ const App: FC<PropsTypes> = ({ getParentCategoriesHandler, logout }) => {
           setLoad(false);
         }
       })
-      .catch((error) => {
+      .catch(() => {
         navigate("/500");
         setLoad(false);
       });
   }, [loggedIn]);
 
-  useEffect(() => {
-    if (socket && loggedIn && !!user) {
-      socket.emit("role", user.role);
-      products.emit("products:role", user.role);
-
-      products.on("products:updateStatus", (data: ProductType) => {
-        events.emit("pending");
-        return new Notification(
-          `${data.entitle} status has been updated to ${data.status}`
-        );
-      });
-    }
-  }, [socket]);
   const loading = (
     <div className="pt-3 text-center">
       <div className="sk-spinner sk-spinner-pulse"></div>
@@ -146,9 +139,7 @@ const App: FC<PropsTypes> = ({ getParentCategoriesHandler, logout }) => {
       document.documentElement.setAttribute("dir", "rtl");
     }
   }, [i18n.language]);
-  // useEffect(() => {
-  //   setLoad(authLoading)
-  // }, [authLoading])
+
   return (
     <PopupProvider>
       <React.Suspense fallback={loading}>
