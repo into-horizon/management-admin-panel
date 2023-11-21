@@ -1,4 +1,4 @@
-import React, { useState, useEffect, Children, FormEvent } from "react";
+import React, { useState, useEffect, Children, FormEvent, memo } from "react";
 import {
   CButton,
   CForm,
@@ -158,4 +158,4 @@ const AddCategoryModal = ({ action, type   }:PropTypes) => {
 
 
 
-export default connect(null, { getParentCategoriesHandler, getChildCategoriesHandler })(AddCategoryModal);
+export default memo(connect(null, { getParentCategoriesHandler, getChildCategoriesHandler })(AddCategoryModal));

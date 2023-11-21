@@ -97,15 +97,14 @@ const App: FC<PropsTypes> = ({ getParentCategoriesHandler, logout }) => {
           i18n.changeLanguage("en");
         }
 
-        let currentPath = cookie.load(`current_path${sessionStorage.tabID}`);
+        let currentPath = location.pathname;
         if (token && !loggedIn) {
           if (!isTokenValid()) {
             ApiService.refresh().then(() => dispatch(getUser()));
           } else {
             dispatch(getUser());
           }
-          setLoad(false);
-        } else if (loggedIn) {
+        } else if (loggedIn && user.id) {
           getParentCategoriesHandler({ limit: 10, offset: 0 });
           navigate(checkUnAuth(currentPath) ? "/" : currentPath);
           setLoad(false);

@@ -64,15 +64,15 @@ import avatar3 from "src/assets/images/avatars/3.jpg";
 import avatar4 from "src/assets/images/avatars/4.jpg";
 import avatar5 from "src/assets/images/avatars/5.jpg";
 import avatar6 from "src/assets/images/avatars/6.jpg";
-import { connect, useSelector } from "react-redux";
+import { connect, useDispatch, useSelector } from "react-redux";
 import { getDashboardData } from "src/store/dashboard";
 import { RootState } from "src/store";
 import LoadingSpinner from "src/components/LoadingSpinner";
 
-type PropTypes = {
-  getDashboardData: () => Promise<void>;
-};
-const Dashboard = ({ getDashboardData }: PropTypes) => {
+// type PropTypes = {
+//   getDashboardData: () => Promise<void>;
+// };
+const Dashboard = () => {
   const {
     products,
     stores,
@@ -83,6 +83,7 @@ const Dashboard = ({ getDashboardData }: PropTypes) => {
     isDashboardLoading,
   } = useSelector((state: RootState) => state.dashboard);
   const { t } = useTranslation("translation", { keyPrefix: "dashboard" });
+  const dispatch = useDispatch()
   const random = (min: number, max: number) => {
     return Math.floor(Math.random() * (max - min + 1) + min);
   };
@@ -251,11 +252,11 @@ const Dashboard = ({ getDashboardData }: PropTypes) => {
     },
   ];
   useEffect(() => {
-    getDashboardData();
+    dispatch(getDashboardData())
   }, []);
 
   if (isDashboardLoading) {
-    return <LoadingSpinner/>;
+    return <LoadingSpinner />;
   }
   return (
     <>
@@ -526,4 +527,4 @@ const Dashboard = ({ getDashboardData }: PropTypes) => {
   );
 };
 
-export default connect(null, { getDashboardData })(Dashboard);
+export default Dashboard;

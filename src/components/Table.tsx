@@ -22,8 +22,9 @@ import PropTypes from "prop-types";
 import CIcon from "@coreui/icons-react";
 import { cilCheck, cilPen, cilX } from "@coreui/icons";
 import TableEditCell from "./TableEditCell";
-import { ParamsType } from "src/types";
+import { GetFunctionType, ParamsType } from "src/types";
 import { InputType } from "src/enums";
+import LoadingSpinner from "./LoadingSpinner";
 
 export type ColumnType = {
   header: string;
@@ -31,7 +32,7 @@ export type ColumnType = {
   body?: React.FC<any> | ((a: any) => React.JSX.Element);
   edit?:
     | {
-        inputType: Exclude<InputType, "dropdown">;  
+        inputType: Exclude<InputType, "dropdown">;
       }
     | {
         inputType: InputType.DROPDOWN;
@@ -44,8 +45,8 @@ type PropTypes = {
   count: number;
   columns: ColumnType[];
   data: { id?: string }[];
-  changeData: (p: ParamsType) => Promise<void>;
-  cookieName: string;
+  changeData?: GetFunctionType;
+  cookieName?: string;
   style?: React.CSSProperties;
   emptyMessage?: string;
   checkbox?: boolean;
@@ -57,6 +58,9 @@ type PropTypes = {
   editable?: boolean | undefined;
   editFn?: Function;
   Actions?: typeof Component | ((a: any) => React.JSX.Element);
+  onPageChange?: (page: number) => void;
+  pageNumber?: number;
+  pageSize?: number;
 };
 export const Table = ({
   updateLoading,
@@ -77,6 +81,9 @@ export const Table = ({
   editable,
   editFn,
   Actions,
+  onPageChange,
+  pageNumber,
+  pageSize
 }: PropTypes) => {
   const [selected, setSelected] = useState<any[]>([]);
   const [onEdit, setOnEdit] = useState<string | null | number>("");
@@ -102,7 +109,7 @@ export const Table = ({
 
   const changeHandler = (e: React.ChangeEvent<HTMLSelectElement>) => {
     updateParams?.((x) => {
-      changeData({ ...x, limit: Number(e.target.value) });
+      changeData?.({ ...x, limit: Number(e.target.value) });
       return { ...x, limit: Number(e.target.value) };
     });
   };
@@ -117,31 +124,33 @@ export const Table = ({
   const editClick = () => {
     editFn && Promise.all([editFn(item)]).then(() => setOnEdit(""));
   };
-
+  if (loading) {
+    return <LoadingSpinner />;
+  }
   return (
     <>
-      <div className="overflow-x">
-        <CTable style={style} striped>
-          <CTableHead>
-            <CTableRow>
-              {checkbox && (
-                <CTableDataCell>
-                  <CFormCheck onChange={selectAll} />
-                </CTableDataCell>
-              )}
+      <CRow className=" overflow-x-auto ">
+        <CCol xs={12}>
+          <CTable style={style} striped>
+            <CTableHead>
+              <CTableRow>
+                {checkbox && (
+                  <CTableDataCell>
+                    <CFormCheck onChange={selectAll} />
+                  </CTableDataCell>
+                )}
+                {Children.toArray(
+                  columns.map(({ header }) => (
+                    <CTableHeaderCell scope="col">{header}</CTableHeaderCell>
+                  ))
+                )}
+                {(editable || Actions) && (
+                  <CTableHeaderCell>Actions</CTableHeaderCell>
+                )}
+              </CTableRow>
+            </CTableHead>
+            <CTableBody>
               {Children.toArray(
-                columns.map(({ header }) => (
-                  <CTableHeaderCell scope="col">{header}</CTableHeaderCell>
-                ))
-              )}
-              {(editable || Actions) && (
-                <CTableHeaderCell>Actions</CTableHeaderCell>
-              )}
-            </CTableRow>
-          </CTableHead>
-          <CTableBody>
-            {!loading &&
-              Children.toArray(
                 data.map((d, i) => (
                   <CTableRow>
                     {checkbox && (
@@ -234,50 +243,56 @@ export const Table = ({
                   </CTableRow>
                 ))
               )}
-          </CTableBody>
-        </CTable>
-        {pagination &&
-          (loading ? (
-            <CSpinner color="primary" />
-          ) : data.length === 0 ? (
-            <span>{emptyMessage ?? `there's no data`}</span>
-          ) : (
-            <CRow className="justify-content-between align-items-end w-100">
-              <CCol xs="auto">
-                <Paginator
-                  params={params}
-                  count={count}
-                  changeData={changeData}
-                  cookieName={cookieName}
-                  updateParams={updateParams}
-                  updateLoading={updateLoading}
-                />
-              </CCol>
-              {displayedItems && (
+            </CTableBody>
+          </CTable>
+        </CCol>
+        <CCol xs={12}>
+          {pagination &&
+            (data.length === 0 ? (
+              <span>{emptyMessage ?? `there's no data`}</span>
+            ) : (
+              <CRow className="justify-content-between align-items-end w-100">
                 <CCol xs="auto">
-                  <CRow className="align-items-center">
-                    <CCol xs="auto">
-                      <CFormLabel htmlFor="display">Displayed Items</CFormLabel>
-                    </CCol>
-                    <CCol xs="auto">
-                      <CFormSelect
-                        name="display"
-                        onChange={changeHandler}
-                        value={params.limit}
-                      >
-                        {Children.toArray(
-                          displayItems.map((val) => (
-                            <option value={val}>{val}</option>
-                          ))
-                        )}
-                      </CFormSelect>
-                    </CCol>
-                  </CRow>
+                  <Paginator
+                    params={params}
+                    count={count}
+                    changeData={changeData}
+                    cookieName={cookieName}
+                    updateParams={updateParams}
+                    updateLoading={updateLoading}
+                    onPageChange={onPageChange}
+                    pageNumber={pageNumber}
+                    pageSize={pageSize}
+                  />
                 </CCol>
-              )}
-            </CRow>
-          ))}
-      </div>
+                {displayedItems && (
+                  <CCol xs="auto">
+                    <CRow className="align-items-center">
+                      <CCol xs="auto">
+                        <CFormLabel htmlFor="display">
+                          Displayed Items
+                        </CFormLabel>
+                      </CCol>
+                      <CCol xs="auto">
+                        <CFormSelect
+                          name="display"
+                          onChange={changeHandler}
+                          value={params.limit}
+                        >
+                          {Children.toArray(
+                            displayItems.map((val) => (
+                              <option value={val}>{val}</option>
+                            ))
+                          )}
+                        </CFormSelect>
+                      </CCol>
+                    </CRow>
+                  </CCol>
+                )}
+              </CRow>
+            ))}
+        </CCol>
+      </CRow>
     </>
   );
 };
