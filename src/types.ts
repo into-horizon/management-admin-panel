@@ -40,6 +40,8 @@ export type ParentCategoriesType = {
   content?: string;
   display: boolean;
   created_at: string;
+  children: ChildAndGrandCategoriesType[];
+  products_count: string | number;
 };
 export type ChildAndGrandCategoriesType = ParentCategoriesType & {
   parent_id: string;
@@ -52,6 +54,10 @@ export type CategoriesStateType = {
   grandChildCategories: { data: ChildAndGrandCategoriesType[]; count: number };
   isLoading: boolean;
   isProgressing: boolean;
+  parentParams: ParamsType;
+  childParams: ParamsType;
+  grandchildParams: ParamsType;
+  categories: ParentCategoriesType[];
 };
 
 export type DiscountCodeType = {

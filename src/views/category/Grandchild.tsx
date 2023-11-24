@@ -1,17 +1,13 @@
-import React, {
-  useState,
-  useEffect,
-  Children,
-  FormEvent,
-  ChangeEvent,
-} from "react";
-import { connect, useSelector } from "react-redux";
+import React, { useState, useEffect, Children, FormEvent } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import Table, { ColumnType } from "../../components/Table";
 import {
   getGrandChildCategoriesHandler,
   updateGrandChildCategory,
   addGrandchildCategoryHandler,
   deleteGrandchildCategoryHandler,
+  resetGrandChildParams,
+  updateGrandchildParams,
 } from "src/store/category";
 import CIcon from "@coreui/icons-react";
 import { cilTrash, cilSearch, cilFilterX } from "@coreui/icons";
@@ -23,52 +19,36 @@ import {
   CRow,
   CTooltip,
 } from "@coreui/react";
-import EditableCell from "src/components/EditableCell";
 import AddCategoryModal from "src/views/category/components/AddCategoryModal";
 import DeleteModal from "src/components/DeleteModal";
 import Category from "src/services/CategoryService";
 import SearchDropdown from "src/components/SearchDropdown";
 import { RootState } from "src/store";
-import { ParamsType, ChildAndGrandCategoriesType } from "src/types";
+import { ChildAndGrandCategoriesType } from "src/types";
 import { InputType } from "src/enums";
 
-type PropTypes = {
-  getGrandChildCategoriesHandler: (p: ParamsType) => Promise<void>;
-  updateGrandChildCategory: (c: ChildAndGrandCategoriesType) => Promise<void>;
-  addGrandchildCategoryHandler: (
-    c: ChildAndGrandCategoriesType
-  ) => Promise<void>;
-  deleteGrandchildCategoryHandler: (id: string) => Promise<void>;
-};
-const Grandchild = ({
-  getGrandChildCategoriesHandler,
-  updateGrandChildCategory,
-  addGrandchildCategoryHandler,
-  deleteGrandchildCategoryHandler,
-}: PropTypes) => {
+const Grandchild = () => {
   const {
     grandChildCategories: { data, count },
+    isLoading,
+    grandchildParams,
   } = useSelector((state: RootState) => state.category);
-  const [params, setParams] = useState<ParamsType & {}>({
-    limit: 10,
-    offset: 0,
-  });
   const [childData, setChildData] = useState<ChildAndGrandCategoriesType[]>([]);
   const [value, setValue] = useState<{ id?: string }>({});
-  const [loading, setLoading] = useState(true);
   const [searchLoading, setSearchLoading] = useState(false);
   const [reset, setReset] = useState<boolean>(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const dispatch = useDispatch();
   useEffect(() => {
     !value.id && setReset(true);
   }, [value.id]);
   useEffect(() => {
-    getGrandChildCategoriesHandler(params).then(() => setLoading(false));
-  }, []);
+    dispatch(getGrandChildCategoriesHandler());
+  }, [grandchildParams]);
   const DeleteButton = ({ id }: { id: string }) => {
     const [visible, setVisible] = useState(false);
-    const deleteHandler = async () => {
-      await deleteGrandchildCategoryHandler(id);
-      await getGrandChildCategoriesHandler(params);
+    const deleteHandler = () => {
+      dispatch(deleteGrandchildCategoryHandler(id));
       setVisible(false);
     };
     return (
@@ -113,12 +93,13 @@ const Grandchild = ({
     {
       header: "meta title",
       field: "metatitle",
-      body: (data:ChildAndGrandCategoriesType) => data.metatitle ? data.metatitle: '-',
-      edit:{
-        inputType :InputType.TEXT ,
-      }
+      body: (data: ChildAndGrandCategoriesType) =>
+        data.metatitle ? data.metatitle : "-",
+      edit: {
+        inputType: InputType.TEXT,
+      },
     },
-    
+    { header: "products count", field: "products_count" },
   ];
 
   const getChild = async (title: string) => {
@@ -134,13 +115,14 @@ const Grandchild = ({
     let data: { title?: string; parent_id?: string } = {};
     target.title.value && (data.title = target.title.value);
     value.id && (data.parent_id = value.id);
-    getGrandChildCategoriesHandler({ ...params, ...data });
+    dispatch(resetGrandChildParams());
+    dispatch(updateGrandchildParams({ ...data }));
   };
 
   const clearFilter = (e: FormEvent<HTMLFormElement>) => {
     const target = e.target as typeof e.target & { reset: () => void };
     target.reset();
-    getGrandChildCategoriesHandler(params);
+    dispatch(resetGrandChildParams());
     setValue({});
   };
   const onChange = (e: string) => {
@@ -148,14 +130,21 @@ const Grandchild = ({
     setTimeout(() => getChild(e), 1000);
   };
   const addCategoryHandler = async (c: ChildAndGrandCategoriesType) => {
-    await addGrandchildCategoryHandler(c);
-    await getGrandChildCategoriesHandler(params);
+    addGrandchildCategoryHandler(c);
   };
   const Actions = (data: ChildAndGrandCategoriesType) => {
     return (
       <>
         <DeleteButton {...data} />
       </>
+    );
+  };
+  const onPageChange = (n: number) => {
+    setCurrentPage(n);
+    dispatch(
+      updateGrandchildParams({
+        offset: (grandchildParams.limit ?? 10) * (n - 1),
+      })
     );
   };
   return (
@@ -208,14 +197,12 @@ const Grandchild = ({
       <Table
         data={data}
         count={count}
-        changeData={getGrandChildCategoriesHandler}
-        cookieName="grandchild"
         columns={columns}
-        params={params}
-        loading={loading}
-        updateLoading={setLoading}
-        updateParams={setParams}
+        loading={isLoading}
+        onPageChange={onPageChange}
         Actions={Actions}
+        pageNumber={currentPage}
+        pageSize={10}
         editable
         editFn={updateGrandChildCategory}
       />
@@ -223,11 +210,4 @@ const Grandchild = ({
   );
 };
 
-const mapDispatchToProps = {
-  getGrandChildCategoriesHandler,
-  updateGrandChildCategory,
-  addGrandchildCategoryHandler,
-  deleteGrandchildCategoryHandler,
-};
-
-export default connect(null, mapDispatchToProps)(Grandchild);
+export default Grandchild;

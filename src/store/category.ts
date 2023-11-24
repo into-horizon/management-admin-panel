@@ -11,30 +11,54 @@ import {
   ParentCategoriesType,
 } from "src/types";
 
+const initialParams = { limit: 10, offset: 0 };
 const initialState: CategoriesStateType = {
   parentCategories: { data: [], count: 0 },
   childCategories: { data: [], count: 0 },
   grandChildCategories: { data: [], count: 0 },
   isLoading: false,
   isProgressing: false,
+  parentParams: initialParams,
+  childParams: initialParams,
+  grandchildParams: initialParams,
+  categories: [],
 };
 const category = createSlice({
   name: "Category",
   initialState,
   reducers: {
-    getParentCategories(state, action) {
-      return { ...state, parentCategories: action.payload };
+    setParentCategories(state, action) {
+      state.parentCategories = action.payload;
     },
-    getChildCategories(state, action) {
-      return { ...state, childCategories: action.payload };
+    setChildCategories(state, action) {
+      state.childCategories = action.payload;
     },
-    getGrandChildCategories(state, action) {
-      return { ...state, grandChildCategories: action.payload };
+    setGrandChildCategories(state, action) {
+      state.grandChildCategories = action.payload;
+    },
+    updateParentParams(state, action) {
+      state.parentParams = { ...state.parentParams, ...action.payload };
+    },
+    updateChildParams(state, action) {
+      state.childParams = { ...state.childParams, ...action.payload };
+    },
+    updateGrandchildParams(state, action) {
+      state.grandchildParams = { ...state.grandchildParams, ...action.payload };
+    },
+    resetParentParams(state) {
+      state.parentParams = initialParams;
+    },
+    resetChildParams(state) {
+      state.childParams = initialParams;
+    },
+    resetGrandChildParams(state) {
+      state.grandchildParams = initialParams;
     },
   },
   extraReducers(builder) {
-    builder.addCase(getParentCategoriesHandler.fulfilled, (state) => {
+    builder.addCase(getParentCategoriesHandler.fulfilled, (state, action) => {
       state.isLoading = false;
+      state.categories = action.payload
     });
     builder.addCase(getParentCategoriesHandler.pending, (state) => {
       state.isLoading = true;
@@ -146,10 +170,17 @@ const category = createSlice({
 
 export const getParentCategoriesHandler = createAsyncThunk(
   "category/getParent",
-  async (payload: ParamsType, { dispatch, rejectWithValue }) => {
+  async (_, { dispatch, rejectWithValue, getState }) => {
     try {
-      const { data } = await Category.getAllParentCategoires(payload);
-      dispatch(getParentCategories(data));
+      const { parentParams } = (getState() as RootState).category;
+      const { data, status } = await Category.getAllParentCategoires(
+        parentParams
+      );
+      const { data: _data } = await Category.getCategories();
+      if (status === 200) {
+        dispatch(setParentCategories(data));
+      }
+      return _data;
     } catch (error) {
       if (error instanceof Error) {
         dispatch(
@@ -167,11 +198,26 @@ export const getParentCategoriesHandler = createAsyncThunk(
 
 export const getChildCategoriesHandler = createAsyncThunk(
   "categories/getChild",
-  async (payload: ParamsType, { dispatch, rejectWithValue }) => {
+  async (_, { dispatch, rejectWithValue, getState }) => {
     try {
-      let { data } = await Category.getAllChildCategoires(payload);
-      dispatch(getChildCategories(data));
+      const { childParams } = (getState() as RootState).category;
+      const { data, status, message } = await Category.getAllChildCategoires(
+        childParams
+      );
+      if (status !== 200) {
+        dispatch(
+          updateToast({
+            status,
+            message,
+            type: DialogResponseTypes.ERROR,
+          })
+        );
+        return rejectWithValue(message);
+      }
+
+      dispatch(setChildCategories(data));
     } catch (error) {
+      console.log("🚀 ~ file: category.ts:216 ~ error:", error);
       if (error instanceof Error) {
         dispatch(
           updateToast({
@@ -188,10 +234,24 @@ export const getChildCategoriesHandler = createAsyncThunk(
 
 export const getGrandChildCategoriesHandler = createAsyncThunk(
   "categories/getGrandchild",
-  async (payload: ParamsType, { dispatch, rejectWithValue }) => {
+  async (_, { dispatch, rejectWithValue, getState }) => {
     try {
-      let { data } = await Category.getAllGrandChildCategoires(payload);
-      dispatch(getGrandChildCategories(data));
+      const { grandchildParams } = (getState() as RootState).category;
+
+      let { data, status, message } = await Category.getAllGrandChildCategoires(
+        grandchildParams
+      );
+      if (status === 200) {
+        dispatch(setGrandChildCategories(data));
+      } else {
+        dispatch(
+          updateToast({
+            status,
+            message,
+            type: DialogResponseTypes.ERROR,
+          })
+        );
+      }
     } catch (error) {
       if (error instanceof Error) {
         dispatch(
@@ -211,31 +271,20 @@ export const updateGrandChildCategory = createAsyncThunk(
   "categories/updateGrandchild",
   async (
     payload: ChildAndGrandCategoriesType,
-    { getState, dispatch, rejectWithValue }
+    { dispatch, rejectWithValue }
   ) => {
-    const { data, count } = (getState() as RootState).category
-      .grandChildCategories;
     try {
-      let {
-        message,
-        data: item,
-        status,
-      } = await Category.updateGrandChildCategory(payload);
+      let { message, status } = await Category.updateGrandChildCategory(
+        payload
+      );
       if (status === 200) {
-        let newData = data.map((val: ChildAndGrandCategoriesType) => {
-          if (item.id === val.id) {
-            return { ...val, ...item };
-          } else return val;
-        });
-        dispatch(getGrandChildCategories({ data: newData, count: count }));
-        dispatch(
-          updateToast({ status: status, message: message, type: "update" })
-        );
+        dispatch(getGrandChildCategoriesHandler());
+        dispatch(updateToast({ status, message, type: "update" }));
       } else
         dispatch(
           updateToast({
-            status: status,
-            message: message,
+            status,
+            message,
             type: DialogResponseTypes.ERROR,
           })
         );
@@ -258,30 +307,18 @@ export const updateChildCategory = createAsyncThunk(
   "categories/updateChild",
   async (
     payload: ChildAndGrandCategoriesType,
-    { getState, dispatch, rejectWithValue }
+    { dispatch, rejectWithValue }
   ) => {
-    const { data, count } = (getState() as RootState).category.childCategories;
     try {
-      let {
-        message,
-        data: item,
-        status,
-      } = await Category.updateChildCategory(payload);
+      let { message, status } = await Category.updateChildCategory(payload);
       if (status === 200) {
-        let newData = data.map((val: ChildAndGrandCategoriesType) => {
-          if (item.id === val.id) {
-            return { ...val, ...item };
-          } else return val;
-        });
-        dispatch(getChildCategories({ data: newData, count: count }));
-        dispatch(
-          updateToast({ status: status, message: message, type: "update" })
-        );
+        dispatch(getChildCategoriesHandler());
+        dispatch(updateToast({ status, message, type: "update" }));
       } else
         dispatch(
           updateToast({
-            status: status,
-            message: message,
+            status,
+            message,
             type: DialogResponseTypes.ERROR,
           })
         );
@@ -301,24 +338,11 @@ export const updateChildCategory = createAsyncThunk(
 );
 export const updateParentCategory = createAsyncThunk(
   "categories/updateParent",
-  async (
-    payload: ParentCategoriesType,
-    { getState, dispatch, rejectWithValue }
-  ) => {
-    const { data, count } = (getState() as RootState).category.parentCategories;
+  async (payload: ParentCategoriesType, { dispatch, rejectWithValue }) => {
     try {
-      let {
-        message,
-        data: item,
-        status,
-      } = await Category.updateParentCategory(payload);
+      let { message, status } = await Category.updateParentCategory(payload);
       if (status === 200) {
-        let newData = data.map((val: ParentCategoriesType) => {
-          if (item.id === val.id) {
-            return { ...val, ...item };
-          } else return val;
-        });
-        dispatch(getParentCategories({ data: newData, count: count }));
+        dispatch(getParentCategoriesHandler());
         dispatch(
           updateToast({ status: status, message: message, type: "update" })
         );
@@ -349,8 +373,9 @@ export const addParentCategoryHandler = createAsyncThunk(
   "categories/addParent",
   async (payload: ParentCategoriesType, { dispatch, rejectWithValue }) => {
     try {
-      let { message, data, status } = await Category.addParentCategory(payload);
+      let { message, status } = await Category.addParentCategory(payload);
       if (status === 200) {
+        dispatch(getParentCategoriesHandler());
         dispatch(
           updateToast({ status: status, message: message, type: "create" })
         );
@@ -384,16 +409,15 @@ export const addChildCategoryHandler = createAsyncThunk(
     { dispatch, rejectWithValue }
   ) => {
     try {
-      let { message, data, status } = await Category.addChildCategory(payload);
+      let { message, status } = await Category.addChildCategory(payload);
       if (status === 200) {
-        dispatch(
-          updateToast({ status: status, message: message, type: "create" })
-        );
+        dispatch(getChildCategoriesHandler());
+        dispatch(updateToast({ status, message, type: "create" }));
       } else
         dispatch(
           updateToast({
-            status: status,
-            message: message,
+            status,
+            message,
             type: DialogResponseTypes.ERROR,
           })
         );
@@ -418,10 +442,9 @@ export const addGrandchildCategoryHandler = createAsyncThunk(
     { dispatch, rejectWithValue }
   ) => {
     try {
-      let { message, data, status } = await Category.addGrandChildCategory(
-        payload
-      );
+      let { message, status } = await Category.addGrandChildCategory(payload);
       if (status === 200) {
+        dispatch(getGrandChildCategoriesHandler());
         dispatch(
           updateToast({ status: status, message: message, type: "create" })
         );
@@ -452,10 +475,11 @@ export const deleteGrandchildCategoryHandler = createAsyncThunk(
   "categories/deleteGrandchild",
   async (payload: string, { dispatch, rejectWithValue }) => {
     try {
-      let { message, data, status } = await Category.deleteGrandChildCategory(
+      let { message, status } = await Category.deleteGrandChildCategory(
         payload
       );
       if (status === 200) {
+        dispatch(getGrandChildCategoriesHandler());
         dispatch(
           updateToast({ status: status, message: message, type: "delete" })
         );
@@ -486,18 +510,16 @@ export const deleteChildCategoryHandler = createAsyncThunk(
   "categories/deleteChild",
   async (payload: string, { dispatch, rejectWithValue }) => {
     try {
-      let { message, data, status } = await Category.deleteChildCategory(
-        payload
-      );
+      let { message, status } = await Category.deleteChildCategory(payload);
       if (status === 200) {
-        dispatch(
-          updateToast({ status: status, message: message, type: "delete" })
-        );
+        dispatch(getChildCategoriesHandler());
+
+        dispatch(updateToast({ status, message, type: "delete" }));
       } else
         dispatch(
           updateToast({
-            status: status,
-            message: message,
+            status,
+            message,
             type: DialogResponseTypes.ERROR,
           })
         );
@@ -520,18 +542,15 @@ export const deleteParentCategoryHandler = createAsyncThunk<void, string>(
   "categories/deleteParent",
   async (payload, { dispatch, rejectWithValue }) => {
     try {
-      let { message, data, status } = await Category.deleteParentCategory(
-        payload
-      );
+      let { message, status } = await Category.deleteParentCategory(payload);
       if (status === 200) {
-        dispatch(
-          updateToast({ status: status, message: message, type: "delete" })
-        );
+        dispatch(getParentCategoriesHandler());
+        dispatch(updateToast({ status, message, type: "delete" }));
       } else {
         dispatch(
           updateToast({
-            status: status,
-            message: message,
+            status,
+            message,
             type: DialogResponseTypes.ERROR,
           })
         );
@@ -553,7 +572,13 @@ export const deleteParentCategoryHandler = createAsyncThunk<void, string>(
 
 export default category.reducer;
 export const {
-  getParentCategories,
-  getChildCategories,
-  getGrandChildCategories,
+  setParentCategories,
+  setChildCategories,
+  setGrandChildCategories,
+  updateChildParams,
+  updateGrandchildParams,
+  updateParentParams,
+  resetChildParams,
+  resetGrandChildParams,
+  resetParentParams,
 } = category.actions;

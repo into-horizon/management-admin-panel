@@ -40,12 +40,12 @@ export type ColumnType = {
       };
 };
 type PropTypes = {
-  updateLoading: React.Dispatch<React.SetStateAction<boolean>>;
-  params: { limit?: number; offset?: number } & {};
+  updateLoading?: React.Dispatch<React.SetStateAction<boolean>>;
+  params?: { limit?: number; offset?: number } & {};
   count: number;
   columns: ColumnType[];
   data: { id?: string }[];
-  changeData?: GetFunctionType;
+  changeData?: GetFunctionType | Function;
   cookieName?: string;
   style?: React.CSSProperties;
   emptyMessage?: string;

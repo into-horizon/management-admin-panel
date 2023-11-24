@@ -1,5 +1,5 @@
 import React, { useState, useEffect, FormEvent, Fragment } from "react";
-import { connect, useSelector } from "react-redux";
+import { connect, useDispatch, useSelector } from "react-redux";
 import Table, { ColumnType } from "../../components/Table";
 import EditableCell from "src/components/EditableCell";
 import {
@@ -7,6 +7,8 @@ import {
   updateChildCategory,
   addChildCategoryHandler,
   deleteChildCategoryHandler,
+  updateChildParams,
+  resetChildParams,
 } from "src/store/category";
 import AddCategoryModal from "src/views/category/components/AddCategoryModal";
 import DeleteModal from "src/components/DeleteModal";
@@ -31,42 +33,36 @@ import {
 } from "src/types";
 import { InputType } from "src/enums";
 
-type PropTypes = {
-  getChildCategoriesHandler: (p: ParamsType & {}) => Promise<void>;
-  updateChildCategory: (p: ChildAndGrandCategoriesType) => Promise<void>;
-  addChildCategoryHandler: (p: ChildAndGrandCategoriesType) => Promise<void>;
-  deleteChildCategoryHandler: (id: string) => Promise<void>;
-};
-const Child = ({
-  getChildCategoriesHandler,
-  updateChildCategory,
-  addChildCategoryHandler,
-  deleteChildCategoryHandler,
-}: PropTypes) => {
+// type PropTypes = {
+//   getChildCategoriesHandler: (p: ParamsType & {}) => Promise<void>;
+//   updateChildCategory: (p: ChildAndGrandCategoriesType) => Promise<void>;
+//   addChildCategoryHandler: (p: ChildAndGrandCategoriesType) => Promise<void>;
+//   deleteChildCategoryHandler: (id: string) => Promise<void>;
+// };
+const Child = () => {
   const {
     childCategories: { data, count },
     parentCategories: { data: parentCategories },
+    childParams,
+    isLoading,
   } = useSelector((state: RootState) => state.category);
-  const [params, setParams] = useState<ParamsType>({ limit: 10, offset: 0 });
   const [parentData, setParentData] = useState<ParentCategoriesType[]>([]);
   const [loading, setLoading] = useState(false);
-  const [tableLoading, setTableLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState<number>(1);
   const [selectedValue, setSelectedValue] =
     useState<ParentCategoriesType | null>(null);
   const [reset, setReset] = useState<boolean>(false);
+  const dispatch = useDispatch();
   useEffect(() => {
     !selectedValue?.id && setReset(true);
   }, [selectedValue?.id]);
   useEffect(() => {
-    Promise.all([getChildCategoriesHandler(params)]).then(() =>
-      setTableLoading(false)
-    );
-  }, []);
+    dispatch(getChildCategoriesHandler());
+  }, [childParams]);
   const DeleteButton = ({ id }: { id: string }) => {
     const [visible, setVisible] = useState(false);
     const deleteHandler = async () => {
-      await deleteChildCategoryHandler(id);
-      await getChildCategoriesHandler(params);
+      dispatch(deleteChildCategoryHandler(id));
       setVisible(false);
     };
     return (
@@ -114,6 +110,7 @@ const Child = ({
         inputType: InputType.TEXT,
       },
     },
+    { header: "products count", field: "products_count" },
   ];
   const onSelect = (e: ParentCategoriesType) => {
     setSelectedValue(e);
@@ -141,7 +138,8 @@ const Child = ({
     let data: { parent_id?: string; title?: string } = {};
     selectedValue?.id && (data["parent_id"] = selectedValue.id);
     target.title.value && (data["title"] = target.title.value);
-    getChildCategoriesHandler(data);
+    dispatch(resetChildParams());
+    dispatch(updateChildParams(data));
   };
   const resetFilter = (e: FormEvent<HTMLFormElement>) => {
     const target = e.target as typeof e.target & {
@@ -150,7 +148,7 @@ const Child = ({
     };
     setSelectedValue(null);
     target.reset();
-    getChildCategoriesHandler(params);
+    dispatch(resetChildParams());
   };
   useEffect(() => {
     setParentData(parentCategories);
@@ -163,6 +161,12 @@ const Child = ({
       </Fragment>
     );
   };
+  const onPageChange = (n: number) => {
+    dispatch(
+      updateChildParams({ offset: (childParams?.limit ?? 10) * (n - 1) })
+    );
+    setCurrentPage(n);
+  };
   return (
     <>
       <AddCategoryModal action={addChildCategoryHandler} type="child" />
@@ -174,9 +178,10 @@ const Child = ({
             </CCol>
             <CCol xs="auto">
               <SearchDropdown
-                options={parentData.map((x: ParentCategoriesType) => {
-                  return { id: x.id, title: `${x.entitle} - ${x.artitle}` };
-                })}
+                options={parentData.map((x: ParentCategoriesType) => ({
+                  id: x.id,
+                  title: `${x.entitle} - ${x.artitle}`,
+                }))}
                 onSelect={onSelect}
                 loading={loading}
                 onChange={onChange}
@@ -205,15 +210,12 @@ const Child = ({
       <Table
         data={data}
         count={count}
-        changeData={getChildCategoriesHandler}
-        cookieName="child"
         columns={columns}
-        params={params}
-        // checkbox={true}
-        loading={tableLoading}
-        updateLoading={setTableLoading}
-        updateParams={setParams}
+        pageSize={10}
+        pageNumber={currentPage}
+        loading={isLoading}
         editFn={updateChildCategory}
+        onPageChange={onPageChange}
         editable
         Actions={Actions}
       />
@@ -221,11 +223,4 @@ const Child = ({
   );
 };
 
-const mapDispatchToProps = {
-  getChildCategoriesHandler,
-  updateChildCategory,
-  addChildCategoryHandler,
-  deleteChildCategoryHandler,
-};
-
-export default connect(null, mapDispatchToProps)(Child);
+export default Child;

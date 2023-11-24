@@ -154,11 +154,16 @@ export default class ApiService {
   getPopulatedStore(
     data: { store_id?: string; duration?: string } & ParamsType = {}
   ) {
+    const extendedParams = { ...data };
     const store = cookie.load("populated-store");
     const duration = cookie.load("duration");
-    store && (data.store_id = store.id);
-    duration && (data.duration = duration);
-    return data;
+    if (store) {
+      extendedParams.store_id = store.id;
+    }
+    if (duration) {
+      extendedParams.duration = duration;
+    }
+    return extendedParams;
   }
   async token(): Promise<string | Error | void> {
     let token = cookie.load("access_token");

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, Dispatch, FC, Children } from "react";
+import React, { useState, useEffect, Dispatch, FC, Children, memo } from "react";
 import { CPagination, CPaginationItem } from "@coreui/react";
 import cookie from "react-cookies";
 import _ from "lodash";
@@ -10,7 +10,7 @@ type PropTypes = {
   cookieName?: string;
   params: ParamsType;
   updateParams?: Dispatch<React.SetStateAction<{}>>;
-  updateLoading: Dispatch<React.SetStateAction<boolean>>;
+  updateLoading?: Dispatch<React.SetStateAction<boolean>>;
   onPageChange?: (page: number) => void;
   pageNumber?: number;
   pageSize?: number;
@@ -28,14 +28,13 @@ const Paginator: FC<PropTypes> = ({
   pageSize,
 }) => {
   const [pages, setPages] = useState<(string | number)[]>([]);
-  const { limit, offset } = params;
   const [selectedPage, setSelectedPage] = useState<number>(
-    (cookieName ? Number(cookie.load(cookieName)) : pageNumber) ?? 1
+    (cookieName ? Number(cookie.load(cookieName)) : pageNumber?? 1) ?? 1
   );
   const siblingCount = 5;
-  let pagesCount = Math.ceil(count / (limit ?? pageSize ?? 5) || 1);
+  let pagesCount = Math.ceil(count / (params?.limit ?? pageSize ?? 5) || 1);
   useEffect(() => {
-    pagesCount = Math.ceil(count / (limit ?? pageSize ?? 5) || 1);
+    pagesCount = Math.ceil(count / (params?.limit ?? pageSize ?? 5) || 1);
     let p: (number | string)[] = [];
     if (pagesCount < selectedPage) {
       setSelectedPage(1);
@@ -115,14 +114,14 @@ const Paginator: FC<PropTypes> = ({
     updateLoading?.(true);
     await changeData?.({
       ...params,
-      limit: limit ?? 5,
-      offset: (limit ?? 5) * (n - 1),
+      limit: params?.limit ?? 5,
+      offset: (params?.limit ?? 5) * (n - 1),
     });
     updateLoading?.(false);
     updateParams?.({
       ...params,
-      limit: limit ?? 5,
-      offset: (limit ?? 5) * (n - 1),
+      limit: params?.limit ?? 5,
+      offset: (params?.limit ?? 5) * (n - 1),
     });
     onPageChange?.(n);
   };
@@ -163,4 +162,4 @@ const Paginator: FC<PropTypes> = ({
   );
 };
 
-export default Paginator;
+export default memo(Paginator);

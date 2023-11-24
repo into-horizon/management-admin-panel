@@ -58,6 +58,7 @@ const store = configureStore({
   middleware(getDefaultMiddleware) {
     return getDefaultMiddleware().concat(thunk);
   },
+  devTools: process.env.NODE_ENV === 'development'
 });
 export default store;
 

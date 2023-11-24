@@ -30,6 +30,7 @@ import { ParamsType, ProductType } from "./types";
 import { isTokenValid } from "./services/helpers";
 import ApiService from "./services/ApiService";
 import { EventEmitter } from "events";
+import LoadingSpinner from "./components/LoadingSpinner";
 export const events = new EventEmitter();
 
 // Containers
@@ -46,11 +47,11 @@ const ResetPassword = React.lazy(
 );
 
 type PropsTypes = {
-  getParentCategoriesHandler: (p: ParamsType) => Promise<void>;
+  // getParentCategoriesHandler: (p: ParamsType) => Promise<void>;
   logout: () => Promise<void>;
 };
 
-const App: FC<PropsTypes> = ({ getParentCategoriesHandler, logout }) => {
+const App: FC<PropsTypes> = ({ logout }) => {
   const dispatch = useDispatch();
   notificationsOffers.on("welcome", (data) => {
     Notification.requestPermission().then((data) => {
@@ -105,7 +106,7 @@ const App: FC<PropsTypes> = ({ getParentCategoriesHandler, logout }) => {
             dispatch(getUser());
           }
         } else if (loggedIn && user.id) {
-          getParentCategoriesHandler({ limit: 10, offset: 0 });
+          dispatch(getParentCategoriesHandler());
           navigate(checkUnAuth(currentPath) ? "/" : currentPath);
           setLoad(false);
         } else if (!loggedIn && !token) {
@@ -141,7 +142,7 @@ const App: FC<PropsTypes> = ({ getParentCategoriesHandler, logout }) => {
 
   return (
     <PopupProvider>
-      <React.Suspense fallback={loading}>
+      <React.Suspense fallback={<LoadingSpinner/>}>
         <Toaster />
         <GlobalDialog />
         {load && (
