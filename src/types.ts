@@ -40,6 +40,8 @@ export type ParentCategoriesType = {
   content?: string;
   display: boolean;
   created_at: string;
+  children: ChildAndGrandCategoriesType[];
+  products_count: string | number;
 };
 export type ChildAndGrandCategoriesType = ParentCategoriesType & {
   parent_id: string;
@@ -50,6 +52,12 @@ export type CategoriesStateType = {
   parentCategories: { data: ParentCategoriesType[]; count: number };
   childCategories: { data: ChildAndGrandCategoriesType[]; count: number };
   grandChildCategories: { data: ChildAndGrandCategoriesType[]; count: number };
+  isLoading: boolean;
+  isProgressing: boolean;
+  parentParams: ParamsType;
+  childParams: ParamsType;
+  grandchildParams: ParamsType;
+  categories: ParentCategoriesType[];
 };
 
 export type DiscountCodeType = {
@@ -349,7 +357,7 @@ export type DashboardStateType = {
     store_rating: number;
     store_picture: string;
   }[];
-  isDashboardLoading: boolean
+  isDashboardLoading: boolean;
 };
 
 export type NotificationType = {
@@ -364,5 +372,5 @@ export type NotificationType = {
   store_name?: string;
   order_item_title?: string;
   role: string;
-  type: string
+  type: string;
 };

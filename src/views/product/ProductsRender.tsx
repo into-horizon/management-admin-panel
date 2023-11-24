@@ -160,7 +160,7 @@ const ProductsRender = ({
     reverseTitles();
   }, [document.querySelectorAll(".deleteBtn")]);
 
-  const getProducts = async (params: ParamsType) => {
+  const getProducts = async (params?: ParamsType) => {
     let {
       data: { data },
     } = await Product.getProducts(params);

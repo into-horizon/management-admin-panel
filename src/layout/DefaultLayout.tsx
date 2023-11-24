@@ -81,12 +81,12 @@ const DefaultLayout = ({ searchForStore, populateStore }: PropTypes) => {
   useEffect(() => {
     if (socket && loggedIn && !!user && products) {
       socket.emit("role", user.role);
-      // products.on("connect", () => {
-      //   console.log("user connected");
-      // });
-      // notifications.on("connect", () => {
-      //   console.log("user connected");
-      // });
+      products.on("connect", () => {
+        console.log("user connected");
+      });
+      notifications.on("connect", () => {
+        console.log("user connected");
+      });
       products.emit("products:role", user.role);
       notifications.emit("notifications:role", user.role);
       notifications.on("admin:notifications", () => {

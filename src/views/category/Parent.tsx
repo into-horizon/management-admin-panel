@@ -1,19 +1,6 @@
-import {
-  CButton,
-  CForm,
-  CFormInput,
-  CModal,
-  CModalBody,
-  CModalFooter,
-  CModalHeader,
-  CModalTitle,
-  CRow,
-  CCol,
-  CTooltip,
-} from "@coreui/react";
+import { CButton, CTooltip } from "@coreui/react";
 import React, { useState, useEffect, Fragment } from "react";
-import { connect, useSelector } from "react-redux";
-import EditableCell from "src/components/EditableCell";
+import { connect, useDispatch, useSelector } from "react-redux";
 import CIcon from "@coreui/icons-react";
 import { cilTrash } from "@coreui/icons";
 
@@ -23,6 +10,7 @@ import {
   updateParentCategory,
   addParentCategoryHandler,
   deleteParentCategoryHandler,
+  updateParentParams,
 } from "../../store/category";
 import AddCategoryModal from "./components/AddCategoryModal";
 import DeleteModal from "src/components/DeleteModal";
@@ -30,36 +18,22 @@ import { RootState } from "src/store";
 import { ParamsType, ParentCategoriesType } from "src/types";
 import { InputType } from "src/enums";
 
-type PropTypes = {
-  getParentCategoriesHandler: (p: ParamsType & {}) => Promise<void>;
-  updateParentCategory: (p: ParentCategoriesType) => Promise<void>;
-  addParentCategoryHandler: (p: ParentCategoriesType) => Promise<void>;
-  deleteParentCategoryHandler: (d: string) => Promise<void>;
-};
-
-const Parent = ({
-  getParentCategoriesHandler,
-  updateParentCategory,
-  addParentCategoryHandler,
-  deleteParentCategoryHandler,
-}: PropTypes) => {
+const Parent = () => {
   const {
-    parentCategories: { data, count },
+    parentCategories: { data = [], count },
+    isLoading,
+    isProgressing,
+    parentParams,
   } = useSelector((state: RootState) => state.category);
-  const [params, setParams] = useState<ParamsType & {}>({
-    limit: 10,
-    offset: 0,
-  });
-  const [loading, setLoading] = useState(true);
+  const [pageNumber, setPageNumber] = useState<number>(1);
+  const dispatch = useDispatch();
   useEffect(() => {
-    getParentCategoriesHandler(params);
-    setLoading(false);
-  }, []);
+    dispatch(getParentCategoriesHandler());
+  }, [parentParams]);
   const DeleteButton = ({ id }: { id: string }) => {
     const [visible, setVisible] = useState(false);
-    const deleteHandler = async () => {
-      await deleteParentCategoryHandler(id);
-      await getParentCategoriesHandler(params);
+    const deleteHandler = () => {
+      dispatch(deleteParentCategoryHandler(id));
       setVisible(false);
     };
     return (
@@ -103,10 +77,10 @@ const Parent = ({
         inputType: InputType.TEXT,
       },
     },
+    { header: "products count", field: "products_count" },
   ];
   const addHandler = async (e: ParentCategoriesType) => {
-    await addParentCategoryHandler(e);
-    await getParentCategoriesHandler(params);
+    dispatch(addParentCategoryHandler(e));
   };
   const Actions = (data: ParentCategoriesType) => {
     return (
@@ -115,22 +89,28 @@ const Parent = ({
       </Fragment>
     );
   };
+  const onPageChange = (n: number) => {
+    setPageNumber(n);
+    let newParams = {
+      ...parentParams,
+      offset: (parentParams.limit ?? 0) * (n - 1),
+    };
+    dispatch(updateParentParams(newParams));
+  };
   return (
     <>
       <AddCategoryModal action={addHandler} type="parent" />
       <Table
         data={data}
         count={count}
-        changeData={getParentCategoriesHandler}
-        cookieName="parent"
         columns={columns}
-        params={params}
-        loading={loading}
-        updateParams={setParams}
-        updateLoading={setLoading}
+        loading={isLoading}
         editable
         editFn={updateParentCategory}
         Actions={Actions}
+        pageSize={10}
+        onPageChange={onPageChange}
+        pageNumber={pageNumber}
       />
     </>
   );

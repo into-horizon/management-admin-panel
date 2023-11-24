@@ -30,6 +30,7 @@ import { ParamsType, ProductType } from "./types";
 import { isTokenValid } from "./services/helpers";
 import ApiService from "./services/ApiService";
 import { EventEmitter } from "events";
+import LoadingSpinner from "./components/LoadingSpinner";
 export const events = new EventEmitter();
 
 // Containers
@@ -46,11 +47,11 @@ const ResetPassword = React.lazy(
 );
 
 type PropsTypes = {
-  getParentCategoriesHandler: (p: ParamsType) => Promise<void>;
+  // getParentCategoriesHandler: (p: ParamsType) => Promise<void>;
   logout: () => Promise<void>;
 };
 
-const App: FC<PropsTypes> = ({ getParentCategoriesHandler, logout }) => {
+const App: FC<PropsTypes> = ({ logout }) => {
   const dispatch = useDispatch();
   notificationsOffers.on("welcome", (data) => {
     Notification.requestPermission().then((data) => {
@@ -97,16 +98,15 @@ const App: FC<PropsTypes> = ({ getParentCategoriesHandler, logout }) => {
           i18n.changeLanguage("en");
         }
 
-        let currentPath = cookie.load(`current_path${sessionStorage.tabID}`);
+        let currentPath = location.pathname;
         if (token && !loggedIn) {
           if (!isTokenValid()) {
             ApiService.refresh().then(() => dispatch(getUser()));
           } else {
             dispatch(getUser());
           }
-          setLoad(false);
-        } else if (loggedIn) {
-          getParentCategoriesHandler({ limit: 10, offset: 0 });
+        } else if (loggedIn && user.id) {
+          dispatch(getParentCategoriesHandler());
           navigate(checkUnAuth(currentPath) ? "/" : currentPath);
           setLoad(false);
         } else if (!loggedIn && !token) {
@@ -142,7 +142,7 @@ const App: FC<PropsTypes> = ({ getParentCategoriesHandler, logout }) => {
 
   return (
     <PopupProvider>
-      <React.Suspense fallback={loading}>
+      <React.Suspense fallback={<LoadingSpinner/>}>
         <Toaster />
         <GlobalDialog />
         {load && (

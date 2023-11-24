@@ -17,7 +17,9 @@ class CategoryService extends ApiService {
       let res = await this.get(`${this.path}/parent`, data);
       return res;
     } catch (error) {
-      return error;
+      if (error instanceof Error) {
+        throw new Error(error.message);
+      }
     }
   }
   async getAllChildCategoires(data?: ParamsType & {}) {
@@ -25,7 +27,9 @@ class CategoryService extends ApiService {
       let res = await this.get(`${this.path}/child`, data);
       return res;
     } catch (error) {
-      return error;
+      if (error instanceof Error) {
+        throw new Error(error.message);
+      }
     }
   }
   async getAllGrandChildCategoires(data?: ParamsType & {}) {
@@ -106,6 +110,13 @@ class CategoryService extends ApiService {
       return res;
     } catch (error) {
       return error;
+    }
+  }
+  async getCategories( ){
+    try {
+      return this.get(`${this.path}`)
+    } catch (error) {
+      throw error
     }
   }
 }

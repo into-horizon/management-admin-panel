@@ -16,7 +16,7 @@ class ProductService extends ApiService {
       return error;
     }
   }
-  async getProducts(data: ParamsType) {
+  async getProducts(data?: ParamsType) {
     try {
       let res = await this.get(this.path, data);
       return res;
