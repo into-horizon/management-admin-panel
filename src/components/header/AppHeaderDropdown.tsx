@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react'
+import React, { useEffect, useState } from "react";
 import {
   CAvatar,
   CBadge,
@@ -8,7 +8,7 @@ import {
   CDropdownItem,
   CDropdownMenu,
   CDropdownToggle,
-} from '@coreui/react'
+} from "@coreui/react";
 import {
   cilBell,
   cilCreditCard,
@@ -19,33 +19,30 @@ import {
   cilSettings,
   cilTask,
   cilUser,
-} from '@coreui/icons'
-import CIcon from '@coreui/icons-react'
-import cookie from 'react-cookies';
-import {Link} from 'react-router-dom'
+} from "@coreui/icons";
+import CIcon from "@coreui/icons-react";
+import { Link } from "react-router-dom";
 
-import avatar8 from '../../assets/images/avatars/8.jpg'
-import { logout } from 'src/store/auth'
-import {connect,useSelector} from 'react-redux'
-import { RootState } from 'src/store';
+import { logout } from "src/store/auth";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "src/store";
 
-
-const AppHeaderDropdown = (props) => {
-  const {first_name,last_name} =  useSelector(state=> state.login.user)
-  const [token, setToken] = useState('')
-  const { login, logout} = props
-
-  useEffect(() => {
-    setToken(t => cookie.load('access_token'))
-    
-  },[])
+const AppHeaderDropdown = () => {
+  const { first_name, last_name } = useSelector(
+    (state: RootState) => state.login.user
+  );
+  const dispatch = useDispatch();
   return (
     <CDropdown variant="nav-item">
-      <CDropdownToggle  className="py-0" caret={false}>
-        <CAvatar color="secondary" size="md" >{`${first_name?.charAt(0).toUpperCase()}${last_name?.charAt(0).toUpperCase()}`}</CAvatar>
+      <CDropdownToggle className="py-0" caret={false}>
+        <CAvatar color="secondary" size="md">{`${first_name
+          ?.charAt(0)
+          .toUpperCase()}${last_name?.charAt(0).toUpperCase()}`}</CAvatar>
       </CDropdownToggle>
-      <CDropdownMenu className="pt-0" >
-        <CDropdownHeader className="bg-light fw-semibold py-2">Account</CDropdownHeader>
+      <CDropdownMenu className="pt-0">
+        <CDropdownHeader className="bg-light fw-semibold py-2">
+          Account
+        </CDropdownHeader>
         <CDropdownItem href="#">
           <CIcon icon={cilBell} className="me-2" />
           Updates
@@ -74,19 +71,19 @@ const AppHeaderDropdown = (props) => {
             42
           </CBadge>
         </CDropdownItem>
-        <CDropdownHeader className="bg-light fw-semibold py-2">Settings</CDropdownHeader>
+        <CDropdownHeader className="bg-light fw-semibold py-2">
+          Settings
+        </CDropdownHeader>
         {/* <CDropdownItem href="" >
         </CDropdownItem> */}
-          <Link to="/profile" className="dropdown-item">
+        <Link to="/profile" className="dropdown-item">
           <CIcon icon={cilUser} className="me-2" />
           Profile
-
-          </Link>
-          <Link to="/settings" className="dropdown-item">
+        </Link>
+        <Link to="/settings" className="dropdown-item">
           <CIcon icon={cilSettings} className="me-2" />
           Settings
-
-          </Link>
+        </Link>
         {/* <CDropdownItem href="#">
           <CIcon icon={cilSettings} className="me-2" />
           Settings
@@ -104,20 +101,21 @@ const AppHeaderDropdown = (props) => {
           <CBadge color="primary" className="ms-2">
             42
           </CBadge>
-        </CDropdownItem> 
+        </CDropdownItem>
         <CDropdownDivider />
-        <CDropdownItem href="" onClick={(e) =>{ e.preventDefault();logout()}}>
+        <CDropdownItem
+          href=""
+          onClick={(e) => {
+            e.preventDefault();
+            dispatch(logout());
+          }}
+        >
           <CIcon icon={cilLockLocked} className="me-2" />
           Logout
         </CDropdownItem>
       </CDropdownMenu>
     </CDropdown>
-  )
-}
-const mapStateToProps = (state : RootState) => ({
-  login: state.login
+  );
+};
 
-});
-const mapDispatchToProps = { logout };
-
-export default connect(mapStateToProps,mapDispatchToProps)(AppHeaderDropdown)
+export default AppHeaderDropdown;

@@ -2,7 +2,7 @@
 // import { useSelector, connect } from 'react-redux';
 // import { CFormFloating, CFormInput, CFormLabel, CButton } from '@coreui/react';
 // import { useTranslation } from 'react-i18next';
-// import { usePopup, DialogType } from "react-custom-popup";
+// import { usePopup, PopupType } from "react-custom-popup";
 // import { updateInfo, updateName } from "../store/auth"
 // import {useNavigate} from 'react-router-dom'
 // import { RootState } from 'src/store';
@@ -57,7 +57,7 @@
 //                 return (
 
 //                     showToast({
-//                         type: DialogType.SUCCESS,
+//                         type: PopupType.SUCCESS,
 //                         text: t('doneUpdating'),
 //                         timeoutDuration: 3000,
 //                         showProgress: true,
