@@ -1,7 +1,6 @@
 import React, { FC, useEffect, useState } from "react";
 import { Route, Routes, useLocation } from "react-router-dom";
 import "./scss/style.scss";
-import { PopupProvider } from "react-custom-popup";
 import { getUser, logout } from "./store/auth";
 import { useNavigate } from "react-router-dom";
 import { connect, useDispatch, useSelector } from "react-redux";
@@ -31,6 +30,7 @@ import { isTokenValid } from "./services/helpers";
 import ApiService from "./services/ApiService";
 import { EventEmitter } from "events";
 import LoadingSpinner from "./components/LoadingSpinner";
+import { PopupProvider } from "react-custom-popup";
 export const events = new EventEmitter();
 
 // Containers
