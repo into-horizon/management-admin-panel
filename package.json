@@ -109,6 +109,8 @@
     "react-error-overlay": "6.0.9"
   },
   "devDependencies": {
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
+    "@babel/plugin-transform-private-property-in-object": "^7.25.9",
     "@types/enzyme": "^3.10.13",
     "@types/jsonwebtoken": "^9.0.2",
     "@types/lodash": "^4.14.195",
