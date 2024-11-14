@@ -4,6 +4,7 @@ import { ParamsType } from "src/types";
 let api = process.env.REACT_APP_API;
 let managementAPI = process.env.REACT_APP_MANAGEMENT_API;
 import { isJwtExpired } from "jwt-check-expiration";
+
 axios.defaults.headers.common.locale = 'en'
 export default class ApiService {
   async get(

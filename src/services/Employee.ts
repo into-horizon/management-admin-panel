@@ -1,42 +1,33 @@
-import { EmployeeType, ParamsType } from "src/types";
-import ApiService from "./ApiService";
+import { EmployeeType, ParamsType } from 'src/types'
+import ApiService from './ApiService'
 
 class Employees extends ApiService {
-  private management: boolean;
-  private path: string;
+  private management: boolean
+  private path: string
   constructor() {
-    super();
-    this.management = true;
-    this.path = "employee";
+    super()
+    this.management = true
+    this.path = 'employee'
   }
   async getEmployees(data: ParamsType) {
     try {
-      return await this.get(
-        { management: this.management, endpoint: `${this.path}s` },
-        data
-      );
+      return await this.get({ management: this.management, endpoint: `${this.path}s` }, data)
     } catch (error) {
-      return error;
+      return error
     }
   }
   async updateEmployee(data: EmployeeType) {
     try {
-      return await this.update(
-        { management: this.management, endpoint: this.path },
-        data
-      );
+      return await this.update({ management: this.management, endpoint: this.path }, data)
     } catch (error) {
-      return error;
+      return error
     }
   }
-  async addEmployee(data: EmployeeType) {
+  async addEmployee(data: Omit<EmployeeType, 'verified'>) {
     try {
-      return await this.post(
-        { management: this.management, endpoint: this.path },
-        data
-      );
+      return await this.post({ management: this.management, endpoint: this.path }, data)
     } catch (error) {
-      return error;
+      return error
     }
   }
   async deleteEmployee(data: string) {
@@ -44,11 +35,11 @@ class Employees extends ApiService {
       return await this.delete({
         management: this.management,
         endpoint: `${this.path}/${data}`,
-      });
+      })
     } catch (error) {
-      return error;
+      return error
     }
   }
 }
 
-export default new Employees();
+export default new Employees()

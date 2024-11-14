@@ -1,36 +1,36 @@
-import { DiscountCodeType, ParamsType } from "src/types";
-import ApiService from "./ApiService";
+import { DiscountCodeType, ParamsType } from 'src/types'
+import ApiService from './ApiService'
 
 class DiscountCode extends ApiService {
-  private path: string;
+  private path: string
   constructor() {
-    super();
-    this.path = "api/admin/promo";
+    super()
+    this.path = 'api/admin/promo'
   }
   async getDiscountCodes(data: ParamsType) {
     try {
-      let result = await this.get(this.path, data);
-      return result;
+      let result = await this.get(this.path, data)
+      return result
     } catch (error) {
-      return error;
+      return error
     }
   }
   async updateDiscountCode(data: DiscountCodeType) {
     try {
-      let result = await this.update(this.path, data);
-      return result;
+      let result = await this.update(this.path, data)
+      return result
     } catch (error) {
-      return error;
+      return error
     }
   }
-  async createDiscountCode(data: DiscountCodeType) {
+  async createDiscountCode(data: Omit<DiscountCodeType, 'active'>) {
     try {
-      let result = await this.post(this.path, data);
-      return result;
+      let result = await this.post(this.path, data)
+      return result
     } catch (error) {
-      return error;
+      return error
     }
   }
 }
 
-export default new DiscountCode();
+export default new DiscountCode()

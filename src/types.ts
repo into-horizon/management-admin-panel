@@ -87,6 +87,7 @@ export type EmployeeType = UserType & {
 export type EmployeeStateType = {
   data: EmployeeType[];
   count: number;
+  params: ParamsType
 };
 
 export type FilterStateType = {

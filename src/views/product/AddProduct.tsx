@@ -242,7 +242,7 @@ const AddProduct = ({ addProductHandler }: PropTypes) => {
       parentCategory: HTMLSelectElement;
       childCategory: HTMLSelectElement;
       grandChildCategory?: HTMLSelectElement;
-      image: { files: Blob[] };
+      image: { files: File[] };
     };
     let obj = {
       entitle: target.entitle.value,

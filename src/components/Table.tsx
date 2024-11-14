@@ -83,7 +83,7 @@ export const Table = ({
   Actions,
   onPageChange,
   pageNumber,
-  pageSize
+  pageSize,
 }: PropTypes) => {
   const [selected, setSelected] = useState<any[]>([]);
   const [onEdit, setOnEdit] = useState<string | null | number>("");
@@ -198,7 +198,7 @@ export const Table = ({
                             {String(
                               field && d[field as keyof typeof d]
                                 ? d[field as keyof typeof d]
-                                : "" ?? "-"
+                                : "-"
                             )}
                           </CTableDataCell>
                         );
@@ -277,7 +277,7 @@ export const Table = ({
                         <CFormSelect
                           name="display"
                           onChange={changeHandler}
-                          value={params.limit}
+                          value={params?.limit}
                         >
                           {Children.toArray(
                             displayItems.map((val) => (
