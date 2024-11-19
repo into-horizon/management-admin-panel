@@ -35,17 +35,15 @@ import { OrderType } from 'src/types'
 
 type PropsTypes = {
   bulkStatusUpdate: (p: { id: string; status: string }) => Promise<void>
-  orders: OrderType[]
-  count: number
   getStatuesHandler: () => Promise<void>
-  statuses: string[]
 }
-const OrdersOverview = ({ bulkStatusUpdate, getStatuesHandler, statuses }: PropsTypes) => {
+const OrdersOverview = ({ bulkStatusUpdate, getStatuesHandler }: PropsTypes) => {
   const initialParams = { limit: 5, offset: 0 }
   const {
     overviewParams,
     isLoading,
     ordersOverview: { data: orders, count },
+    statuses,
   } = useSelector((state: RootState) => state.orders)
   const [selected, setSelected] = useState<any[]>([])
   const dispatch = useDispatch()
@@ -272,12 +270,6 @@ const OrdersOverview = ({ bulkStatusUpdate, getStatuesHandler, statuses }: Props
   )
 }
 
-const mapStateToProps = (state: RootState) => ({
-  orders: state.orders.ordersOverview.data,
-  count: state.orders.ordersOverview?.count,
-  statuses: state.orders.statuses,
-})
-
 const mapDispatchToProps = { getStatuesHandler, bulkStatusUpdate }
 
-export default connect(mapStateToProps, mapDispatchToProps)(OrdersOverview)
+export default connect(null, mapDispatchToProps)(OrdersOverview)
