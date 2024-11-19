@@ -29,7 +29,7 @@ const Paginator: FC<PropTypes> = ({
 }) => {
   const [pages, setPages] = useState<(string | number)[]>([])
   const [selectedPage, setSelectedPage] = useState<number>(
-    (cookieName ? Number(cookie.load(cookieName)) : pageNumber ?? 1) ?? 1,
+    (cookieName && cookie.load(cookieName) ? +cookie.load(cookieName) : pageNumber ?? 1) ?? 1,
   )
   const siblingCount = 5
   let pagesCount = Math.ceil(count / (params?.limit ?? pageSize ?? 5) || 1)
