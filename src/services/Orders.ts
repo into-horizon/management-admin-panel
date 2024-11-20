@@ -31,7 +31,7 @@ class Orders extends ApiService {
       let result = await this.patch(`${this.path}/item`, data);
       return result;
     } catch (error) {
-      return error;
+      throw error;
     }
   }
   async getStatues() {

@@ -6,7 +6,7 @@ import {
   setOverviewParams,
 } from '../../store/orders'
 import OrdersModel from './OrdersModel'
-import { connect, useDispatch, useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import Paginator from '../../components/Paginator'
 import {
   CForm,
@@ -33,11 +33,7 @@ import CopyableText from '../../components/CopyableText'
 import { RootState } from 'src/store'
 import { OrderType } from 'src/types'
 
-type PropsTypes = {
-  bulkStatusUpdate: (p: { id: string; status: string }) => Promise<void>
-  getStatuesHandler: () => Promise<void>
-}
-const OrdersOverview = ({ bulkStatusUpdate, getStatuesHandler }: PropsTypes) => {
+const OrdersOverview = () => {
   const initialParams = { limit: 5, offset: 0 }
   const {
     overviewParams,
@@ -49,7 +45,7 @@ const OrdersOverview = ({ bulkStatusUpdate, getStatuesHandler }: PropsTypes) => 
   const dispatch = useDispatch()
   useEffect(() => {
     dispatch(getOverviewOrdersHandler())
-    getStatuesHandler()
+    dispatch(getStatuesHandler())
   }, [overviewParams])
 
   const [searchType, setSearchType] = useState('status')
@@ -85,7 +81,7 @@ const OrdersOverview = ({ bulkStatusUpdate, getStatuesHandler }: PropsTypes) => 
     const target = e.target as typeof e.target & {
       status: HTMLSelectElement
     }
-    bulkStatusUpdate({ id: selected.join('&'), status: target.status.value })
+    dispatch(bulkStatusUpdate({ id: selected.join('&'), status: target.status.value }))
     setVisible(false)
   }
   const downloadableData = async () => {
@@ -270,6 +266,4 @@ const OrdersOverview = ({ bulkStatusUpdate, getStatuesHandler }: PropsTypes) => 
   )
 }
 
-const mapDispatchToProps = { getStatuesHandler, bulkStatusUpdate }
-
-export default connect(null, mapDispatchToProps)(OrdersOverview)
+export default OrdersOverview
