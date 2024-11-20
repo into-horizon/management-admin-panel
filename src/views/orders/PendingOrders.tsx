@@ -5,6 +5,7 @@ import OrdersModel from './OrdersModel'
 import { CSpinner } from '@coreui/react'
 import Paginator from '../../components/Paginator'
 import { RootState } from 'src/store'
+import LoadingSpinner from 'src/components/LoadingSpinner'
 
 const PendingOrders = () => {
   const {
@@ -13,13 +14,15 @@ const PendingOrders = () => {
     isLoading,
   } = useSelector((state: RootState) => state.orders)
   const dispatch = useDispatch()
+
   useEffect(() => {
     dispatch(getPendingOrdersHandler())
-  }, [])
+  }, [pendingParams])
+
   return (
     <>
       <h2>pending orders</h2>
-      {isLoading ? <CSpinner /> : <OrdersModel data={orders} type="pending" />}
+      {isLoading ? <LoadingSpinner /> : <OrdersModel data={orders} type="pending" />}
       <Paginator
         params={pendingParams}
         count={+count}

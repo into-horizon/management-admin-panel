@@ -17,15 +17,11 @@ import Auth from "./services/Auth";
 import {
   socket,
   notificationsOffers,
-  orders,
-  products,
-  notifications,
 } from "./socket";
 import GlobalDialog from "./components/GlobalDialog";
 import Toaster from "./components/Toaster";
 import { CCol, CContainer, CRow } from "@coreui/react";
 import { RootState } from "./store";
-import { ParamsType, ProductType } from "./types";
 import { isTokenValid } from "./services/helpers";
 import ApiService from "./services/ApiService";
 import { EventEmitter } from "events";
