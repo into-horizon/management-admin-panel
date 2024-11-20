@@ -1,14 +1,10 @@
 import React, { useState, useEffect, Fragment } from 'react'
-import { connect, useSelector } from 'react-redux'
+import { connect, useDispatch, useSelector } from 'react-redux'
 import {
   CWidgetStatsF,
   CRow,
   CCol,
   CSpinner,
-  CAccordionHeader,
-  CAccordionItem,
-  CAccordion,
-  CAccordionBody,
   CForm,
   CFormInput,
   CFormSelect,
@@ -21,40 +17,19 @@ import {
   CModalFooter,
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
-import {
-  cilCheck,
-  cilWallet,
-  cilPlus,
-  cilPaperclip,
-  cilTruck,
-  cilExternalLink,
-  cilX,
-  cilFile,
-} from '@coreui/icons'
+import { cilCheck, cilPaperclip, cilTruck, cilExternalLink, cilX, cilFile } from '@coreui/icons'
 import { getPendingAmounts, getAmounts } from '../../store/finance'
 import { getCashAccount, getAccountsHandler } from 'src/store/bankAccount'
-import {
-  getWithdrawalsHandler,
-  addWithdrawalHandler,
-  updateWithdrawalHandler,
-} from 'src/store/withdrawal'
+import { getWithdrawalsHandler, updateWithdrawalHandler } from 'src/store/withdrawal'
 import AccountModal from './components/AccountModal'
 import Table from '../../components/Table'
 import { RootState } from 'src/store'
-import { ParamsType, WithdrawalType } from 'src/types'
+import { WithdrawalType } from 'src/types'
 
 type PropTypes = {
-  getWithdrawalsHandler: (p: ParamsType) => Promise<void>
-  addWithdrawalHandler: (p: WithdrawalType) => Promise<void>
   getAmounts: () => Promise<void>
-  updateWithdrawalHandler: (p: WithdrawalType | FormData) => Promise<void>
 }
-const Summary = ({
-  getWithdrawalsHandler,
-  addWithdrawalHandler,
-  getAmounts,
-  updateWithdrawalHandler,
-}: PropTypes) => {
+const Summary = ({ getAmounts }: PropTypes) => {
   const {
     pending,
     released,
@@ -67,6 +42,7 @@ const Summary = ({
   } = useSelector((state: RootState) => state.finance)
   const { account, cashAccount } = useSelector((state: RootState) => state.bankAccount)
   const { data: withdrawals, count } = useSelector((state: RootState) => state.withdrawals)
+
   const [params, setParams] = useState({ limit: 10, offset: 0 })
   const [loading, setLoading] = useState(true)
   const [releasedFinal, setReleasedFinal] = useState<number>(0)
@@ -74,8 +50,10 @@ const Summary = ({
   const [add, setAdd] = useState(false)
   const [progressLoading, setProgressLoading] = useState(false)
 
+  const dispatch = useDispatch()
   useEffect(() => {
-    Promise.all([getAmounts(), getWithdrawalsHandler(params)]).then(() => setLoading(false))
+    dispatch(getWithdrawalsHandler())
+    Promise.all([getAmounts()]).then(() => setLoading(false))
   }, [])
 
   useEffect(() => {
@@ -83,35 +61,35 @@ const Summary = ({
     setReleasedFinal(Number(newValue.toFixed(2)))
   }, [released, withdrawn, canceledWithdrawn])
 
-  const submitFormHandler = async (e: React.FormEvent): Promise<void> => {
-    const target = e.target as typeof e.target & {
-      account: { value: string }
-      amount: { value: string }
-      reset: () => void
-    }
-    e.preventDefault()
-    setProgressLoading(true)
-    let obj: WithdrawalType = {
-      account_id: target.account.value,
-      amount: Number(target.amount.value),
-      id: '',
-      courier_id: null,
-      store_id: '',
-      type: '',
-      status: '',
-      updated: null,
-      document: null,
-      created_at: '',
-    }
-    try {
-      await addWithdrawalHandler(obj)
-      target.reset()
-      setProgressLoading(false)
-      await getWithdrawalsHandler(params)
-    } catch (e) {
-      return
-    }
-  }
+  // const submitFormHandler = async (e: React.FormEvent): Promise<void> => {
+  //   const target = e.target as typeof e.target & {
+  //     account: { value: string }
+  //     amount: { value: string }
+  //     reset: () => void
+  //   }
+  //   e.preventDefault()
+  //   setProgressLoading(true)
+  //   let obj: WithdrawalType = {
+  //     account_id: target.account.value,
+  //     amount: Number(target.amount.value),
+  //     id: '',
+  //     courier_id: null,
+  //     store_id: '',
+  //     type: '',
+  //     status: '',
+  //     updated: null,
+  //     document: null,
+  //     created_at: '',
+  //   }
+  //   try {
+  //     await addWithdrawalHandler(obj)
+  //     target.reset()
+  //     setProgressLoading(false)
+  //     // await getWithdrawalsHandler(params)
+  //   } catch (e) {
+  //     return
+  //   }
+  // }
   useEffect(() => {
     setActive(!withdrawals.find((w: WithdrawalType) => w.status === 'requested'))
   }, [withdrawals])
@@ -152,72 +130,73 @@ const Summary = ({
         value && formData.append(key, value)
       })
       e.preventDefault()
-      Promise.all([updateWithdrawalHandler(formData)]).then(() => {
-        return setVisible(false)
-      })
+      dispatch(updateWithdrawalHandler(formData))
+      // Promise.all([]).then(() => {
+      //   return setVisible(false)
+      // })
     }
     return (
       <Fragment>
-        <CTooltip content="accept">
-          <CButton color="success" onClick={() => updateType('accept')}>
+        <CTooltip content='accept'>
+          <CButton color='success' onClick={() => updateType('accept')}>
             <CIcon icon={cilCheck} />
           </CButton>
         </CTooltip>
-        <CTooltip content="reject">
-          <CButton color="danger" onClick={() => updateType('reject')}>
+        <CTooltip content='reject'>
+          <CButton color='danger' onClick={() => updateType('reject')}>
             <CIcon icon={cilX} />
           </CButton>
         </CTooltip>
-        <CModal visible={visible} alignment="center" onClose={() => setVisible(false)}>
+        <CModal visible={visible} alignment='center' onClose={() => setVisible(false)}>
           <CModalHeader>
             <CModalTitle>Update withdrawal</CModalTitle>
           </CModalHeader>
           <CForm onSubmit={submitHandler}>
-            <CRow className="justify-content-center align-items-center">
-              <CCol xs="auto " className="file-label">
+            <CRow className='justify-content-center align-items-center'>
+              <CCol xs='auto ' className='file-label'>
                 {type === 'accept' && (
                   <>
                     <CFormLabel
                       style={{ margin: 'auto' }}
-                      htmlFor="document"
-                      className="btn btn-primary"
+                      htmlFor='document'
+                      className='btn btn-primary'
                     >
                       {' '}
-                      <CIcon icon={cilFile} size="lg" />
+                      <CIcon icon={cilFile} size='lg' />
                       upload document
                     </CFormLabel>
                     <CFormInput
-                      name="document"
-                      id="document"
-                      type="file"
+                      name='document'
+                      id='document'
+                      type='file'
                       hidden
-                      accept=".jpeg, .png, .pdf"
+                      accept='.jpeg, .png, .pdf'
                       onChange={(e) => setFile(e.target.files ? e.target.files[0] : null)}
                     />
 
                     <CFormInput
                       value={file?.name ? file?.name : ''}
                       readOnly
-                      placeholder="file name"
+                      placeholder='file name'
                     />
                   </>
                 )}
                 {type === 'reject' && (
                   <>
-                    <CFormLabel htmlFor="rejection">rejection reason</CFormLabel>
+                    <CFormLabel htmlFor='rejection'>rejection reason</CFormLabel>
                     <CFormSelect
-                      id="rejection_reason"
+                      id='rejection_reason'
                       onChange={(e) => setReason(e.target.value)}
                       defaultValue={'invalid amount'}
                     >
-                      <option value="invalid amount">invalid amount</option>
-                      <option value="incorrect bank details">incorrect bank details</option>
-                      <option value="other">other</option>
+                      <option value='invalid amount'>invalid amount</option>
+                      <option value='incorrect bank details'>incorrect bank details</option>
+                      <option value='other'>other</option>
                     </CFormSelect>
                     {reason === 'other' && (
                       <CFormInput
-                        placeholder="enter reason"
-                        id="rejection_reason_other"
+                        placeholder='enter reason'
+                        id='rejection_reason_other'
                         required
                       ></CFormInput>
                     )}
@@ -226,10 +205,10 @@ const Summary = ({
               </CCol>
             </CRow>
             <CModalFooter>
-              <CButton color="primary" type="submit">
+              <CButton color='primary' type='submit'>
                 submit
               </CButton>
-              <CButton color="secondary" onClick={() => setVisible(false)}>
+              <CButton color='secondary' onClick={() => setVisible(false)}>
                 close
               </CButton>
             </CModalFooter>
@@ -258,7 +237,7 @@ const Summary = ({
       header: 'attachment',
       body: (data: WithdrawalType) =>
         data.document ? (
-          <a href={data.document} target="_blank">
+          <a href={data.document} target='_blank'>
             <CIcon icon={cilPaperclip} />
           </a>
         ) : (
@@ -279,39 +258,39 @@ const Summary = ({
       <CRow>
         <CCol lg={4} md={4} xs={12} sm={4}>
           <CWidgetStatsF
-            className="mb-3"
-            color="success"
+            className='mb-3'
+            color='success'
             icon={<CIcon icon={cilCheck} height={24} />}
             padding={false}
-            title="commission"
+            title='commission'
             value={commission}
           />
         </CCol>
         <CCol lg={4} md={4} xs={12} sm={4}>
           <CWidgetStatsF
-            className="mb-3"
-            color="warning"
+            className='mb-3'
+            color='warning'
             icon={<CIcon icon={cilTruck} height={24} />}
             padding={false}
-            title="delivery"
+            title='delivery'
             value={delivery}
           />
         </CCol>
         <CCol lg={4} md={4} xs={12} sm={4}>
           <CWidgetStatsF
-            className="mb-3"
-            color="info"
+            className='mb-3'
+            color='info'
             icon={<CIcon icon={cilExternalLink} height={24} />}
             padding={false}
-            title="transferred"
+            title='transferred'
             value={transferred}
           />
         </CCol>
       </CRow>
-      <CRow className="justify-content-md-center">
+      {/* <CRow className='justify-content-md-center'>
         <CCol xs={12}>
           {progressLoading ? (
-            <CSpinner color="primary" />
+            <CSpinner color='primary' />
           ) : (
             active &&
             releasedFinal > 0 && (
@@ -319,8 +298,8 @@ const Summary = ({
                 <CAccordionItem itemKey={1}>
                   <CAccordionHeader>
                     <CRow>
-                      <CCol xs="auto">
-                        <CIcon icon={cilWallet} size="lg" />
+                      <CCol xs='auto'>
+                        <CIcon icon={cilWallet} size='lg' />
                       </CCol>
                       <CCol>
                         <strong>you have {releasedFinal} withdrawal amount</strong>
@@ -329,38 +308,38 @@ const Summary = ({
                   </CAccordionHeader>
                   <CAccordionBody>
                     <CForm onSubmit={submitFormHandler}>
-                      <CRow className="justify-content-md-center align-items-end ">
+                      <CRow className='justify-content-md-center align-items-end '>
                         <CCol xs={3}>
                           <CFormLabel>requested amount</CFormLabel>
                           <CFormInput
-                            type="number"
-                            step="any"
+                            type='number'
+                            step='any'
                             max={releasedFinal}
                             defaultValue={releasedFinal}
-                            id="amount"
+                            id='amount'
                           />
                         </CCol>
                         <CCol xs={3}>
                           <CFormLabel>Transfer To</CFormLabel>
-                          <CFormSelect id="account">
+                          <CFormSelect id='account'>
                             <option value={cashAccount.id}>{cashAccount.title}</option>
                             {account.id && <option value={account.id}>{account.title}</option>}
                           </CFormSelect>
                         </CCol>
                         {!account.id && (
-                          <CCol xs="auto">
+                          <CCol xs='auto'>
                             <CButton
-                              color="secondary"
-                              title="add account"
+                              color='secondary'
+                              title='add account'
                               onClick={() => setAdd(true)}
-                              type="button"
+                              type='button'
                             >
-                              <CIcon icon={cilPlus} size="lg" />
+                              <CIcon icon={cilPlus} size='lg' />
                             </CButton>
                           </CCol>
                         )}
-                        <CCol xs="auto">
-                          <CButton type="submit">submit</CButton>
+                        <CCol xs='auto'>
+                          <CButton type='submit'>submit</CButton>
                         </CCol>
                       </CRow>
                     </CForm>
@@ -370,15 +349,15 @@ const Summary = ({
             )
           )}
         </CCol>
-      </CRow>
-      <CRow className="justify-content-md-center mgn-top50">
+      </CRow> */}
+      <CRow className='justify-content-md-center mgn-top50'>
         <CCol xs={12} lg={10} xl={8}>
           <Table
             columns={columns}
             data={withdrawals}
             count={count}
             changeData={getWithdrawalsHandler}
-            cookieName="withdrawal"
+            cookieName='withdrawal'
             params={params}
             updateLoading={setLoading}
           />
@@ -396,10 +375,7 @@ const mapDispatchToProps = {
   getPendingAmounts,
   getCashAccount,
   getAccountsHandler,
-  getWithdrawalsHandler,
-  addWithdrawalHandler,
   getAmounts,
-  updateWithdrawalHandler,
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Summary)
