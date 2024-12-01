@@ -17,6 +17,7 @@ import Table, { ColumnType } from 'src/components/Table'
 import {
   deleteEmployee,
   getEmployees,
+  resetEmployeesParams,
   setEmployeesParams,
   updateEmployee,
 } from 'src/store/employee'
@@ -27,6 +28,7 @@ import DeleteModal from 'src/components/DeleteModal'
 import { RootState } from 'src/store'
 import { ParamsType, EmployeeType } from 'src/types'
 import { InputType } from 'src/enums'
+import { updateParamsHelper } from 'src/services/helpers'
 
 type PropTypes = {
   // getEmployees: (p: ParamsType) => Promise<void>
@@ -34,20 +36,19 @@ type PropTypes = {
   // deleteEmployee: (id: string) => Promise<void>
 }
 export const Overview = () => {
-  const { data, count } = useSelector((state: RootState) => state.employee)
-  const [loading, setLoading] = useState(true)
-  const [params, setParams] = useState<ParamsType>({ offset: 0, limit: 10 })
+  const { data, count, params, loading } = useSelector((state: RootState) => state.employee)
+  // const [loading, setLoading] = useState(true)
+  // const [params, setParams] = useState<ParamsType>({ offset: 0, limit: 10 })
   const dispatch = useDispatch()
   useEffect(() => {
     dispatch(getEmployees())
-    setLoading(false)
-  }, [])
+  }, [params])
   const Actions = ({ id }: EmployeeType) => {
     const [visible, setVisible] = useState(false)
     return (
       <Fragment>
-        <CTooltip content="delete">
-          <CButton color="danger" onClick={(e) => setVisible(true)}>
+        <CTooltip content='delete'>
+          <CButton color='danger' onClick={(e) => setVisible(true)}>
             <CIcon icon={cilTrash} />
           </CButton>
         </CTooltip>
@@ -113,19 +114,17 @@ export const Overview = () => {
     let data: ParamsType & { key?: string; role?: string; active?: string } = {
       ...params,
     }
-    setLoading(true)
     _params.map((param: string) => {
       target[param as keyof PType]?.value &&
         (data[param as keyof PType] = target[param as keyof PType]?.value)
     })
-    setParams(data)
-    dispatch(getEmployees())
-    setLoading(false)
+    dispatch(setEmployeesParams(data))
+    // dispatch(getEmployees())
   }
   const resetHandler = (e: FormEvent<HTMLFormElement>) => {
     const target = e.target as typeof e.target & { reset(): void }
     target.reset()
-    setParams({ offset: 0, limit: 10 })
+    dispatch(resetEmployeesParams())
   }
   const deleteHandler = async (id: string) => {
     dispatch(deleteEmployee(id))
@@ -135,25 +134,25 @@ export const Overview = () => {
       <AddEmployee />
       <FilterCard>
         <CForm onSubmit={submitHandler} onReset={resetHandler}>
-          <CRow className="justify-content-center" xs={{ gutterY: 3 }}>
+          <CRow className='justify-content-center' xs={{ gutterY: 3 }}>
             <CCol xs={12}>
-              <CFormInput placeholder="search by name, email or mobile number" id="key" />
+              <CFormInput placeholder='search by name, email or mobile number' id='key' />
             </CCol>
-            <CCol xs="auto">
-              <CFormLabel htmlFor="active">active</CFormLabel>
-              <CFormSelect id="active">
-                <option value="true">true</option>
-                <option value="false">false</option>
+            <CCol xs='auto'>
+              <CFormLabel htmlFor='active'>active</CFormLabel>
+              <CFormSelect id='active'>
+                <option value='true'>true</option>
+                <option value='false'>false</option>
               </CFormSelect>
             </CCol>
-            <CCol xs="auto">
-              <CFormLabel htmlFor="role">role</CFormLabel>
-              <CFormSelect id="role">
-                <option value="">all</option>
-                <option value="admin">admin</option>
-                <option value="supervisor">supervisor</option>
-                <option value="moderator">moderator</option>
-                <option value="advisor">advisor</option>
+            <CCol xs='auto'>
+              <CFormLabel htmlFor='role'>role</CFormLabel>
+              <CFormSelect id='role'>
+                <option value=''>all</option>
+                <option value='admin'>admin</option>
+                <option value='supervisor'>supervisor</option>
+                <option value='moderator'>moderator</option>
+                <option value='advisor'>advisor</option>
               </CFormSelect>
             </CCol>
             <CCol xs={12}>
@@ -165,14 +164,14 @@ export const Overview = () => {
       <Table
         data={data}
         columns={columns}
-        cookieName="employees"
+        cookieName='employees'
         count={count}
         loading={loading}
-        updateLoading={setLoading}
+        // updateLoading={setLoading}
         editable
         editFn={updateEmployee}
         Actions={Actions}
-        onPageChange={(page) => setEmployeesParams({ ...params, offset: page })}
+        onPageChange={(page) => setEmployeesParams(updateParamsHelper(params, page))}
       />
     </>
   )

@@ -9,6 +9,7 @@ const initialState: EmployeeStateType = {
   data: [],
   count: 0,
   params: { limit: 10, offset: 0 },
+  loading: false,
 }
 const employee = createSlice({
   name: 'employee',
@@ -18,25 +19,45 @@ const employee = createSlice({
       return { ...state, ...action.payload }
     },
     setParams(state, action: PayloadAction<ParamsType>) {
-      state.params = action.payload
+      state.params = { ...state.params, ...action.payload }
     },
+    resetParams(state) {
+      state.params = { limit: 10, offset: 0 }
+    },
+  },
+  extraReducers: (builder) => {
+    builder.addCase(getEmployees.pending, (state) => {
+      state.loading = true
+    })
+    builder.addCase(getEmployees.fulfilled, (state, action) => {
+      state.loading = false
+      state.data = action.payload.data
+      state.count = action.payload.count
+    })
+    builder.addCase(getEmployees.rejected, (state) => {
+      state.loading = false
+    })
   },
 })
 
-export const getEmployees = createAsyncThunk<void, void>(
+export const getEmployees = createAsyncThunk<{ data: EmployeeType[]; count: number }, void>(
   'employees/getAll',
   async (_, { dispatch, rejectWithValue, getState }) => {
     try {
       const { params } = (getState() as RootState).employee
       let { data, status, message } = await Employee.getEmployees(params)
       if (status === 200) {
-        dispatch(setData(data))
-      } else dispatch(updateToast({ type: 'error', message }))
+        return data
+      } else {
+        dispatch(updateToast({ type: DialogResponseTypes.ERROR, message }))
+        return rejectWithValue(message)
+      }
     } catch (error) {
       if (error instanceof Error) {
         dispatch(
           updateToast({ status: 403, message: error.message, type: DialogResponseTypes.ERROR }),
         )
+        return rejectWithValue(error.message)
       }
     }
   },
@@ -98,6 +119,10 @@ export const deleteEmployee = createAsyncThunk<void, string>(
     }
   },
 )
-export const { setData, setParams: setEmployeesParams } = employee.actions
+export const {
+  setData,
+  setParams: setEmployeesParams,
+  resetParams: resetEmployeesParams,
+} = employee.actions
 
 export default employee.reducer

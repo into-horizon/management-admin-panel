@@ -91,10 +91,6 @@ export const addWithdrawalHandler = (payload: WithdrawalType) => async (dispatch
   }
 }
 
-// export const updateWithdrawalHandler =
-//   (payload: WithdrawalType | FormData) =>
-//   async (dispatch: AppDispatch, state: () => RootState) => {}
-
 export const updateWithdrawalHandler = createAsyncThunk<void, WithdrawalType | FormData>(
   'withdrawals/update',
   async (payload, { dispatch }) => {

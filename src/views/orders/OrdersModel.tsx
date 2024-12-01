@@ -24,6 +24,7 @@ import Pdf from '../../components/Pdf'
 import CopyableText from '../../components/CopyableText'
 import { RootState } from 'src/store'
 import { OrderType, OrderItemType } from 'src/types'
+import LoadingSpinner from 'src/components/LoadingSpinner'
 
 type PropTypes = {
   data: OrderType[]
@@ -96,7 +97,7 @@ const OrderModel = ({ data, loading, type }: PropTypes) => {
   return (
     <>
       {loading ? (
-        <CSpinner />
+        <LoadingSpinner />
       ) : (
         data.map((order, idx) => (
           <div

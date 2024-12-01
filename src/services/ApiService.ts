@@ -1,204 +1,177 @@
-import axios from "axios";
-import cookie from "react-cookies";
-import { ParamsType } from "src/types";
-let api = process.env.REACT_APP_API;
-let managementAPI = process.env.REACT_APP_MANAGEMENT_API;
-import { isJwtExpired } from "jwt-check-expiration";
+import axios, { AxiosError, AxiosRequestHeaders } from 'axios'
+import cookie from 'react-cookies'
+import { ParamsType } from 'src/types'
+const api = process.env.REACT_APP_API
+const managementAPI = process.env.REACT_APP_MANAGEMENT_API
+import { isJwtExpired } from 'jwt-check-expiration'
 
 axios.defaults.headers.common.locale = 'en'
 export default class ApiService {
+  constructor() {
+    axios.interceptors.request.use(async (config) => {
+      const locale = localStorage.getItem('i18nextLng') ?? 'en'
+      if (config.headers?.Authorization) {
+        config.headers.locale = locale
+        return config
+      }
+      config.headers = this.bearer(await this.token())
+      return config
+    })
+  }
   async get(
     path: { management: boolean; endpoint: string } | string,
     params?: ParamsType,
-    header?: { [key: string]: any }
+    header?: AxiosRequestHeaders,
   ) {
-    let _header: { [key: string]: any } = header ?? {};
-    if (header instanceof Error || header === undefined) {
-      _header = this.bearer(await this.token()) ?? {};
-    }
     try {
       let res = await axios({
-        method: "get",
+        method: 'get',
         url:
-          typeof path !== "string" && path?.management
+          typeof path !== 'string' && path?.management
             ? `${managementAPI}/${path.endpoint}`
-            : `${api}/${path ?? ""}`,
+            : `${api}/${path ?? ''}`,
         params: this.getPopulatedStore(params),
-        headers: _header,
-      });
-      return res.data;
-    } catch (error) {
-      if (error instanceof Error) throw new Error(error.message);
+        headers: header,
+      })
+      return res.data
+    } catch (error: AxiosError | any) {
+      throw new Error(error.response.message)
     }
   }
   async post(
     path: string | { management: boolean; endpoint: string },
     data?: { [key: string]: any } | null | undefined,
-    header?: { [key: string]: any } | Error | undefined,
-    params?: ParamsType
+    header?: AxiosRequestHeaders,
+    params?: ParamsType,
   ) {
     try {
-      let _header: { [key: string]: any } = header ?? {};
-      if (header instanceof Error || header === undefined) {
-        _header = this.bearer(await this.token()) ?? {};
-      }
       let res = await axios({
-        method: "post",
+        method: 'post',
         url:
-          typeof path !== "string" && path.management
+          typeof path !== 'string' && path.management
             ? `${managementAPI}/${path.endpoint}`
             : `${api}/${path}`,
         data: data,
-        headers: _header,
+        headers: header,
         params: params,
-      });
-      return res.data;
-    } catch (error) {
-      return error;
+      })
+      return res.data
+    } catch (error: AxiosError | any) {
+      throw new Error(error.response.message)
     }
   }
 
   async update(
     path: string | { management: boolean; endpoint: string },
     data: { [key: string]: any },
-    header?: { [key: string]: any },
-    params?: ParamsType
+    params?: ParamsType,
   ) {
     try {
-      let _header: { [key: string]: any } = header ?? {};
-      if (header instanceof Error || header === undefined) {
-        _header = this.bearer(await this.token()) ?? {};
-      }
       let res = await axios({
-        method: "put",
+        method: 'put',
         url:
-          typeof path !== "string" && path.management
+          typeof path !== 'string' && path.management
             ? `${managementAPI}/${path.endpoint}`
             : `${api}/${path}`,
         params: params,
         data: data,
-        headers: _header,
-      });
-      return res.data;
-    } catch (error) {
-      return error;
+      })
+      return res.data
+    } catch (error: AxiosError | any) {
+      throw new Error(error.response.message)
     }
   }
 
   async patch(
     path: string | { management: boolean; endpoint: string },
     data: { [key: string]: any },
-    header?: { [key: string]: any },
-    params?: ParamsType
+    params?: ParamsType,
   ) {
-    let _header: { [key: string]: any } = header ?? {};
-    if (header instanceof Error || header === undefined) {
-      _header = this.bearer(await this.token()) ?? {};
-    }
     try {
       let res = await axios({
-        method: "patch",
+        method: 'patch',
         url:
-          typeof path !== "string" && path.management
+          typeof path !== 'string' && path.management
             ? `${managementAPI}/${path.endpoint}`
             : `${api}/${path}`,
         params: params,
         data: data,
-        headers: _header,
-      });
-      return res.data;
-    } catch (error) {
-      return error;
+      })
+      return res.data
+    } catch (error: AxiosError | any) {
+      throw new Error(error.response.message)
     }
   }
 
   async delete(
     path: string | { management: boolean; endpoint: string },
     data?: { [key: string]: any },
-    header?: { [key: string]: any },
-    params?: ParamsType
+    params?: ParamsType,
   ) {
-    let _header: { [key: string]: any } = header ?? {};
-    if (header instanceof Error || header === undefined) {
-      _header = this.bearer(await this.token()) ?? {};
-    }
     try {
       let res = await axios({
-        method: "delete",
+        method: 'delete',
         url:
-          typeof path !== "string" && path.management
+          typeof path !== 'string' && path.management
             ? `${managementAPI}/${path.endpoint}`
             : `${api}/${path}`,
         data: data,
         params: params,
-        headers: _header,
-      });
-      return res.data;
-    } catch (error) {
-      return error;
+      })
+      return res.data
+    } catch (error: AxiosError | any) {
+      throw new Error(error.response.message)
     }
   }
 
-  bearer(
-    token: string | Error | void
-  ): Error | { [key: string]: any } | undefined {
-    if (typeof token === "string") {
-      return { Authorization: `Bearer ${token}` };
-    } else if (token instanceof Error) {
-      throw new Error(token.message);
-    }
+  bearer(token?: string): AxiosRequestHeaders {
+    if (!!token && typeof token === 'string') {
+      return { Authorization: `Bearer ${token}` }
+    } else return {}
   }
 
   basic(data: { email: string; password: string }) {
-    return { Authorization: `Basic ${btoa(`${data.email}:${data.password}`)}` };
+    return { Authorization: `Basic ${btoa(`${data.email}:${data.password}`)}` }
   }
-  getPopulatedStore(
-    data: { store_id?: string; duration?: string } & ParamsType = {}
-  ) {
-    const extendedParams = { ...data };
-    const store = cookie.load("populated-store");
-    const duration = cookie.load("duration");
+  getPopulatedStore(data: { store_id?: string; duration?: string } & ParamsType = {}) {
+    const extendedParams = { ...data }
+    const store = cookie.load('populated-store')
+    const duration = cookie.load('duration')
     if (store) {
-      extendedParams.store_id = store.id;
+      extendedParams.store_id = store.id
     }
     if (duration) {
-      extendedParams.duration = duration;
+      extendedParams.duration = duration
     }
-    return extendedParams;
+    return extendedParams
   }
-  async token(): Promise<string | Error | void> {
-    let token = cookie.load("access_token");
-    if (!token) return;
+  async token(): Promise<string | undefined> {
+    let token = cookie.load('access_token')
+    if (!token) return
     if (!isJwtExpired(token)) {
-      return token;
+      return token
     } else {
-      try {
-        await ApiService.refresh();
-      } catch (error) {
-        if (error instanceof Error) {
-          throw new Error(error.message);
-        }
-      }
+      await ApiService.refresh()
     }
   }
   static async refresh() {
-    const api = new ApiService();
+    const api = new ApiService()
     try {
       const { refresh_token, access_token, status, message } = await api.post(
-        { endpoint: "refresh", management: true },
+        { endpoint: 'refresh', management: true },
         null,
-        api.bearer(cookie.load("refresh_token"))
-      );
+        api.bearer(cookie.load('refresh_token')),
+      )
       if (status === 200) {
-        cookie.save("access_token", access_token, { path: "/" });
-        cookie.save("refresh_token", refresh_token, { path: "/" });
-        return access_token;
-      } else throw new Error(message);
+        cookie.save('access_token', access_token, { path: '/' })
+        cookie.save('refresh_token', refresh_token, { path: '/' })
+        return access_token
+      } else throw new Error(message)
     } catch (error) {
-      cookie.remove("access_token", { path: "/" });
-      cookie.remove("refresh_token", { path: "/" });
+      cookie.remove('access_token', { path: '/' })
+      cookie.remove('refresh_token', { path: '/' })
       if (error instanceof Error) {
-        throw new Error(error.message);
+        throw new Error(error.message)
       }
     }
   }
