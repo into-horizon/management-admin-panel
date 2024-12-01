@@ -32,6 +32,7 @@ import NewOrders from 'src/services/Orders'
 import CopyableText from '../../components/CopyableText'
 import { RootState } from 'src/store'
 import { OrderType } from 'src/types'
+import { updateParamsHelper } from 'src/services/helpers'
 
 const OrdersOverview = () => {
   const initialParams = { limit: 5, offset: 0 }
@@ -67,7 +68,7 @@ const OrdersOverview = () => {
     {
       header: 'order id',
       field: 'customer_order_id',
-      body: (data: OrderType) => <CopyableText data={data} field="customer_order_id" />,
+      body: (data: OrderType) => <CopyableText data={data} field='customer_order_id' />,
     },
     { header: 'status', field: 'status' },
   ]
@@ -96,61 +97,61 @@ const OrdersOverview = () => {
     <>
       <h2>orders overview</h2>
       <CButtonGroup
-        role="group"
-        aria-label="Basic checkbox toggle button group"
-        size="lg"
-        className="m-2-1rem"
+        role='group'
+        aria-label='Basic checkbox toggle button group'
+        size='lg'
+        className='m-2-1rem'
       >
         <CFormCheck
-          type="radio"
+          type='radio'
           button={{ color: 'primary', variant: 'outline' }}
-          name="btnradio"
-          id="card"
-          label="Card View"
+          name='btnradio'
+          id='card'
+          label='Card View'
           checked={view === 'card'}
           onChange={changeView}
         />
         <CFormCheck
-          type="radio"
+          type='radio'
           button={{ color: 'primary', variant: 'outline' }}
-          name="btnradio"
-          id="table"
+          name='btnradio'
+          id='table'
           checked={view === 'table'}
-          label="Table View"
+          label='Table View'
           onChange={changeView}
         />
       </CButtonGroup>
-      <CRow className="background">
+      <CRow className='background'>
         <CCol md={2}>
           <strong>search by</strong>
         </CCol>
         <CCol md={2}>
           <CFormCheck
-            type="radio"
-            name="search"
-            value="status"
-            label="order status"
+            type='radio'
+            name='search'
+            value='status'
+            label='order status'
             checked={searchType === 'status'}
             onChange={(e) => setSearchType(e.target.value)}
           />
         </CCol>
         <CCol md={2}>
           <CFormCheck
-            type="radio"
-            name="search"
-            value="number"
-            label="order number"
+            type='radio'
+            name='search'
+            value='number'
+            label='order number'
             checked={searchType === 'number'}
             onChange={(e) => setSearchType(e.target.value)}
           />
         </CCol>
 
         {searchType === 'status' && (
-          <CForm onSubmit={submitHandler} className="mgn-top50">
+          <CForm onSubmit={submitHandler} className='mgn-top50'>
             <CRow>
               <CCol>
-                <CFormSelect id="status">
-                  <option value="">All</option>
+                <CFormSelect id='status'>
+                  <option value=''>All</option>
                   {React.Children.toArray(
                     statuses.map((status) => <option value={status}>{status}</option>),
                   )}
@@ -160,7 +161,7 @@ const OrdersOverview = () => {
                 </CFormSelect>
               </CCol>
               <CCol>
-                <CButton type="submit">
+                <CButton type='submit'>
                   <CIcon icon={cilSearch} />
                   search
                 </CButton>
@@ -169,18 +170,18 @@ const OrdersOverview = () => {
           </CForm>
         )}
         {searchType === 'number' && (
-          <CForm className="mgn-top50" onSubmit={submitHandler}>
+          <CForm className='mt-3' onSubmit={submitHandler}>
             <CRow>
               <CCol>
                 <CFormInput
-                  type="text"
-                  placeholder="order number"
-                  aria-label="default input example"
-                  id="order"
+                  type='text'
+                  placeholder='order number'
+                  aria-label='default input example'
+                  id='order'
                 />
               </CCol>
               <CCol>
-                <CButton type="submit">
+                <CButton type='submit'>
                   <CIcon icon={cilSearch} />
                   search
                 </CButton>
@@ -197,48 +198,48 @@ const OrdersOverview = () => {
             count={+count}
             params={overviewParams}
             onPageChange={(page) =>
-              dispatch(setOverviewParams({ offset: (page - 1) * overviewParams.limit! }))
+              dispatch(setOverviewParams(updateParamsHelper(overviewParams, page)))
             }
-            cookieName="orderOverview"
+            cookieName='orderOverview'
           />
         </>
       )}
 
       {view === 'table' && (
         <>
-          <CRow className="justify-content-end mgn-top50" xs={{ gutterX: 3 }}>
-            <CCol xs="auto">
-              <Export color="primary" data={downloadableData} fileName="orders" />
+          <CRow className='justify-content-end mgn-top50' xs={{ gutterX: 3 }}>
+            <CCol xs='auto'>
+              <Export color='primary' data={downloadableData} fileName='orders' />
             </CCol>
-            <CCol xs="auto">
-              <CTooltip content="update status">
-                <CButton color="secondary" onClick={() => setVisible(true)}>
+            <CCol xs='auto'>
+              <CTooltip content='update status'>
+                <CButton color='secondary' onClick={() => setVisible(true)}>
                   <CIcon icon={cilPencil} />
                 </CButton>
               </CTooltip>
-              <CModal visible={visible} alignment="center">
+              <CModal visible={visible} alignment='center'>
                 <CModalHeader>
                   <CModalTitle>Bulk Status Update</CModalTitle>
                 </CModalHeader>
                 <CForm onSubmit={statusHandler}>
-                  <CRow className="justify-content-center">
-                    <CCol xs="auto">
-                      <CFormLabel htmlFor="status">Select Status</CFormLabel>
-                      <CFormSelect name="status" id="status">
-                        <option value="delivered">delivered</option>
-                        <option value="canceled">canceled</option>
-                        <option value="ready for pick-up">ready for pick-up</option>
-                        <option value="out for delivery">out for delivery</option>
-                        <option value="received at hub">received at hub</option>
-                        <option value="ready for delivery">ready for delivery</option>
+                  <CRow className='justify-content-center'>
+                    <CCol xs='auto'>
+                      <CFormLabel htmlFor='status'>Select Status</CFormLabel>
+                      <CFormSelect name='status' id='status'>
+                        <option value='delivered'>delivered</option>
+                        <option value='canceled'>canceled</option>
+                        <option value='ready for pick-up'>ready for pick-up</option>
+                        <option value='out for delivery'>out for delivery</option>
+                        <option value='received at hub'>received at hub</option>
+                        <option value='ready for delivery'>ready for delivery</option>
                       </CFormSelect>
                     </CCol>
                   </CRow>
                   <CModalFooter>
-                    <CButton color="secondary" onClick={() => setVisible(false)}>
+                    <CButton color='secondary' onClick={() => setVisible(false)}>
                       Cancel
                     </CButton>
-                    <CButton color="primary" type="submit">
+                    <CButton color='primary' type='submit'>
                       Submit
                     </CButton>
                   </CModalFooter>
@@ -253,7 +254,7 @@ const OrdersOverview = () => {
             data={orders}
             count={count}
             params={overviewParams}
-            cookieName="tableView"
+            cookieName='tableView'
             onPageChange={(page) =>
               dispatch(setOverviewParams({ offset: (page - 1) * overviewParams.limit! }))
             }
