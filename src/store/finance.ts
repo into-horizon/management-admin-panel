@@ -88,11 +88,11 @@ export const getAmounts = createAsyncThunk('finance/getAmounts', async (_, { dis
       description: string,
       status: string,
     ) => {
-      return (
-        data
-          .find((val) => val.type === type && val.source === description && val.status === status)
-          ?.sum.toFixed(2) ?? 0
-      )
+      return data.reduce((acc, current) => {
+        if (current.type === type && current.status === status && current.source === description) {
+          return acc + current.sum
+        } else return acc
+      }, 0)
     }
     if (status === 200) {
       dispatch(
