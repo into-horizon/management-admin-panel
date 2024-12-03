@@ -6,15 +6,17 @@ const managementAPI = process.env.REACT_APP_MANAGEMENT_API
 import { isJwtExpired } from 'jwt-check-expiration'
 
 axios.defaults.headers.common.locale = 'en'
+axios.defaults.timeout = 20000
 export default class ApiService {
   constructor() {
     axios.interceptors.request.use(async (config) => {
-      const locale = localStorage.getItem('i18nextLng') ?? 'en'
-      if (config.headers?.Authorization) {
-        config.headers.locale = locale
-        return config
+      config.headers ??= {}
+      const locale = localStorage.getItem('i18nextLng') || 'en'
+      config.headers.locale = locale
+      const token = await this.token()
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`
       }
-      config.headers = this.bearer(await this.token())
       return config
     })
   }
@@ -151,7 +153,7 @@ export default class ApiService {
     if (!isJwtExpired(token)) {
       return token
     } else {
-      await ApiService.refresh()
+      return await ApiService.refresh()
     }
   }
   static async refresh() {

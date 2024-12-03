@@ -1,16 +1,14 @@
-import React, { FC, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Route, Routes, useLocation } from 'react-router-dom'
 import './scss/style.scss'
-import { getUser, logout } from './store/auth'
+import { getUser } from './store/auth'
 import { useNavigate } from 'react-router-dom'
-import { connect, useDispatch, useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import cookie from 'react-cookies'
 import { useTranslation } from 'react-i18next'
 import { Rings } from 'react-loader-spinner'
 import {
   getParentCategoriesHandler,
-  getChildCategoriesHandler,
-  getGrandChildCategoriesHandler,
 } from './store/category'
 import 'react-select-search/style.css'
 import Auth from './services/Auth'
@@ -19,8 +17,6 @@ import GlobalDialog from './components/GlobalDialog'
 import Toaster from './components/Toaster'
 import { CCol, CContainer, CRow } from '@coreui/react'
 import { RootState } from './store'
-import { isTokenValid } from './services/helpers'
-import ApiService from './services/ApiService'
 import { EventEmitter } from 'events'
 import LoadingSpinner from './components/LoadingSpinner'
 import { PopupProvider } from 'react-custom-popup'
@@ -79,11 +75,7 @@ const App = () => {
 
         let currentPath = location.pathname
         if (token && !loggedIn) {
-          if (!isTokenValid()) {
-            ApiService.refresh().then(() => dispatch(getUser()))
-          } else {
-            dispatch(getUser())
-          }
+          dispatch(getUser())
         } else if (loggedIn && user.id) {
           dispatch(getParentCategoriesHandler())
           navigate(checkUnAuth(currentPath) ? '/' : currentPath)
