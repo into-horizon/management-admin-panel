@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Route, Routes, useLocation } from 'react-router-dom'
+import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import './scss/style.scss'
 import { getUser } from './store/auth'
 import { useNavigate } from 'react-router-dom'
@@ -7,9 +7,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import cookie from 'react-cookies'
 import { useTranslation } from 'react-i18next'
 import { Rings } from 'react-loader-spinner'
-import {
-  getParentCategoriesHandler,
-} from './store/category'
+import { getParentCategoriesHandler } from './store/category'
 import 'react-select-search/style.css'
 import Auth from './services/Auth'
 import { socket, notificationsOffers } from './socket'
@@ -20,6 +18,7 @@ import { RootState } from './store'
 import { EventEmitter } from 'events'
 import LoadingSpinner from './components/LoadingSpinner'
 import { PopupProvider } from 'react-custom-popup'
+import routes from './routes'
 export const events = new EventEmitter()
 
 // Containers
@@ -131,7 +130,16 @@ const App = () => {
                 path='/resetPassword/:token'
                 element={<ResetPassword load={(x: boolean) => setLoad(x)} />}
               />
-              <Route path='/*' element={<DefaultLayout />} />
+              <Route path='/*' element={<DefaultLayout />}>
+                <Route index element={<Navigate to={'dashboard'} />} />
+                {routes.map((route, idx) => {
+                  return (
+                    route.component && (
+                      <Route key={idx} path={route.path} element={<route.component />} />
+                    )
+                  )
+                })}
+              </Route>
               <Route path='*' element={<Page404 />} />
             </Routes>
           </div>
