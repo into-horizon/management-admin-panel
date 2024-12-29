@@ -14,6 +14,7 @@ export type AuthStateType = {
   user: UserType
   message: string
   loading: boolean
+  isServerDown: boolean
 }
 
 export type AccountType = {
@@ -262,6 +263,10 @@ export type ProductStateType = {
   overview: { data: ProductType[]; count: number }
   searched: ProductType
   reviews: { data: ReviewType[]; count: number }
+  isLoading: boolean
+  isUpdating: boolean
+  pendingParams: ParamsType
+  overviewParams: ParamsType & { status: 'approved' | 'pending' | 'rejected' }
 }
 
 export type StoreType = {
