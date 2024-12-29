@@ -18,5 +18,5 @@ export const isTokenValid = (): boolean => {
 }
 
 export const updateParamsHelper = (currentParams: ParamsType, currentPage: number): ParamsType => {
-  return { offset: currentParams.limit! * (currentPage - 1) }
+  return { ...currentParams, offset: currentParams.limit! * (currentPage - 1) }
 }

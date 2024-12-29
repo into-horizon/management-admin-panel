@@ -11,10 +11,10 @@ import {
 } from '@coreui/react'
 import React, { FormEvent, useEffect, useState } from 'react'
 import { connect, useDispatch, useSelector } from 'react-redux'
-import { Navigate, Outlet, useLocation, useNavigate } from 'react-router-dom'
-import { AppContent, AppSidebar, AppFooter, AppHeader } from '../components/index'
+import { Navigate, Outlet } from 'react-router-dom'
+import { AppSidebar, AppFooter, AppHeader } from '../components/index'
 import Draggable from 'react-draggable'
-import { cilFilterSquare, cilShieldAlt, cilCursorMove, cilFilter, cilFilterX } from '@coreui/icons'
+import { cilFilterSquare, cilCursorMove, cilFilter, cilFilterX } from '@coreui/icons'
 import SearchDropdown from 'src/components/SearchDropdown'
 import { searchForStore } from '../store/store'
 import { populateStore } from 'src/store/filter'
@@ -34,34 +34,19 @@ const DefaultLayout = ({ searchForStore, populateStore }: PropTypes) => {
   const [filterVisible, setVisibleFilter] = useState(false)
   const [selectedStore, setSelectedStore] = useState({})
   const { searched } = useSelector((state: RootState) => state.stores)
-  const { duration, store } = useSelector((state: RootState) => state.filter)
+  const { duration } = useSelector((state: RootState) => state.filter)
   const { user, loggedIn } = useSelector((state: RootState) => state.login)
   const dispatch = useDispatch()
-  const location = useLocation()
-  const setDate = (_date: string) => {
-    const date = new Date(_date)
-    const formattedDate = Intl.DateTimeFormat('en', {
-      month: '2-digit',
-      year: 'numeric',
-      day: '2-digit',
-    }).format(date)
-    return formattedDate
-  }
   const submitHandler = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    const target = e.target as typeof e.target & {
-      from: HTMLInputElement
-      to: HTMLInputElement
-    }
+    const target = e.currentTarget
     populateStore({
       store: selectedStore,
       duration: `${target.from.value}&${target.to.value}`,
     })
   }
   const resetHandler = (e: FormEvent<HTMLFormElement>) => {
-    const target = e.target as typeof e.target & {
-      reset(): void
-    }
+    const target = e.currentTarget
     target.reset()
     populateStore()
   }
@@ -92,6 +77,10 @@ const DefaultLayout = ({ searchForStore, populateStore }: PropTypes) => {
       })
     }
   }, [socket, products, notifications, loggedIn, user.id])
+
+  if (!loggedIn) {
+    return <Navigate to={'/login'} />
+  }
   return (
     <div>
       <AppSidebar />
