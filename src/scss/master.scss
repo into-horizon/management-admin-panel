@@ -11,7 +11,7 @@ button::first-letter {
     text-transform: capitalize;
 }
 
-input[type=number]:out-of-range {
+input[type='number']:out-of-range {
     color: orangered;
 }
 
@@ -23,7 +23,7 @@ input[type=number]:out-of-range {
 }
 
 .pointer:hover {
-    background-color: skyblue
+    background-color: skyblue;
 }
 
 .mrgn50 {
@@ -48,21 +48,20 @@ input[type=number]:out-of-range {
 }
 
 .padding {
-    padding: 2rem
+    padding: 2rem;
 }
 
 .background {
     background-color: #fff;
     padding: 2rem;
     border-radius: 2rem;
-
 }
 
 /* ::-webkit-input-placeholder {
     text-align: center;
   } */
 .m-5rem {
-    margin: 0 .5rem
+    margin: 0 0.5rem;
 }
 
 .noen::placeholder {
@@ -112,12 +111,12 @@ input[type=number]:out-of-range {
 }
 
 .leftBorder {
-    padding: .3rem;
+    padding: 0.3rem;
     border-left: 1px solid gray;
 }
 
 .rightBorder {
-    padding: .3rem;
+    padding: 0.3rem;
     border-right: 1px solid gray;
 }
 
@@ -127,7 +126,7 @@ input[type=number]:out-of-range {
 
 .productForm select {
     /* width: 25%; */
-    margin: .5rem 0;
+    margin: 0.5rem 0;
 }
 
 .thirdCategory {
@@ -158,17 +157,14 @@ input[type=number]:out-of-range {
 }
 
 .sizesDiv h5 {
-    margin: auto .5rem !important;
+    margin: auto 0.5rem !important;
 }
-
-
 
 .radioBtns {
     display: flex;
     flex-direction: column;
     margin: 1rem 1rem;
     line-height: 2rem;
-
 }
 
 .discountSection {
@@ -182,19 +178,19 @@ input[type=number]:out-of-range {
 }
 
 #sizesInput {
-    margin: .5rem 0;
+    margin: 0.5rem 0;
 }
 
 .description {
     display: flex;
     flex-direction: row;
     width: 100%;
-    justify-content: space-around
+    justify-content: space-around;
 }
 
 .description div {
     width: 80%;
-    margin: 1rem
+    margin: 1rem;
 }
 
 .quantity {
@@ -206,7 +202,6 @@ input[type=number]:out-of-range {
     padding: 0 1rem;
     display: flexbox !important;
     justify-content: space-between !important;
-
 }
 
 .upload {
@@ -232,7 +227,7 @@ input[type=number]:out-of-range {
     display: flex;
     justify-content: center;
     align-items: center;
-    margin: 0 .5rem;
+    margin: 0 0.5rem;
 }
 
 /* .productPictures div img{
@@ -272,7 +267,6 @@ input[type=number]:out-of-range {
     border-radius: 0.3rem;
     cursor: pointer;
     /* margin-top: 1rem; */
-
 }
 
 .productRender {
@@ -286,7 +280,7 @@ input[type=number]:out-of-range {
 .productTitles {
     display: flex;
     justify-content: space-between;
-    padding: .5rem 0;
+    padding: 0.5rem 0;
 }
 
 .sizesTable {
@@ -298,7 +292,6 @@ input[type=number]:out-of-range {
 .sizesTable th {
     border: 1px solid black;
     width: 9rem;
-
 }
 
 .productsRender h6 {
@@ -320,13 +313,10 @@ input[type=number]:out-of-range {
 
 .productbtn:nth-child(2) {
     max-width: 50%;
-
-
 }
 
 .productbtn:nth-child(2) form {
     width: 100%;
-
 }
 
 /* .productbtn:nth-child(2) form fieldset{
@@ -335,7 +325,6 @@ input[type=number]:out-of-range {
     justify-content: space-between; 
     
  } */
-
 
 .productStatusHead {
     padding: 1rem;
@@ -346,7 +335,6 @@ input[type=number]:out-of-range {
     flex-direction: column;
     margin-top: 1rem;
     background-color: transparent;
-
 }
 
 .fieldset {
@@ -368,15 +356,15 @@ input[type=number]:out-of-range {
     font-size: medium;
     font-weight: bold;
 
-    padding: .5rem;
+    padding: 0.5rem;
 }
 
 .discounRate {
     width: 40%;
     margin: 0 1rem;
     border: 1px solid rgba(149, 148, 148, 0.803);
-    border-radius: .3rem;
-    padding: .3rem
+    border-radius: 0.3rem;
+    padding: 0.3rem;
 }
 
 .switchLabel,
@@ -403,15 +391,13 @@ input[type=number]:out-of-range {
     margin: auto;
     padding: 0 1rem;
     /* justify-content: flex-start */
-
 }
 
 .productUl li {
     width: 70%;
-    margin: .5rem 0;
+    margin: 0.5rem 0;
     display: flex;
     justify-content: space-between;
-
 }
 
 .productUl li input {
@@ -434,7 +420,7 @@ input[type=number]:out-of-range {
 }
 
 .SQForm h6 strong {
-    font-family: "Helvetica Neue", Helvetica, Arial;
+    font-family: 'Helvetica Neue', Helvetica, Arial;
 }
 
 .SQForm h6 {
@@ -462,22 +448,9 @@ input[type=number]:out-of-range {
     display: none;
 } */
 
-.floating-dropdown-hide {
-    /* display: none !important ; */
-    position: absolute;
-    visibility: hidden;
-}
 
 /* .dropdown-input:focus +  */
 
-.floating-dropdown-show {
-    position: absolute;
-    overflow-y: scroll;
-    max-height: 10rem;
-    width: 13rem;
-    z-index: 10;
-    visibility: visible;
-}
 
 
 
@@ -496,30 +469,66 @@ input[type=number]:out-of-range {
     background-color: #fff;
     border: gray solid 1px;
     border-radius: 2rem;
-
 }
 
 .search-dropdown {
     position: relative;
+    right: 0;
+    display: flex !important;
+    flex-direction: column;
+    flex: 1 1 100%;
+    // width: fit-content;
 
-    right: 0
+    .floating-dropdown {
+        position: absolute;
+        overflow-y: auto;
+        max-height: 10rem;
+        width: 100%;
+        left: 0;
+        z-index: 10;
+        top: 100%;
+    }
+
+    .end-adornment {
+        position: absolute;
+        right: 0.7rem;
+        top: 0;
+        display: flex;
+        align-items: center;
+        height: 100%;
+    }
+
+    .selected-items {
+        display: flex;
+        flex-wrap: wrap;
+        overflow: hidden;
+        max-width: 80%;
+
+        /* flex: 1 0 100%; */
+        span.chip {
+            background-color: #ebedef;
+            border-radius: 10px;
+            padding: 3px;
+            font-size: small;
+        }
+
+    }
 }
+
+
 
 .overflow-x {
     overflow-x: scroll;
-}
-
-.search-dropdown {
-    position: relative;
 }
 
 .move {
     cursor: move;
 }
 
-.paginator{
-   max-width: 100%;
+.paginator {
+    max-width: 100%;
 }
+
 /* .body{
     position: relative;
 } */
@@ -527,12 +536,10 @@ input[type=number]:out-of-range {
 .document {
     margin: auto;
     background-color: blueviolet;
-    padding: .5rem;
+    padding: 0.5rem;
     border-radius: 7px;
     color: #fff !important;
     cursor: pointer;
-
-
 }
 
 .document:hover {
@@ -546,7 +553,6 @@ input[type=number]:out-of-range {
     flex-direction: column;
     row-gap: 1rem;
 }
-
 
 .text-align-right {
     text-align: right !important;
@@ -564,12 +570,22 @@ input[type=number]:out-of-range {
     width: 15rem !important;
 }
 
-.notification-list{
+.notification-list {
     max-height: 20rem;
-    overflow-y: scroll;
+    overflow-y: auto;
+    width: 15rem;
 }
 
 .lg-spinner {
     height: 3rem !important;
     width: 3rem !important;
+}
+
+.dropdown-input {
+    all: unset !important;
+    width: 85% !important;
+}
+
+.dropdown-input::placeholder {
+    text-overflow: ellipsis;
 }
