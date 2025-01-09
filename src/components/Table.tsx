@@ -1,5 +1,5 @@
-import React, { useState, useEffect, Children, Component } from "react";
-import Paginator from "./Paginator";
+import React, { useState, useEffect, Children, Component } from 'react'
+import Paginator from './Paginator'
 import {
   CTable,
   CTableHead,
@@ -16,52 +16,52 @@ import {
   CButton,
   CTooltip,
   CFormInput,
-} from "@coreui/react";
-import _ from "lodash";
-import PropTypes from "prop-types";
-import CIcon from "@coreui/icons-react";
-import { cilCheck, cilPen, cilX } from "@coreui/icons";
-import TableEditCell from "./TableEditCell";
-import { GetFunctionType, ParamsType } from "src/types";
-import { InputType } from "src/enums";
-import LoadingSpinner from "./LoadingSpinner";
+} from '@coreui/react'
+import _ from 'lodash'
+import PropTypes from 'prop-types'
+import CIcon from '@coreui/icons-react'
+import { cilCheck, cilPen, cilX } from '@coreui/icons'
+import TableEditCell from './TableEditCell'
+import { GetFunctionType, ParamsType } from 'src/types'
+import { InputType } from 'src/enums'
+import LoadingSpinner from './LoadingSpinner'
 
 export type ColumnType = {
-  header: string;
-  field?: string;
-  body?: React.FC<any> | ((a: any) => React.JSX.Element);
+  header: string
+  field?: string
+  body?: React.FC<any> | ((a: any) => React.JSX.Element)
   edit?:
     | {
-        inputType: Exclude<InputType, "dropdown">;
+        inputType: Exclude<InputType, 'dropdown'>
       }
     | {
-        inputType: InputType.DROPDOWN;
-        options: { value: string; name: string }[];
-      };
-};
+        inputType: InputType.DROPDOWN
+        options: { value: string; name: string }[]
+      }
+}
 type PropTypes = {
-  updateLoading?: React.Dispatch<React.SetStateAction<boolean>>;
-  params?: { limit?: number; offset?: number } & {};
-  count: number;
-  columns: ColumnType[];
-  data: { id?: string }[];
-  changeData?: GetFunctionType | Function;
-  cookieName?: string;
-  style?: React.CSSProperties;
-  emptyMessage?: string;
-  checkbox?: boolean;
-  onSelect?: React.Dispatch<React.SetStateAction<any[]>>;
-  updateParams?: React.Dispatch<React.SetStateAction<{}>>;
-  loading?: boolean;
-  displayedItems?: boolean;
-  pagination?: boolean;
-  editable?: boolean | undefined;
-  editFn?: Function;
-  Actions?: typeof Component | ((a: any) => React.JSX.Element);
-  onPageChange?: (page: number) => void;
-  pageNumber?: number;
-  pageSize?: number;
-};
+  updateLoading?: React.Dispatch<React.SetStateAction<boolean>>
+  params?: { limit?: number; offset?: number } & {}
+  count: number
+  columns: ColumnType[]
+  data: { id?: string }[]
+  changeData?: GetFunctionType | Function
+  cookieName?: string
+  style?: React.CSSProperties
+  emptyMessage?: string
+  checkbox?: boolean
+  onSelect?: React.Dispatch<React.SetStateAction<any[]>>
+  updateParams?: React.Dispatch<React.SetStateAction<{}>>
+  loading?: boolean
+  displayedItems?: boolean
+  pagination?: boolean
+  editable?: boolean | undefined
+  editFn?: Function
+  Actions?: typeof Component | ((a: any) => React.JSX.Element)
+  onPageChange?: (page: number) => void
+  pageNumber?: number
+  pageSize?: number
+}
 export const Table = ({
   updateLoading,
   params,
@@ -85,68 +85,64 @@ export const Table = ({
   pageNumber,
   pageSize,
 }: PropTypes) => {
-  const [selected, setSelected] = useState<any[]>([]);
-  const [onEdit, setOnEdit] = useState<string | null | number>("");
-  const [item, setItem] = useState<{}>({});
+  const [selected, setSelected] = useState<any[]>([])
+  const [onEdit, setOnEdit] = useState<string | null | number>('')
+  const [item, setItem] = useState<{}>({})
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.checked) {
-      setSelected((x) => [...x, e.target.value]);
+      setSelected((x) => [...x, e.target.value])
     } else {
-      setSelected((x) => x.filter((w) => w !== e.target.value));
+      setSelected((x) => x.filter((w) => w !== e.target.value))
     }
-  };
+  }
   const selectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.checked) {
-      setSelected(data.map((s) => s.id));
+      setSelected(data.map((s) => s.id))
     } else {
-      setSelected([]);
+      setSelected([])
     }
-  };
-  let displayItems: number[] = _.range(5, 100, 5);
+  }
+  let displayItems: number[] = _.range(5, 100, 5)
   useEffect(() => {
-    checkbox && onSelect?.(selected);
-  }, [selected]);
+    checkbox && onSelect?.(selected)
+  }, [selected])
 
   const changeHandler = (e: React.ChangeEvent<HTMLSelectElement>) => {
     updateParams?.((x) => {
-      changeData?.({ ...x, limit: Number(e.target.value) });
-      return { ...x, limit: Number(e.target.value) };
-    });
-  };
+      changeData?.({ ...x, limit: Number(e.target.value) })
+      return { ...x, limit: Number(e.target.value) }
+    })
+  }
 
-  const updateItem = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ): void => {
+  const updateItem = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>): void => {
     setItem((x) => {
-      return { ...x, [e.target.id]: e.target.value };
-    });
-  };
+      return { ...x, [e.target.id]: e.target.value }
+    })
+  }
   const editClick = () => {
-    editFn && Promise.all([editFn(item)]).then(() => setOnEdit(""));
-  };
+    editFn && Promise.all([editFn(item)]).then(() => setOnEdit(''))
+  }
   if (loading) {
-    return <LoadingSpinner />;
+    return <LoadingSpinner />
   }
   return (
     <>
-      <CRow className=" overflow-x-auto ">
+      <CRow className=' overflow-x-auto '>
         <CCol xs={12}>
           <CTable style={style} striped>
             <CTableHead>
               <CTableRow>
                 {checkbox && (
                   <CTableDataCell>
-                    <CFormCheck onChange={selectAll} />
+                    <CFormCheck onChange={selectAll} checked={selected.length === data.length}/>
                   </CTableDataCell>
                 )}
                 {Children.toArray(
                   columns.map(({ header }) => (
-                    <CTableHeaderCell scope="col">{header}</CTableHeaderCell>
-                  ))
+                    <CTableHeaderCell scope='col'>{header}</CTableHeaderCell>
+                  )),
                 )}
-                {(editable || Actions) && (
-                  <CTableHeaderCell>Actions</CTableHeaderCell>
-                )}
+                {(editable || Actions) && <CTableHeaderCell>Actions</CTableHeaderCell>}
               </CTableRow>
             </CTableHead>
             <CTableBody>
@@ -170,24 +166,22 @@ export const Table = ({
                               {edit && edit.inputType ? (
                                 <TableEditCell
                                   type={edit.inputType}
-                                  id={field ? field : ""}
+                                  id={field ? field : ''}
                                   onChange={updateItem}
                                   value={
                                     field && item[field as keyof typeof item]
                                       ? item[field as keyof typeof item]
-                                      : ""
+                                      : ''
                                   }
                                   options={
-                                    edit.inputType === InputType.DROPDOWN
-                                      ? edit.options
-                                      : []
+                                    edit.inputType === InputType.DROPDOWN ? edit.options : []
                                   }
                                 />
                               ) : (
-                                item[field as keyof typeof item] ?? "-"
+                                item[field as keyof typeof item] ?? '-'
                               )}
                             </CTableDataCell>
-                          );
+                          )
                         }
                         return Body ? (
                           <CTableDataCell>
@@ -198,50 +192,47 @@ export const Table = ({
                             {String(
                               field && d[field as keyof typeof d]
                                 ? d[field as keyof typeof d]
-                                : "-"
+                                : '-',
                             )}
                           </CTableDataCell>
-                        );
-                      })
+                        )
+                      }),
                     )}
                     {editable && (
                       <CTableDataCell>
                         {i === onEdit ? (
                           <>
-                            <CTooltip content="confirm">
-                              <CButton color="success" onClick={editClick}>
+                            <CTooltip content='confirm'>
+                              <CButton color='success' onClick={editClick}>
                                 <CIcon icon={cilCheck} />
                               </CButton>
                             </CTooltip>
-                            <CTooltip content="cancel">
-                              <CButton
-                                color="danger"
-                                onClick={() => setOnEdit("")}
-                              >
+                            <CTooltip content='cancel'>
+                              <CButton color='danger' onClick={() => setOnEdit('')}>
                                 <CIcon icon={cilX} />
                               </CButton>
                             </CTooltip>
                           </>
                         ) : (
-                          <>
-                            <CTooltip content="edit">
+                          <div className=' d-flex gap-1'>
+                            <CTooltip content='edit'>
                               <CButton
-                                color="secondary"
+                                color='secondary'
                                 onClick={() => {
-                                  setOnEdit(i);
-                                  setItem(d);
+                                  setOnEdit(i)
+                                  setItem(d)
                                 }}
                               >
                                 <CIcon icon={cilPen} />
                               </CButton>
                             </CTooltip>
                             {Actions && <Actions {...d} />}
-                          </>
+                          </div>
                         )}
                       </CTableDataCell>
                     )}
                   </CTableRow>
-                ))
+                )),
               )}
             </CTableBody>
           </CTable>
@@ -251,8 +242,8 @@ export const Table = ({
             (data.length === 0 ? (
               <span>{emptyMessage ?? `there's no data`}</span>
             ) : (
-              <CRow className="justify-content-between align-items-end w-100">
-                <CCol xs="auto">
+              <CRow className='justify-content-between align-items-end w-100'>
+                <CCol xs='auto'>
                   <Paginator
                     params={params}
                     count={count}
@@ -266,23 +257,15 @@ export const Table = ({
                   />
                 </CCol>
                 {displayedItems && (
-                  <CCol xs="auto">
-                    <CRow className="align-items-center">
-                      <CCol xs="auto">
-                        <CFormLabel htmlFor="display">
-                          Displayed Items
-                        </CFormLabel>
+                  <CCol xs='auto'>
+                    <CRow className='align-items-center'>
+                      <CCol xs='auto'>
+                        <CFormLabel htmlFor='display'>Displayed Items</CFormLabel>
                       </CCol>
-                      <CCol xs="auto">
-                        <CFormSelect
-                          name="display"
-                          onChange={changeHandler}
-                          value={params?.limit}
-                        >
+                      <CCol xs='auto'>
+                        <CFormSelect name='display' onChange={changeHandler} value={params?.limit}>
                           {Children.toArray(
-                            displayItems.map((val) => (
-                              <option value={val}>{val}</option>
-                            ))
+                            displayItems.map((val) => <option value={val}>{val}</option>),
                           )}
                         </CFormSelect>
                       </CCol>
@@ -294,7 +277,7 @@ export const Table = ({
         </CCol>
       </CRow>
     </>
-  );
-};
+  )
+}
 
-export default Table;
+export default Table

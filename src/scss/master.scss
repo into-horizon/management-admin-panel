@@ -477,6 +477,8 @@ input[type='number']:out-of-range {
     display: flex !important;
     flex-direction: column;
     flex: 1 1 100%;
+    min-width: 10rem;
+    min-height: 2rem;
     // width: fit-content;
 
     .floating-dropdown {
@@ -503,13 +505,17 @@ input[type='number']:out-of-range {
         flex-wrap: wrap;
         overflow: hidden;
         max-width: 80%;
+        gap: 5px;
 
         /* flex: 1 0 100%; */
         span.chip {
             background-color: #ebedef;
             border-radius: 10px;
-            padding: 3px;
+            padding: 5px 7px;
             font-size: small;
+            display: flex;
+            flex-wrap: nowrap;
+            align-items: center;
         }
 
     }

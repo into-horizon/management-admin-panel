@@ -1,7 +1,14 @@
-import React, { useState, useEffect, Children, ChangeEvent, Dispatch, useRef } from 'react'
-import { CButton, CFormInput, CListGroup, CListGroupItem, CSpinner } from '@coreui/react'
+import React, { useState, useEffect, Children, ChangeEvent, Dispatch, useRef, FC } from 'react'
+import {
+  CCloseButton,
+  CFormCheck,
+  CFormInput,
+  CListGroup,
+  CListGroupItem,
+  CSpinner,
+} from '@coreui/react'
 import CIcon from '@coreui/icons-react'
-import { cilChevronBottom, cilX } from '@coreui/icons'
+import { cilChevronBottom } from '@coreui/icons'
 export type OptionType<T = string, P = string> = { title: T; id: P }
 
 type PropTypes = {
@@ -12,6 +19,7 @@ type PropTypes = {
   placeholder?: string
   delay?: number
   selectedValue?: {} | null
+  emptyMessage?: string
 } & (
   | { reset: boolean; resetCallback: Dispatch<React.SetStateAction<boolean>> }
   | { reset?: undefined; resetCallback?: undefined }
@@ -19,12 +27,12 @@ type PropTypes = {
   (
     | { multiple: true; selectedValue?: OptionType[]; onSelect: (d: OptionType[]) => void }
     | {
-        multiple?: false | undefined
+        multiple?: false
         selectedValue?: OptionType | null
         onSelect: (d: OptionType | null) => void
       }
   )
-const SearchDropdown = ({
+const SearchDropdown: FC<PropTypes> = ({
   options,
   onSelect,
   onChange,
@@ -34,16 +42,20 @@ const SearchDropdown = ({
   delay,
   multiple,
   selectedValue,
+  emptyMessage,
   ...props
-}: PropTypes) => {
+}) => {
   const [isListOpen, setIsListOpen] = useState(false)
   const [value, setValue] = useState<string | null | number>(null)
 
   const containerRef = useRef<HTMLDivElement | null>(null)
 
   const onSelectValue = (e: OptionType) => {
-    setValue(e.title)
-    onSelect(e)
+    if (multiple && selectedValue) {
+      onSelect(selectedValue?.concat(e))
+    } else {
+      onSelect(e as OptionType)
+    }
   }
   const onChangeValue = (e: ChangeEvent<HTMLInputElement>) => {
     setIsListOpen(true)
@@ -74,6 +86,12 @@ const SearchDropdown = ({
       window.removeEventListener('click', listVisibilityHandler)
     }
   }, [])
+  function getSelected(option: OptionType<string, string>): boolean | undefined {
+    if (Array.isArray(selectedValue)) {
+      return !!selectedValue.find((item) => item.id === option.id)
+    }
+  }
+
   return (
     <div className='search-dropdown form-control' ref={containerRef}>
       <div className='end-adornment'>
@@ -81,11 +99,7 @@ const SearchDropdown = ({
           <CSpinner color='secondary' size='sm' />
         ) : (
           <>
-            {!multiple && selectedValue && (
-              <CButton size='sm' color='transparent' onClick={() => onSelect(null)}>
-                <CIcon icon={cilX} size='sm' />
-              </CButton>
-            )}
+            {!multiple && selectedValue && <CCloseButton onClick={() => onSelect(null)} />}
 
             <CIcon icon={cilChevronBottom} color='red' size='sm' />
           </>
@@ -96,7 +110,13 @@ const SearchDropdown = ({
           {multiple ? (
             selectedValue?.map((item) => (
               <span className='chip' key={item.id}>
-                {item.title}
+                <strong>{item.title}</strong>
+                <CCloseButton
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    onSelect(selectedValue.filter((i) => i.id !== item.id))
+                  }}
+                />
               </span>
             ))
           ) : (
@@ -104,7 +124,7 @@ const SearchDropdown = ({
           )}
         </div>
       )}
-      {!multiple && !selectedValue && (
+      {((!multiple && !selectedValue) || multiple) && (
         <CFormInput
           className='dropdown-input'
           onChange={onChangeValue}
@@ -120,21 +140,46 @@ const SearchDropdown = ({
               ? options?.map((option) => (
                   <CListGroupItem
                     component='button'
-                    className='floating-dropdown-item'
+                    className='floating-dropdown-item position-relative'
                     type='button'
-                    onClick={() => onSelectValue(option)}
+                    onClick={(e) => {
+                      if (multiple) {
+                        e.stopPropagation()
+                      }
+                      !multiple && onSelectValue(option)
+                    }}
                   >
-                    {option.title}
+                    {multiple ? (
+                      <CFormCheck
+                        id={option.title}
+                        label={option.title}
+                        floatingLabel={option.title}
+                        checked={getSelected(option)}
+                        className=' position-absolute'
+                        hitArea='full'
+                        onChange={(e) =>
+                          e.target.checked
+                            ? onSelectValue(option)
+                            : onSelect(
+                                (selectedValue as Array<OptionType>).filter(
+                                  (i) => i.id !== option.id,
+                                ),
+                              )
+                        }
+                      />
+                    ) : (
+                      option.title
+                    )}
                   </CListGroupItem>
                 ))
-              : value && (
+              : value && !loading && (
                   <CListGroupItem
                     component='button'
                     className='floating-dropdown-item'
                     type='button'
                     disabled
                   >
-                    no results found
+                    {emptyMessage ?? ' no results found'}
                   </CListGroupItem>
                 ),
           )}

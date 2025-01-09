@@ -12,7 +12,7 @@ import {
 } from 'src/store/category'
 import AddCategoryModal from 'src/views/category/components/AddCategoryModal'
 import DeleteModal from 'src/components/DeleteModal'
-import { CButton, CCol, CForm, CFormInput, CRow, CTooltip } from '@coreui/react'
+import { CButton, CCol, CForm, CFormCheck, CFormInput, CRow, CTooltip } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import { cilTrash, cilSearch, cilFilterX } from '@coreui/icons'
 import Category from 'src/services/CategoryService'
@@ -93,13 +93,16 @@ const Child = () => {
   }
   const getParent = async (title: string) => {
     setLoading(true)
-    let {
-      data: { data },
-    } = await Category.getAllParentCategoires({
-      title: title,
-    })
-    setLoading(false)
-    setParentData(data)
+    try {
+      const {
+        data: { data },
+      } = await Category.getAllParentCategoires({
+        title: title,
+      })
+      setParentData(data)
+    } finally {
+      setLoading(false)
+    }
   }
   const onChange = (e: string) => {
     getParent(e)
@@ -111,9 +114,14 @@ const Child = () => {
       title: { value: string }
       reset(): void
     }
-    let data: { parent_id?: string; title?: string } = {}
-    selectedValue?.id && (data['parent_id'] = selectedValue.id)
-    target.title.value && (data['title'] = target.title.value)
+    const data: { parent_id?: string; title?: string } = {}
+
+    if (selectedValue?.id) {
+      data.parent_id = selectedValue.id
+    }
+    if (target.title.value) {
+      data.title = target.title.value
+    }
     dispatch(resetChildParams())
     dispatch(updateChildParams(data))
   }
@@ -144,7 +152,6 @@ const Child = () => {
   return (
     <>
       <AddCategoryModal action={addChildCategoryHandler} type='child' />
-      
       <FilterCard>
         <CForm onSubmit={submitHandler} onReset={resetFilter}>
           <CRow className='justify-content-center align-items-end'>
@@ -188,7 +195,7 @@ const Child = () => {
         data={data}
         count={count}
         columns={columns}
-        pageSize={10}
+        pageSize={childParams.limit}
         pageNumber={currentPage}
         loading={isLoading}
         editFn={updateChildCategory}
