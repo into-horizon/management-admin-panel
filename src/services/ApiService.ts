@@ -1,9 +1,8 @@
 import axios, { AxiosError, AxiosRequestHeaders } from 'axios'
 import cookie from 'react-cookies'
 import { ParamsType } from 'src/types'
-const api = process.env.REACT_APP_API
-const managementAPI = process.env.REACT_APP_MANAGEMENT_API
 import { isJwtExpired } from 'jwt-check-expiration'
+import { apiURL, managementApiURL } from 'src/enviroment'
 
 axios.defaults.headers.common.locale = 'en'
 axios.defaults.timeout = 20000
@@ -30,8 +29,8 @@ export default class ApiService {
         method: 'get',
         url:
           typeof path !== 'string' && path?.management
-            ? `${managementAPI}/${path.endpoint}`
-            : `${api}/${path ?? ''}`,
+            ? `${managementApiURL}/${path.endpoint}`
+            : `${apiURL}/${path ?? ''}`,
         params: this.getPopulatedStore(params),
         headers: header,
       })
@@ -51,8 +50,8 @@ export default class ApiService {
         method: 'post',
         url:
           typeof path !== 'string' && path.management
-            ? `${managementAPI}/${path.endpoint}`
-            : `${api}/${path}`,
+            ? `${managementApiURL}/${path.endpoint}`
+            : `${apiURL}/${path}`,
         data: data,
         headers: header,
         params: params,
@@ -73,8 +72,8 @@ export default class ApiService {
         method: 'put',
         url:
           typeof path !== 'string' && path.management
-            ? `${managementAPI}/${path.endpoint}`
-            : `${api}/${path}`,
+            ? `${managementApiURL}/${path.endpoint}`
+            : `${apiURL}/${path}`,
         params: params,
         data: data,
       })
@@ -94,8 +93,8 @@ export default class ApiService {
         method: 'patch',
         url:
           typeof path !== 'string' && path.management
-            ? `${managementAPI}/${path.endpoint}`
-            : `${api}/${path}`,
+            ? `${managementApiURL}/${path.endpoint}`
+            : `${apiURL}/${path}`,
         params: params,
         data: data,
       })
@@ -115,8 +114,8 @@ export default class ApiService {
         method: 'delete',
         url:
           typeof path !== 'string' && path.management
-            ? `${managementAPI}/${path.endpoint}`
-            : `${api}/${path}`,
+            ? `${managementApiURL}/${path.endpoint}`
+            : `${apiURL}/${path}`,
         data: data,
         params: params,
       })

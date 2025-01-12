@@ -10,7 +10,6 @@ import {
   CHeaderToggler,
   CNavLink,
   CNavItem,
-  CButton,
   CAlert,
   CListGroupItem,
   CListGroup,
@@ -18,17 +17,19 @@ import {
   CRow,
   CBadge,
   CSpinner,
+  CImage,
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
-import { cilBell, cilEnvelopeOpen, cilList, cilMenu } from '@coreui/icons'
+import { cilBell, cilMenu } from '@coreui/icons'
 
 import { AppBreadcrumb } from './index'
 import { AppHeaderDropdown } from './header/index'
-import { logo } from 'src/assets/brand/logo'
+// import { logo } from 'src/assets/brand/logo'
 import { populateStore } from 'src/store/filter'
 import { RootState } from 'src/store'
 import _ from 'lodash'
 import { getNotifications, updateNotificationsAsSeen } from 'src/store/notification'
+import { logo } from 'src/enviroment'
 
 type PropTypes = {
   populateStore: () => void
@@ -98,7 +99,7 @@ const AppHeader = ({ populateStore }: PropTypes) => {
           <CIcon icon={cilMenu} size='lg' />
         </CHeaderToggler>
         <CHeaderBrand className='mx-auto d-md-none'>
-          <CIcon icon={logo} height={48} />
+          <CImage src={logo} height={48} />
         </CHeaderBrand>
         <CHeaderNav className='d-none d-md-flex me-auto'>
           <CNavItem>
