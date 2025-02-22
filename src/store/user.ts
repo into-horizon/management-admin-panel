@@ -1,36 +1,66 @@
-import { createSlice } from '@reduxjs/toolkit'
+import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
 
 import User from '../services/User'
 import { updateToast } from './globalToasts'
 import { AppDispatch, RootState } from '.'
 import { DialogResponseTypes } from '../enums'
-import { ParamsType, UserType } from '../types'
+import { ParamsType, UserResponse, UserType } from '../types'
 
+const initialState: UserResponse & { isLoading: boolean } & { params: ParamsType } = {
+  count: 0,
+  data: [],
+  isLoading: false,
+  params: { limit: 10, offset: 0 },
+}
 const user = createSlice({
   name: 'user',
-  initialState: { count: 0, data: [] },
+  initialState,
   reducers: {
     addData(state, action) {
       return { ...state, ...action.payload }
     },
+    updateParams(state, action) {
+      state.params = action.payload
+    },
+    resetParams(state) {
+      state.params = initialState.params
+    },
+  },
+  extraReducers: (builder) => {
+    builder.addCase(getUsersHandler.pending, (state) => {
+      state.isLoading = true
+    })
+    builder.addCase(
+      getUsersHandler.fulfilled,
+      (state, { payload }: PayloadAction<UserResponse>) => {
+        state.isLoading = false
+        state.data = payload.data
+        state.count = payload.count
+      },
+    )
+    builder.addCase(getUsersHandler.rejected, (state) => {
+      state.isLoading = false
+    })
   },
 })
 
-export const getUsersHandler = (payload: ParamsType) => async (dispatch: AppDispatch) => {
-  try {
-    const { status, data, message } = await User.getUsers(payload)
-    if (status === 200) {
-      dispatch(addData(data))
-    } else
-      dispatch(updateToast({ status: status, message: message, type: DialogResponseTypes.ERROR }))
-  } catch (error) {
-    if (error instanceof Error) {
-      dispatch(
-        updateToast({ status: 403, message: error.message, type: DialogResponseTypes.ERROR }),
-      )
+export const getUsersHandler = createAsyncThunk<UserResponse, void>(
+  'user/getUsers',
+  async (_, { dispatch, rejectWithValue, getState }) => {
+    try {
+      const { params } = (getState() as RootState).user
+      const data = await User.getUsers(params)
+      return data
+    } catch (error) {
+      if (error instanceof Error) {
+        dispatch(
+          updateToast({ status: 403, message: error.message, type: DialogResponseTypes.ERROR }),
+        )
+      }
+      return rejectWithValue((error as Error).message)
     }
-  }
-}
+  },
+)
 
 export const updateUserHandler =
   (payload: UserType) => async (dispatch: AppDispatch, state: () => RootState) => {
@@ -84,4 +114,4 @@ export const updateProfileHandler =
 
 export default user.reducer
 
-export const { addData } = user.actions
+export const { addData, updateParams, resetParams } = user.actions

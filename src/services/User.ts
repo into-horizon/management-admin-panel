@@ -1,4 +1,4 @@
-import { ParamsType, UserType } from '../types'
+import { ParamsType, UserResponse, UserType } from '../types'
 import ApiService from './ApiService'
 
 class User extends ApiService {
@@ -11,12 +11,7 @@ class User extends ApiService {
   }
 
   async getUsers(data: ParamsType) {
-    let result = await this.post<{
-      data: UserType[]
-      count: number
-      status?: number
-      message?: string
-    }>(`${this.path}/user`, data)
+    let result = await this.post<UserResponse>(`${this.path}/user`, data)
     return result
   }
 

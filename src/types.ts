@@ -387,3 +387,8 @@ export type NotificationType = {
   role: string
   type: string
 }
+
+export interface UserResponse {
+  data: UserType[]
+  count: number
+}

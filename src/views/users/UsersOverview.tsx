@@ -8,9 +8,15 @@ import {
   CFormSelect,
   CFormLabel,
 } from '@coreui/react'
-import React, { useState, FormEvent } from 'react'
-import { connect, useSelector } from 'react-redux'
-import { getUsersHandler, updateProfileHandler, updateUserHandler } from '../../store/user'
+import React, { useState, FormEvent, useEffect } from 'react'
+import { connect, useDispatch, useSelector } from 'react-redux'
+import {
+  getUsersHandler,
+  updateProfileHandler,
+  updateUserHandler,
+  resetParams,
+  updateParams,
+} from '../../store/user'
 import CIcon from '@coreui/icons-react'
 import { cilSearch, cilFilterX } from '@coreui/icons'
 import EditableCell from '../../components/EditableCell'
@@ -19,22 +25,17 @@ import Table, { ColumnType } from '../../components/Table'
 import { InputType } from '../../enums'
 import { RootState } from '../../store'
 import { GetFunctionType, UserType, ParamsType } from '../../types'
+import { updateParamsHelper } from '../../services/helpers'
 
 type PropTypes = {
   getUsersHandler: GetFunctionType
   updateProfileHandler: (payload: UserType) => Promise<void>
   updateUserHandler: (payload: UserType) => Promise<void>
 }
-export const UsersOverview = ({
-  getUsersHandler,
-  updateProfileHandler,
-  updateUserHandler,
-}: PropTypes) => {
-  const { count, data } = useSelector((state: RootState) => state.user)
-  const [params, setParams] = useState<ParamsType>({ limit: 10, offset: 0 })
-  // const Verified =  data => data.Verified ? <span>yes</span>: <span>no</span>
+export const UsersOverview = ({ updateProfileHandler, updateUserHandler }: PropTypes) => {
+  const { count, data, isLoading, params } = useSelector((state: RootState) => state.user)
+  const dispatch = useDispatch()
 
-  const [loading, setLoading] = useState(false)
   const columns: ColumnType[] = [
     {
       header: 'first name',
@@ -91,8 +92,7 @@ export const UsersOverview = ({
 
   const submitHandler = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    setLoading(true)
-    let data: ParamsType = { limit: 10, offset: 0 }
+    let data: ParamsType = {}
     type InputTypes = {
       query: HTMLInputElement
       status: HTMLSelectElement
@@ -101,16 +101,24 @@ export const UsersOverview = ({
     const target = e.target as typeof e.target & InputTypes
     target.query.value && (data['query'] = target.query.value)
     target.status.value !== 'false' && (data['status'] = target.status.value)
-    target.verified.value !== '' && (data['verified'] = target.verified.value)
+    target.verified.value !== '' &&
+      (data['verified'] = target.verified.value === 'true' ? true : false)
 
-    setParams(data)
-    getUsersHandler(data).then(() => setLoading(false))
+    dispatch(updateParams({ ...params, ...data }))
   }
   const resetTable = (e: FormEvent<HTMLFormElement>) => {
     const target = e.target as typeof e.target & { reset(): void }
     target.reset()
-    setParams({ limit: 10, offset: 0 })
+    dispatch(resetParams())
   }
+
+  function pageChangeHandler(page: number): void {
+    dispatch(updateParams(updateParamsHelper(params, page)))
+  }
+
+  useEffect(() => {
+    dispatch(getUsersHandler())
+  }, [params])
 
   return (
     <>
@@ -166,11 +174,11 @@ export const UsersOverview = ({
         params={params}
         count={count}
         data={data}
-        changeData={getUsersHandler}
+        pageNumber={params.offset}
+        pageSize={params.limit}
+        onPageChange={pageChangeHandler}
         columns={columns}
-        loading={loading}
-        updateParams={setParams}
-        updateLoading={setLoading}
+        loading={isLoading}
         cookieName='users'
         editable
         editFn={updateUserHandler}
@@ -180,7 +188,6 @@ export const UsersOverview = ({
 }
 
 const mapDispatchToProps = {
-  getUsersHandler,
   updateProfileHandler,
   updateUserHandler,
 }
