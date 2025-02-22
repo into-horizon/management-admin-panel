@@ -1,27 +1,24 @@
-import React, { useState, useEffect, Children, FormEvent, memo } from 'react'
+import React, { useState, useEffect, FormEvent, memo } from 'react'
 import {
   CButton,
   CForm,
   CFormInput,
   CModal,
-  CModalBody,
   CModalFooter,
   CModalHeader,
   CModalTitle,
   CRow,
   CCol,
   CFormTextarea,
-  CTooltip,
 } from '@coreui/react'
-import Category from 'src/services/CategoryService'
-import SelectSearch from 'react-select-search'
 import CIcon from '@coreui/icons-react'
 import { cilPlus } from '@coreui/icons'
 import SearchDropdown from '../../../components/SearchDropdown'
-import { getParentCategoriesHandler, getChildCategoriesHandler } from 'src/store/category'
 import { connect, useSelector } from 'react-redux'
-import { RootState } from 'src/store'
-import { ParentCategoriesType, ChildAndGrandCategoriesType } from 'src/types'
+import Category from '../../../services/CategoryService'
+import { RootState } from '../../../store'
+import { getParentCategoriesHandler, getChildCategoriesHandler } from '../../../store/category'
+import { ParentCategoriesType, ChildAndGrandCategoriesType } from '../../../types'
 
 type PropTypes = {
   action: (d: any) => void

@@ -5,7 +5,7 @@
 // import { CButton, CSpinner } from '@coreui/react'
 // import { updateStorePicture } from '../store/auth'
 // import {If,Then,Else} from 'react-if'
-// import { RootState } from 'src/store';
+// import { RootState } from '../store';
 
 // type PropTypes ={
 //     login: {}
@@ -15,10 +15,10 @@
 //     const [type, setType] = useState('hidden')
 //     const [text, setText] = useState('update')
 //     const [loading, setLoading] = useState(false)
-  
+
 //     const { t } = useTranslation('translation', { keyPrefix: 'profile' });
 //     const { login, updateStorePicture } = props
-    
+
 //     const changeHandler = (e : ChangeEvent<HTMLInputElement>) => {
 //         setLoading(!loading)
 //         let formData = new FormData();
@@ -71,9 +71,7 @@
 import React from 'react'
 
 function StorePicture() {
-  return (
-    <div>StorePicture</div>
-  )
+  return <div>StorePicture</div>
 }
 
 export default StorePicture

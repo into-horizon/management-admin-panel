@@ -1,6 +1,6 @@
-import React, { useState, useEffect, FormEvent } from 'react'
-import { connect, useDispatch } from 'react-redux'
-import { createDiscountCode } from 'src/store/discountCode'
+import React, { useState, FormEvent } from 'react'
+import { useDispatch } from 'react-redux'
+// import { createDiscountCode } from '../store/discountCode'
 import CIcon from '@coreui/icons-react'
 import { cilPlus } from '@coreui/icons'
 import {
@@ -14,7 +14,9 @@ import {
   CCol,
   CFormInput,
 } from '@coreui/react'
-import { DiscountCodeType, GetFunctionType, ParamsType } from 'src/types'
+import { DiscountCodeType, GetFunctionType, ParamsType } from '../../types'
+import { createDiscountCode } from '../../store/discountCode'
+// import { DiscountCodeType, GetFunctionType, ParamsType } from '../types'
 
 type PropTypes = {
   callback: GetFunctionType
@@ -94,43 +96,43 @@ const CreateCodeModal = ({ callback, params }: PropTypes) => {
         <CIcon icon={cilPlus} />
         Create Discount Code
       </CButton>
-      <CModal visible={visible} alignment="center" onClose={() => setVisible(false)}>
+      <CModal visible={visible} alignment='center' onClose={() => setVisible(false)}>
         <CModalHeader>
           <CModalTitle>Create Discount Code</CModalTitle>
         </CModalHeader>
         <CForm onSubmit={submitHandler} onReset={onClose}>
-          <CRow className="justify-content-center align-content-center" xs={{ gutter: 3 }}>
-            <CCol xs="auto">
-              <CFormInput placeholder="code title" id="discount_code" />
+          <CRow className='justify-content-center align-content-center' xs={{ gutter: 3 }}>
+            <CCol xs='auto'>
+              <CFormInput placeholder='code title' id='discount_code' />
             </CCol>
-            <CCol xs="auto">
+            <CCol xs='auto'>
               <CFormInput
-                type="date"
-                id="expiry_date"
-                placeholder="expiry date"
+                type='date'
+                id='expiry_date'
+                placeholder='expiry date'
                 min={`${new Date().getFullYear()}-${
                   months[new Date().getMonth()]
                 }-${new Date().getDate()}`}
               />
             </CCol>
-            <CCol xs="auto">
-              <CFormInput type="number" id="min_order_amount" placeholder="min order amount" />
+            <CCol xs='auto'>
+              <CFormInput type='number' id='min_order_amount' placeholder='min order amount' />
             </CCol>
-            <CCol xs="auto">
+            <CCol xs='auto'>
               <CFormInput
-                type="number"
-                id="max_counter"
-                step="1"
+                type='number'
+                id='max_counter'
+                step='1'
                 min={1}
-                placeholder="max counter"
+                placeholder='max counter'
               />
             </CCol>
             <CCol xs={10}>
               <CFormInput
-                type="number"
-                id="discount"
+                type='number'
+                id='discount'
                 step={0.01}
-                placeholder="discount amount or percentage"
+                placeholder='discount amount or percentage'
                 min={0}
                 value={value}
                 onChange={(e) => setValue(parseInt(e.target.value))}
@@ -138,28 +140,28 @@ const CreateCodeModal = ({ callback, params }: PropTypes) => {
             </CCol>
             <CCol xs={10}>
               <CFormInput
-                type="number"
-                id="max_discount"
-                placeholder="max discount amount"
+                type='number'
+                id='max_discount'
+                placeholder='max discount amount'
                 min={0}
                 required={value < 1}
                 disabled={value >= 1}
               />
             </CCol>
-            <CCol xs="auto">
+            <CCol xs='auto'>
               <CFormInput
-                type="number"
-                id="number_of_time"
+                type='number'
+                id='number_of_time'
                 step={1}
                 min={1}
-                placeholder="usage per user"
+                placeholder='usage per user'
               />
             </CCol>
           </CRow>
 
           <CModalFooter>
-            <CButton type="submit">submit</CButton>
-            <CButton color="secondary" type="reset">
+            <CButton type='submit'>submit</CButton>
+            <CButton color='secondary' type='reset'>
               close
             </CButton>
           </CModalFooter>

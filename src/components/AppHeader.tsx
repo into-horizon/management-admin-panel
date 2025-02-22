@@ -24,12 +24,12 @@ import { cilBell, cilMenu } from '@coreui/icons'
 
 import { AppBreadcrumb } from './index'
 import { AppHeaderDropdown } from './header/index'
-// import { logo } from 'src/assets/brand/logo'
-import { populateStore } from 'src/store/filter'
-import { RootState } from 'src/store'
+// import { logo } from '../assets/brand/logo'
+import { populateStore } from '../store/filter'
+import { RootState } from '../store'
 import _ from 'lodash'
-import { getNotifications, updateNotificationsAsSeen } from 'src/store/notification'
-import { logo } from 'src/enviroment'
+import { getNotifications, updateNotificationsAsSeen } from '../store/notification'
+import { logo } from '../environment'
 
 type PropTypes = {
   populateStore: () => void

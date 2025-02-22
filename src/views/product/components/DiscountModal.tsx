@@ -1,5 +1,4 @@
-import React, { useState, useEffect, Fragment, ChangeEvent, FormEvent } from 'react'
-import { useSelector, connect, useDispatch } from 'react-redux'
+import React, { useState, Fragment, FormEvent } from 'react'
 import {
   CButton,
   CFormInput,
@@ -16,7 +15,7 @@ import Switch from 'react-switch'
 import CIcon from '@coreui/icons-react'
 import { cilCash } from '@coreui/icons'
 import { useTranslation } from 'react-i18next'
-import { ProductType } from 'src/types'
+import { ProductType } from '../../../types'
 
 type PropTypes = {
   data: ProductType

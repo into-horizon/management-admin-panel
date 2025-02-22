@@ -9,9 +9,9 @@
 
 module.exports = {
   collectCoverageFrom: [
-    'src/**/*.{js,jsx}',
+    '@/**/*.{js,jsx}',
     '!**/*index.js',
-    '!src/serviceWorker.js',
-    '!src/polyfill.js',
+    '!@/serviceWorker.js',
+    '!@/polyfill.js',
   ],
 }

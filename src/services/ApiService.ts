@@ -1,8 +1,8 @@
 import axios, { AxiosError, AxiosRequestHeaders } from 'axios'
 import cookie from 'react-cookies'
-import { ParamsType } from 'src/types'
+import { ParamsType } from '../types'
 import { isJwtExpired } from 'jwt-check-expiration'
-import { apiURL, managementApiURL } from 'src/enviroment'
+import { apiURL, managementApiURL } from '../environment'
 
 axios.defaults.headers.common.locale = 'en'
 axios.defaults.timeout = 20000
@@ -19,106 +19,90 @@ export default class ApiService {
       return config
     })
   }
-  async get(
+  async get<T = any>(
     path: { management: boolean; endpoint: string } | string,
     params?: ParamsType,
-    header?: AxiosRequestHeaders,
   ) {
     try {
-      let res = await axios({
-        method: 'get',
-        url:
-          typeof path !== 'string' && path?.management
-            ? `${managementApiURL}/${path.endpoint}`
-            : `${apiURL}/${path ?? ''}`,
-        params: this.getPopulatedStore(params),
-        headers: header,
-      })
+      let res = await axios.get<T>(
+        typeof path !== 'string' && path?.management
+          ? `${managementApiURL}/${path.endpoint}`
+          : `${apiURL}/${path ?? ''}`,
+        { params: this.getPopulatedStore(params) },
+      )
+
       return res.data
     } catch (error: AxiosError | any) {
       throw new Error(error.response.message)
     }
   }
-  async post(
+  async post<T = any>(
     path: string | { management: boolean; endpoint: string },
-    data?: { [key: string]: any } | null | undefined,
+    data?: Record<string, any> | undefined | null,
     header?: AxiosRequestHeaders,
     params?: ParamsType,
   ) {
     try {
-      let res = await axios({
-        method: 'post',
-        url:
-          typeof path !== 'string' && path.management
-            ? `${managementApiURL}/${path.endpoint}`
-            : `${apiURL}/${path}`,
-        data: data,
-        headers: header,
-        params: params,
-      })
+      let res = await axios.post<T>(
+        typeof path !== 'string' && path.management
+          ? `${managementApiURL}/${path.endpoint}`
+          : `${apiURL}/${path}`,
+        data,
+        { headers: header, params: this.getPopulatedStore(params) },
+      )
       return res.data
     } catch (error: AxiosError | any) {
       throw new Error(error.response.message)
     }
   }
 
-  async update(
+  async put<T = any>(
     path: string | { management: boolean; endpoint: string },
     data: { [key: string]: any },
-    params?: ParamsType,
+    headers?: AxiosRequestHeaders,
   ) {
     try {
-      let res = await axios({
-        method: 'put',
-        url:
-          typeof path !== 'string' && path.management
-            ? `${managementApiURL}/${path.endpoint}`
-            : `${apiURL}/${path}`,
-        params: params,
-        data: data,
-      })
+      const res = await axios.put<T>(
+        typeof path !== 'string' && path.management
+          ? `${managementApiURL}/${path.endpoint}`
+          : `${apiURL}/${path}`,
+        data,
+        { headers },
+      )
       return res.data
     } catch (error: AxiosError | any) {
       throw new Error(error.response.message)
     }
   }
 
-  async patch(
+  async patch<T = any>(
     path: string | { management: boolean; endpoint: string },
     data: { [key: string]: any },
-    params?: ParamsType,
   ) {
     try {
-      let res = await axios({
-        method: 'patch',
-        url:
-          typeof path !== 'string' && path.management
-            ? `${managementApiURL}/${path.endpoint}`
-            : `${apiURL}/${path}`,
-        params: params,
-        data: data,
-      })
+      const res = await axios.patch<T>(
+        typeof path !== 'string' && path.management
+          ? `${managementApiURL}/${path.endpoint}`
+          : `${apiURL}/${path}`,
+        data,
+      )
       return res.data
     } catch (error: AxiosError | any) {
       throw new Error(error.response.message)
     }
   }
 
-  async delete(
+  async delete<T = any>(
     path: string | { management: boolean; endpoint: string },
     data?: { [key: string]: any },
-    params?: ParamsType,
   ) {
     try {
-      let res = await axios({
-        method: 'delete',
-        url:
-          typeof path !== 'string' && path.management
-            ? `${managementApiURL}/${path.endpoint}`
-            : `${apiURL}/${path}`,
-        data: data,
-        params: params,
-      })
+      let res = await axios.delete<T>(
+        typeof path !== 'string' && path.management
+          ? `${managementApiURL}/${path.endpoint}`
+          : `${apiURL}/${path}`,
+        { data },
+      )
       return res.data
     } catch (error: AxiosError | any) {
       throw new Error(error.response.message)

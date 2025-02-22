@@ -13,8 +13,8 @@ import {
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import { cilPlus } from '@coreui/icons'
-import { addEmployee } from 'src/store/employee'
-import { EmployeeType } from 'src/types'
+import { addEmployee } from '../../../store/employee'
+import { EmployeeType } from '../../../types'
 
 const AddEmployee = () => {
   const [visible, setVisible] = useState(false)
@@ -53,46 +53,46 @@ const AddEmployee = () => {
   return (
     <>
       <CButton onClick={() => setVisible(true)}>
-        <CIcon icon={cilPlus} size="lg" />
+        <CIcon icon={cilPlus} size='lg' />
         Add Employee
       </CButton>
-      <CModal visible={visible} onClose={closeModal} alignment="center">
+      <CModal visible={visible} onClose={closeModal} alignment='center'>
         <CModalHeader>
           <CModalTitle>Add Employee</CModalTitle>
         </CModalHeader>
         <CForm onSubmit={submitHandler}>
-          <CRow xs={{ gutter: 3 }} className="justify-content-center m-1">
+          <CRow xs={{ gutter: 3 }} className='justify-content-center m-1'>
             <CCol xs={5}>
-              <CFormInput placeholder="first name" id="first_name" required />
+              <CFormInput placeholder='first name' id='first_name' required />
             </CCol>
             <CCol xs={5}>
-              <CFormInput placeholder="last name" id="last_name" required />
+              <CFormInput placeholder='last name' id='last_name' required />
             </CCol>
             <CCol xs={5}>
-              <CFormInput placeholder="email" id="email" required />
+              <CFormInput placeholder='email' id='email' required />
             </CCol>
             <CCol xs={5}>
-              <CFormInput placeholder="password" id="password" required />
+              <CFormInput placeholder='password' id='password' required />
             </CCol>
             <CCol xs={5}>
-              <CFormInput placeholder="mobile" type="tel" id="mobile" required />
+              <CFormInput placeholder='mobile' type='tel' id='mobile' required />
             </CCol>
             <CCol xs={5}>
-              <CFormSelect id="role" onClick={() => setDisabled(true)} required>
-                <option value="" disabled={disabled}>
+              <CFormSelect id='role' onClick={() => setDisabled(true)} required>
+                <option value='' disabled={disabled}>
                   select role
                 </option>
-                <option value="supervisor">supervisor</option>
-                <option value="moderator">moderator</option>
-                <option value="advisor">advisor</option>
+                <option value='supervisor'>supervisor</option>
+                <option value='moderator'>moderator</option>
+                <option value='advisor'>advisor</option>
               </CFormSelect>
             </CCol>
           </CRow>
           <CModalFooter>
-            <CButton type="submit" color="primary">
+            <CButton type='submit' color='primary'>
               Submit
             </CButton>
-            <CButton color="secondary" onClick={closeModal}>
+            <CButton color='secondary' onClick={closeModal}>
               Close
             </CButton>
           </CModalFooter>

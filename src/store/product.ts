@@ -2,8 +2,8 @@ import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
 import Product from '../services/ProductService'
 import { updateToast } from './globalToasts'
 import { AppDispatch, RootState } from '.'
-import { DialogResponseTypes } from 'src/enums'
-import { ProductStateType, ProductType, ParamsType, ProductPictureType } from 'src/types'
+import { DialogResponseTypes } from '../enums'
+import { ProductStateType, ProductType, ParamsType, ProductPictureType } from '../types'
 
 const initialState: ProductStateType = {
   pending: {

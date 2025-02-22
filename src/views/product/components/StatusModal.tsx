@@ -1,5 +1,5 @@
 import React, { FormEvent, useState } from 'react'
-import { connect, useDispatch } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import { cilCheck } from '@coreui/icons'
 import CIcon from '@coreui/icons-react'
 import {
@@ -15,7 +15,7 @@ import {
   CFormTextarea,
 } from '@coreui/react'
 import { updateProductStatus } from '../../../store/product'
-import { ProductType } from 'src/types'
+import { ProductType } from '../../../types'
 
 type PropTypes = {
   product: ProductType

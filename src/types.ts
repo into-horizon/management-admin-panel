@@ -1,17 +1,21 @@
-export type UserType = {
-  id?: string
+export type profileType = {
+  id: string
   first_name: string
   last_name: string
+}
+
+export type UserType = {
+  id?: string
   role: string
   active?: boolean
   mobile: string
   created_at?: string
-  profile_id?: string
   verified: boolean
+  profile: profileType
 }
 export type AuthStateType = {
   loggedIn: boolean
-  user: UserType
+  user: EmployeeType
   message: string
   loading: boolean
   isServerDown: boolean
@@ -79,10 +83,12 @@ export type DiscountCodeStateType = {
   count: number
 }
 
-export type EmployeeType = UserType & {
+export type EmployeeType = Omit<UserType, 'profile'> & {
   name?: string
   email?: string
   password?: string
+  first_name: string
+  last_name: string
 }
 
 export type EmployeeStateType = {

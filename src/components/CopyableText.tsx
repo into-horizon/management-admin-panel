@@ -1,6 +1,6 @@
 import { cilCheck, cilCopy } from '@coreui/icons'
 import CIcon from '@coreui/icons-react'
-import { CButton, CCol, CRow, CBadge, CTooltip } from '@coreui/react'
+import { CButton, CCol, CRow, CTooltip } from '@coreui/react'
 import React, { useState } from 'react'
 
 type PropTypes = {

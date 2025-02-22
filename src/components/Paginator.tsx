@@ -2,7 +2,7 @@ import React, { useState, useEffect, Dispatch, FC, Children, memo } from 'react'
 import { CPagination, CPaginationItem } from '@coreui/react'
 import cookie from 'react-cookies'
 import _ from 'lodash'
-import { ParamsType } from 'src/types'
+import { ParamsType } from '../types'
 
 type PropTypes = {
   count: number
@@ -108,13 +108,13 @@ const Paginator: FC<PropTypes> = ({
     onPageChange?.(n)
   }
   return (
-    <CPagination aria-label="Page navigation example" className="paginator">
+    <CPagination aria-label='Page navigation example' className='paginator'>
       <CPaginationItem
-        aria-label="Previous"
+        aria-label='Previous'
         onClick={() => changePage(selectedPage - 1 < 1 ? 1 : selectedPage - 1)}
         disabled={selectedPage === 1}
       >
-        <span aria-hidden="true">&laquo;</span>
+        <span aria-hidden='true'>&laquo;</span>
       </CPaginationItem>
 
       {Children.toArray(
@@ -130,13 +130,13 @@ const Paginator: FC<PropTypes> = ({
       )}
 
       <CPaginationItem
-        aria-label="Next"
+        aria-label='Next'
         onClick={() =>
           changePage(selectedPage + 1 > pages.length ? pages.length : selectedPage + 1)
         }
         disabled={selectedPage === pagesCount}
       >
-        <span aria-hidden="true">&raquo;</span>
+        <span aria-hidden='true'>&raquo;</span>
       </CPaginationItem>
     </CPagination>
   )

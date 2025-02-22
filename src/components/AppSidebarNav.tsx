@@ -1,36 +1,43 @@
 import React, { ForwardRefExoticComponent, ReactElement } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
 import PropTypes from 'prop-types'
-import { useTranslation } from 'react-i18next';
-import { useSelector } from 'react-redux';
+import { useSelector } from 'react-redux'
 import { CBadge } from '@coreui/react'
-import { RootState } from 'src/store';
+import { RootState } from '../store'
 
 type ItemType = {
-  name: string,
-  component: ForwardRefExoticComponent<any>,
-  to?: string,
+  name: string
+  component: ForwardRefExoticComponent<any>
+  to?: string
   icon?: ReactElement<any, any>
-  badge?: { color: string, text?: string }
+  badge?: { color: string; text?: string }
   items?: ItemType[]
 }
 export const AppSidebarNav = ({ items }: { items: ItemType[] }) => {
   const location = useLocation()
   const pendingProductsCount = useSelector((state: RootState) => state.products.pending.count)
   const pendingOrdersCount = useSelector((state: RootState) => state.orders.pendingOrders.count)
-  const navLink = (name: string, icon?: ReactElement<any, any>, badge?: { color: string, text?: string }) => {
+  const navLink = (
+    name: string,
+    icon?: ReactElement<any, any>,
+    badge?: { color: string; text?: string },
+  ) => {
     return (
       <>
         {icon && icon}
         {name && name}
-        {badge && (name === "Pending Orders" && pendingOrdersCount > 0) && <CBadge color={badge.color} className="ms-auto">
-          {pendingOrdersCount}
-        </CBadge>}
-        {badge && (name === "Pending Products" && pendingProductsCount > 0) && <CBadge color={badge.color} className="ms-auto">
-          {pendingProductsCount}
-        </CBadge>}
+        {badge && name === 'Pending Orders' && pendingOrdersCount > 0 && (
+          <CBadge color={badge.color} className='ms-auto'>
+            {pendingOrdersCount}
+          </CBadge>
+        )}
+        {badge && name === 'Pending Products' && pendingProductsCount > 0 && (
+          <CBadge color={badge.color} className='ms-auto'>
+            {pendingProductsCount}
+          </CBadge>
+        )}
         {badge && badge.text && (
-          <CBadge color={badge.color} className="ms-auto">
+          <CBadge color={badge.color} className='ms-auto'>
             {badge.text}
           </CBadge>
         )}
@@ -45,9 +52,9 @@ export const AppSidebarNav = ({ items }: { items: ItemType[] }) => {
       <Component
         {...(rest.to &&
           !rest.items && {
-          component: NavLink,
-          // className: 'active',
-        })}
+            component: NavLink,
+            // className: 'active',
+          })}
         key={index}
         {...rest}
       >

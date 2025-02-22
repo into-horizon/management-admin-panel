@@ -1,16 +1,14 @@
 import React from 'react'
-import ProfileInfo from 'src/components/StoreInformation'
-import StorePicture from 'src/components/StorePicture'
-import { useTranslation } from 'react-i18next';
+import StorePicture from '../../../components/StorePicture'
+import StoreInformation from '../../../components/StoreInformation'
 
-const Profile = () =>{
-    
-    return (
-        <>
-        <StorePicture/>
-        <ProfileInfo/>
-        </>
-    )
+const Profile = () => {
+  return (
+    <>
+      <StorePicture />
+      <StoreInformation />
+    </>
+  )
 }
 
 export default Profile

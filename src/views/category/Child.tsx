@@ -1,26 +1,25 @@
 import React, { useState, useEffect, FormEvent, Fragment } from 'react'
-import { connect, useDispatch, useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import Table, { ColumnType } from '../../components/Table'
-import EditableCell from 'src/components/EditableCell'
+import { cilTrash, cilSearch, cilFilterX } from '@coreui/icons'
+import CIcon from '@coreui/icons-react'
+import { CTooltip, CButton, CForm, CRow, CCol, CFormInput } from '@coreui/react'
+import FilterCard from '../../components/FilterCard'
+import SearchDropdown, { OptionType } from '../../components/SearchDropdown'
+import { InputType } from '../../enums'
+import Category from '../../services/CategoryService'
+import { RootState } from '../../store'
 import {
   getChildCategoriesHandler,
-  updateChildCategory,
-  addChildCategoryHandler,
   deleteChildCategoryHandler,
-  updateChildParams,
   resetChildParams,
-} from 'src/store/category'
-import AddCategoryModal from 'src/views/category/components/AddCategoryModal'
-import DeleteModal from 'src/components/DeleteModal'
-import { CButton, CCol, CForm, CFormCheck, CFormInput, CRow, CTooltip } from '@coreui/react'
-import CIcon from '@coreui/icons-react'
-import { cilTrash, cilSearch, cilFilterX } from '@coreui/icons'
-import Category from 'src/services/CategoryService'
-import SearchDropdown, { OptionType } from 'src/components/SearchDropdown'
-import FilterCard from 'src/components/FilterCard'
-import { RootState } from 'src/store'
-import { ChildAndGrandCategoriesType, ParentCategoriesType } from 'src/types'
-import { InputType } from 'src/enums'
+  updateChildParams,
+  addChildCategoryHandler,
+  updateChildCategory,
+} from '../../store/category'
+import { ParentCategoriesType, ChildAndGrandCategoriesType } from '../../types'
+import AddCategoryModal from './components/AddCategoryModal'
+import DeleteModal from '../../components/DeleteModal'
 
 const Child = () => {
   const {

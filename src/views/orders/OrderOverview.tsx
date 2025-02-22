@@ -28,11 +28,11 @@ import CIcon from '@coreui/icons-react'
 import { cilSearch, cilPencil } from '@coreui/icons'
 import Table from '../../components/Table'
 import Export from '../../components/Export'
-import NewOrders from 'src/services/Orders'
 import CopyableText from '../../components/CopyableText'
-import { RootState } from 'src/store'
-import { OrderType } from 'src/types'
-import { updateParamsHelper } from 'src/services/helpers'
+import { updateParamsHelper } from '../../services/helpers'
+import NewOrders from '../../services/Orders'
+import { RootState } from '../../store'
+import { OrderType } from '../../types'
 
 const OrdersOverview = () => {
   const initialParams = { limit: 5, offset: 0 }

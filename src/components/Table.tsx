@@ -8,22 +8,20 @@ import {
   CTableBody,
   CTableDataCell,
   CFormCheck,
-  CSpinner,
   CRow,
   CCol,
   CFormSelect,
   CFormLabel,
   CButton,
   CTooltip,
-  CFormInput,
 } from '@coreui/react'
 import _ from 'lodash'
 import PropTypes from 'prop-types'
 import CIcon from '@coreui/icons-react'
 import { cilCheck, cilPen, cilX } from '@coreui/icons'
 import TableEditCell from './TableEditCell'
-import { GetFunctionType, ParamsType } from 'src/types'
-import { InputType } from 'src/enums'
+import { GetFunctionType } from '../types'
+import { InputType } from '../enums'
 import LoadingSpinner from './LoadingSpinner'
 
 export type ColumnType = {
@@ -134,7 +132,7 @@ export const Table = ({
               <CTableRow>
                 {checkbox && (
                   <CTableDataCell>
-                    <CFormCheck onChange={selectAll} checked={selected.length === data.length}/>
+                    <CFormCheck onChange={selectAll} checked={selected.length === data.length} />
                   </CTableDataCell>
                 )}
                 {Children.toArray(

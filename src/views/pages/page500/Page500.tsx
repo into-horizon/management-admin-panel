@@ -1,8 +1,8 @@
 import React from 'react'
 import { CButton, CCol, CContainer, CInputGroup, CRow } from '@coreui/react'
 import { useSelector } from 'react-redux'
-import { RootState } from 'src/store'
 import { Navigate } from 'react-router-dom'
+import { RootState } from '../../../store'
 
 const Page500 = () => {
   const { isServerDown } = useSelector((state: RootState) => state.login)

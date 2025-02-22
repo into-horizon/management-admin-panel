@@ -6,16 +6,15 @@ import CIcon from '@coreui/icons-react'
 
 import { AppSidebarNav } from './AppSidebarNav'
 
-import { logoNegative } from 'src/assets/brand/logo-negative'
-import { sygnet } from 'src/assets/brand/sygnet'
+import { sygnet } from '../assets/brand/sygnet'
 
 import SimpleBar from 'simplebar-react'
 import 'simplebar/dist/simplebar.min.css'
 
 // sidebar nav config
 import navigation from '../_nav'
-import { RootState } from 'src/store'
-import { logo } from 'src/enviroment'
+import { RootState } from '../store'
+import { logo } from '../environment'
 
 const AppSidebar = () => {
   const dispatch = useDispatch()

@@ -1,9 +1,9 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
-import { DashboardStateType } from 'src/types'
+import { DashboardStateType } from '../types'
 import { AppDispatch } from '.'
-import Dashboard from 'src/services/Dashboard'
+import Dashboard from '../services/Dashboard'
 import { updateToast } from './globalToasts'
-import { DialogResponseTypes } from 'src/enums'
+import { DialogResponseTypes } from '../enums'
 
 const initialState: DashboardStateType = {
   stores: 0,

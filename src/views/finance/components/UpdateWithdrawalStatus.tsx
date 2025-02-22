@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux'
-import { updateWithdrawalHandler } from 'src/store/withdrawal'
-import { WithdrawalType } from 'src/types'
 import {
   CRow,
   CCol,
@@ -18,6 +16,8 @@ import {
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import { cilCheck, cilX, cilFile } from '@coreui/icons'
+import { updateWithdrawalHandler } from '../../../store/withdrawal'
+import { WithdrawalType } from '../../../types'
 
 const UpdateWithdrawalStatus = (data: WithdrawalType) => {
   const [visible, setVisible] = useState(false)

@@ -15,17 +15,17 @@ import {
 } from '@coreui/react'
 import React, { useState, useEffect, Children, FormEvent } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import Table from 'src/components/Table'
+import Table from '../../components/Table'
 import {
   getPendingProducts,
   updatePendingProductsParams,
   updateProductStatus,
 } from '../../store/product'
 import { cilImage, cilLibrary, cilDescription, cilCheck, cilX } from '@coreui/icons'
-import { RootState } from 'src/store'
-import { ParamsType, ProductType } from 'src/types'
-import { events } from 'src/App'
-import { updateParamsHelper } from 'src/services/helpers'
+import { RootState } from '../../store'
+import { ParamsType, ProductType } from '../../types'
+import { events } from '../../App'
+import { updateParamsHelper } from '../../services/helpers'
 
 const PendingProducts = () => {
   // const [loading, setLoading] = useState(true)

@@ -2,8 +2,8 @@ import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
 
 import Finance from '../services/Finance'
 import { updateToast } from './globalToasts'
-import { DialogResponseTypes } from 'src/enums'
-import { ParamsType, TransactionType } from 'src/types'
+import { DialogResponseTypes } from '../enums'
+import { ParamsType, TransactionType } from '../types'
 import { RootState } from '.'
 
 const initialState: {

@@ -16,7 +16,7 @@ import { cilUser } from '@coreui/icons'
 import { provideReferenceHandler, deleteMessage } from '../../../store/auth'
 import { connect, useSelector, useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
-import { RootState } from 'src/store'
+import { RootState } from '../../../store'
 
 const Reference = ({}) => {
   const dispatch = useDispatch()

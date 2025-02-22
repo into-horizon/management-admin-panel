@@ -1,10 +1,10 @@
-import ApiService from "./ApiService";
+import ApiService from './ApiService'
 
 export default class Auth extends ApiService {
-  private path: string;
+  private path: string
   constructor() {
-    super();
-    this.path = "employee";
+    super()
+    this.path = 'employee'
   }
 
   async basicAuth(data: { email: string; password: string }) {
@@ -12,42 +12,42 @@ export default class Auth extends ApiService {
       let response = await this.post(
         { management: true, endpoint: `signin` },
         null,
-        this.basic(data)
-      );
-      return response;
+        this.basic(data),
+      )
+      return response
     } catch (error) {
-      return error;
+      return error
     }
   }
   async getStore() {
     try {
-      let response = await this.get({ management: true, endpoint: this.path });
-      return response;
+      let response = await this.get({ management: true, endpoint: this.path })
+      return response
     } catch (error) {
       if (error instanceof Error) {
-        throw new Error(error.message);
+        throw new Error(error.message)
       }
     }
   }
 
   async logout() {
     try {
-      let response = await this.post({ management: true, endpoint: "logout" });
+      let response = await this.post({ management: true, endpoint: 'logout' })
 
-      return response;
+      return response
     } catch (error) {
-      return error;
+      return error
     }
   }
 
   async createStore(data: any) {
     try {
       let response = await this.post(`${this.path}/email`, data, {
-        "Content-Type": "multipart/form-data",
-      });
-      return response;
+        'Content-Type': 'multipart/form-data',
+      })
+      return response
     } catch (error) {
-      return error;
+      return error
     }
   }
 
@@ -71,52 +71,48 @@ export default class Auth extends ApiService {
   // }
   async provideReference(reference: string) {
     try {
-      let response = await this.post("auth/user/password/generateToken", {
+      let response = await this.post('auth/user/password/generateToken', {
         reference: reference,
-      });
-      return response;
+      })
+      return response
     } catch (error) {
-      return error;
+      return error
     }
   }
   async validateToken(token: string) {
     try {
-      let response = await this.post("auth/user/password/validateToken", {
+      let response = await this.post('auth/user/password/validateToken', {
         token: token,
-      });
-      return response;
+      })
+      return response
     } catch (error) {
-      return error;
+      return error
     }
   }
   async resetPassword(token: string, password: string) {
     try {
-      let response = await this.post("auth/user/password/resetByToken", {
+      let response = await this.post('auth/user/password/resetByToken', {
         token: token,
         password: password,
-      });
-      return response;
+      })
+      return response
     } catch (error) {
-      return error;
+      return error
     }
   }
   static async checkAPI() {
     try {
-      let rest = await new ApiService().get("", undefined, {});
-      return rest;
+      let rest = await new ApiService().get('', undefined)
+      return rest
     } catch (error) {
-      if (error instanceof Error) throw new Error(error.message);
+      if (error instanceof Error) throw new Error(error.message)
     }
   }
   static async checkManagementAPI() {
     try {
-      return await new ApiService().get(
-        { management: true, endpoint: "" },
-        undefined,
-        {}
-      );
+      return await new ApiService().get({ management: true, endpoint: '' }, undefined)
     } catch (error) {
-      if (error instanceof Error) throw new Error(error.message);
+      if (error instanceof Error) throw new Error(error.message)
     }
   }
 }

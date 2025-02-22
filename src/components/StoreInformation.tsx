@@ -5,7 +5,7 @@
 // import { usePopup, PopupType } from "react-custom-popup";
 // import { updateInfo, updateName } from "../store/auth"
 // import {useNavigate} from 'react-router-dom'
-// import { RootState } from 'src/store';
+// import { RootState } from '../store';
 // const ProfileInfo = (props) => {
 //     const navigate = useNavigate()
 //     const { updateInfo, updateName } = props
@@ -113,20 +113,14 @@
 //     )
 // }
 
-
-
-
 // const mapDispatchToProps = { updateInfo, updateName }
 
 // export default connect(null, mapDispatchToProps)(ProfileInfo);
 
-
 import React from 'react'
 
 function StoreInformation() {
-  return (
-    <div>StoreInformation</div>
-  )
+  return <div>StoreInformation</div>
 }
 
 export default StoreInformation

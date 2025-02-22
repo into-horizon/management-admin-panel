@@ -15,11 +15,10 @@ import {
 import { useParams } from 'react-router-dom'
 import CIcon from '@coreui/icons-react'
 import { cilLockLocked } from '@coreui/icons'
-import { validateTokenHandler, deleteMessage, resetPasswordHandler } from '../../../store/auth'
-import { connect, useSelector, useDispatch } from 'react-redux'
+import { validateTokenHandler, resetPasswordHandler } from '../../../store/auth'
+import { useSelector, useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
-import cookie from 'react-cookies'
-import { RootState } from 'src/store'
+import { RootState } from '../../../store'
 
 type PropTypes = {
   load?: Function

@@ -1,4 +1,4 @@
-import React, {  } from 'react'
+import React from 'react'
 import {
   CAvatar,
   CDropdown,
@@ -8,17 +8,13 @@ import {
   CDropdownMenu,
   CDropdownToggle,
 } from '@coreui/react'
-import {
-  cilLockLocked,
-  cilSettings,
-  cilUser,
-} from '@coreui/icons'
+import { cilLockLocked, cilSettings, cilUser } from '@coreui/icons'
 import CIcon from '@coreui/icons-react'
 import { NavLink } from 'react-router-dom'
 
-import { logout } from 'src/store/auth'
 import { useDispatch, useSelector } from 'react-redux'
-import { RootState } from 'src/store'
+import { RootState } from '../../store'
+import { logout } from '../../store/auth'
 
 const AppHeaderDropdown = () => {
   const { first_name, last_name } = useSelector((state: RootState) => state.login.user)

@@ -22,9 +22,10 @@ import {
   getChildCategoriesHandler,
   getGrandChildCategoriesHandler,
 } from '../../store/category'
-import { RootState } from 'src/store'
+// import { RootState } from '../store'
 import _ from 'lodash'
-import { ProductType, GetFunctionType } from 'src/types'
+import { RootState } from '../../store'
+// import { ProductType, GetFunctionType } from '../types'
 
 const UpdateProduct = () => {
   const { showOptionDialog } = usePopup()
@@ -189,61 +190,61 @@ const UpdateProduct = () => {
           ) : (
             <CRow xs={{ gutterY: 5 }}>
               <CCol xs={12}>
-                <CRow className="justify-content-center">
-                  <CCol xs="auto">
+                <CRow className='justify-content-center'>
+                  <CCol xs='auto'>
                     <CFormLabel>{t('englishTitle')}*</CFormLabel>
                     <CFormInput
-                      type="text"
-                      id="entitle"
+                      type='text'
+                      id='entitle'
                       placeholder={t('englishTitle')}
                       required
                       defaultValue={searched.entitle}
                     />
                   </CCol>
-                  <CCol xs="auto">
+                  <CCol xs='auto'>
                     <CFormLabel>{t('arabicTitle')}*</CFormLabel>
                     <CFormInput
-                      type="text"
-                      id="artitle"
+                      type='text'
+                      id='artitle'
                       placeholder={t('arabicTitle')}
                       required
                       defaultValue={searched.artitle}
                     />
                   </CCol>
-                  <CCol xs="auto">
+                  <CCol xs='auto'>
                     <CFormLabel>{t('metaTitle')}</CFormLabel>
                     <CFormInput
-                      type="text"
-                      id="metatitle"
+                      type='text'
+                      id='metatitle'
                       placeholder={t('metaTitle')}
                       defaultValue={searched.metatitle ?? ''}
                     />
                   </CCol>
-                  <CCol xs="auto">
+                  <CCol xs='auto'>
                     <CFormLabel>SKU</CFormLabel>
                     <CFormInput
-                      type="text"
-                      id="sku"
-                      placeholder="SKU"
+                      type='text'
+                      id='sku'
+                      placeholder='SKU'
                       defaultValue={searched.sku}
                     />
                   </CCol>
-                  <CCol xs="auto">
+                  <CCol xs='auto'>
                     <CFormLabel>{t('price')}*</CFormLabel>
                     <CFormInput
-                      type="number"
-                      id="price"
+                      type='number'
+                      id='price'
                       placeholder={t('price')}
-                      step="0.01"
+                      step='0.01'
                       required
                       defaultValue={searched.price}
                     />
                   </CCol>
-                  <CCol xs="auto">
+                  <CCol xs='auto'>
                     <CFormLabel>{t('brandName')}</CFormLabel>
                     <CFormInput
-                      type="text"
-                      id="brandName"
+                      type='text'
+                      id='brandName'
                       placeholder={t('brandName')}
                       defaultValue={searched.brand_name ?? ''}
                     />
@@ -255,25 +256,25 @@ const UpdateProduct = () => {
                   <CCol md={12} lg={6}>
                     <CFormFloating>
                       <CFormTextarea
-                        placeholder="Leave a comment here"
-                        id="endescription"
+                        placeholder='Leave a comment here'
+                        id='endescription'
                         style={{ height: '100px' }}
                         defaultValue={searched.endescription}
                         required
                       ></CFormTextarea>
-                      <CFormLabel htmlFor="floatingTextarea2">{t('englishDescrition')}*</CFormLabel>
+                      <CFormLabel htmlFor='floatingTextarea2'>{t('englishDescrition')}*</CFormLabel>
                     </CFormFloating>
                   </CCol>
                   <CCol md={12} lg={6}>
                     <CFormFloating>
                       <CFormTextarea
-                        placeholder="Leave a comment here"
-                        id="ardescription"
+                        placeholder='Leave a comment here'
+                        id='ardescription'
                         defaultValue={searched.ardescription}
                         style={{ height: '100px' }}
                         required
                       ></CFormTextarea>
-                      <CFormLabel htmlFor="floatingTextarea3">{t('arabicDescription')}*</CFormLabel>
+                      <CFormLabel htmlFor='floatingTextarea3'>{t('arabicDescription')}*</CFormLabel>
                     </CFormFloating>
                   </CCol>
                 </CRow>
@@ -282,10 +283,10 @@ const UpdateProduct = () => {
                 <CRow xs={{ gutter: 2 }}>
                   <CCol xs={12}>
                     <CFormSelect
-                      aria-label="Default select example"
+                      aria-label='Default select example'
                       required
                       onChange={categoryVisibility}
-                      id="parentCategory"
+                      id='parentCategory'
                       defaultValue={searched.parent_category_id}
                     >
                       {Children.toArray(
@@ -297,10 +298,10 @@ const UpdateProduct = () => {
                   </CCol>
                   <CCol xs={12}>
                     <CFormSelect
-                      aria-label="Default select example"
+                      aria-label='Default select example'
                       disabled={secondCategory.data.length === 0}
                       onChange={categoryVisibility2}
-                      id="childCategory"
+                      id='childCategory'
                       defaultValue={searched.child_category_id}
                     >
                       {Children.toArray(
@@ -312,8 +313,8 @@ const UpdateProduct = () => {
                   </CCol>
                   <CCol xs={12}>
                     <CFormCheck
-                      id="flexCheckDefault"
-                      label="Select Third Category"
+                      id='flexCheckDefault'
+                      label='Select Third Category'
                       onChange={(e) =>
                         setThirdCategory({ ...thirdCategory, select: e.target.checked })
                       }
@@ -325,12 +326,12 @@ const UpdateProduct = () => {
                   {thirdCategory.select && (
                     <CCol xs={12}>
                       <CFormSelect
-                        aria-label="Default select example"
-                        id="grandChildCategory"
+                        aria-label='Default select example'
+                        id='grandChildCategory'
                         disabled={thirdCategory.data.length === 0}
                         defaultValue={searched.grandchild_category_id ?? ''}
                       >
-                        <option value="default">{t('grandChildCategory')}</option>
+                        <option value='default'>{t('grandChildCategory')}</option>
                         {Children.toArray(
                           thirdCategory.data.map((val) => (
                             <option value={val.id}>{val.entitle}</option>
@@ -365,7 +366,7 @@ const UpdateProduct = () => {
 
                         </section> */}
               <CCol xs={12}>
-                <CButton type="submit" color="primary">
+                <CButton type='submit' color='primary'>
                   {t('submit')}
                 </CButton>
               </CCol>

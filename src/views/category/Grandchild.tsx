@@ -1,24 +1,25 @@
 import React, { useState, useEffect, Children, FormEvent } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import Table, { ColumnType } from '../../components/Table'
-import {
-  getGrandChildCategoriesHandler,
-  updateGrandChildCategory,
-  addGrandchildCategoryHandler,
-  deleteGrandchildCategoryHandler,
-  resetGrandChildParams,
-  updateGrandchildParams,
-} from 'src/store/category'
+
 import CIcon from '@coreui/icons-react'
 import { cilTrash, cilSearch, cilFilterX } from '@coreui/icons'
 import { CButton, CCol, CForm, CFormInput, CRow, CTooltip } from '@coreui/react'
-import AddCategoryModal from 'src/views/category/components/AddCategoryModal'
-import DeleteModal from 'src/components/DeleteModal'
-import Category from 'src/services/CategoryService'
-import SearchDropdown, { OptionType } from 'src/components/SearchDropdown'
-import { RootState } from 'src/store'
-import { ChildAndGrandCategoriesType } from 'src/types'
-import { InputType } from 'src/enums'
+import DeleteModal from '../../components/DeleteModal'
+import SearchDropdown, { OptionType } from '../../components/SearchDropdown'
+import { InputType } from '../../enums'
+import Category from '../../services/CategoryService'
+import { RootState } from '../../store'
+import {
+  getGrandChildCategoriesHandler,
+  deleteGrandchildCategoryHandler,
+  resetGrandChildParams,
+  updateGrandchildParams,
+  addGrandchildCategoryHandler,
+  updateGrandChildCategory,
+} from '../../store/category'
+import { ChildAndGrandCategoriesType } from '../../types'
+import AddCategoryModal from './components/AddCategoryModal'
 
 const Grandchild = () => {
   const {

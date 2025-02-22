@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react'
 import { CNav, CNavItem, CNavLink, CTabContent, CTabPane } from '@coreui/react'
-import ProductsRender from 'src/views/product/ProductsRender'
 import cookie from 'react-cookies'
 import { useTranslation } from 'react-i18next'
-import { getProductsByStatus, updateOverviewProductsParams } from 'src/store/product'
 import { useDispatch, useSelector } from 'react-redux'
-import { RootState } from 'src/store'
+import { RootState } from '../../store'
+import { updateOverviewProductsParams, getProductsByStatus } from '../../store/product'
+import ProductsRender from './ProductsRender'
 
 const Products = () => {
   const [activeKey, setActiveKey] = useState<'approved' | 'pending' | 'rejected'>(

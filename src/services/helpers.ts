@@ -1,6 +1,6 @@
 import cookie from 'react-cookies'
 import { isJwtExpired } from 'jwt-check-expiration'
-import { ParamsType } from 'src/types'
+import { ParamsType } from '../types'
 
 export const setDate = (days: number = 0): string => {
   let date = new Date(Date.now() - 1000 * 60 * 60 * 24 * days)

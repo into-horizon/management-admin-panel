@@ -1,9 +1,9 @@
 import { createSlice } from '@reduxjs/toolkit'
-import DiscountCode from 'src/services/DiscountCode'
+import DiscountCode from '../services/DiscountCode'
 import { updateToast } from './globalToasts'
 import { AppDispatch, RootState } from '.'
-import { DialogResponseTypes } from 'src/enums'
-import { DiscountCodeStateType, ParamsType, DiscountCodeType } from 'src/types'
+import { DialogResponseTypes } from '../enums'
+import { DiscountCodeStateType, ParamsType, DiscountCodeType } from '../types'
 
 const initialState: DiscountCodeStateType = {
   data: [],

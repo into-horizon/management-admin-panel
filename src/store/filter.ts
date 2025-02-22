@@ -1,6 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit'
 import { save, load, remove } from 'react-cookies'
-import { setDate } from 'src/services/helpers'
+import { setDate } from '../services/helpers'
 import { AppDispatch } from '.'
 
 const setDefaultDate = () => {

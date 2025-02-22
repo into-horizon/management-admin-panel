@@ -3,8 +3,8 @@ import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
 import Orders from '../services/Orders'
 import { updateToast } from './globalToasts'
 import { AppDispatch, RootState } from '.'
-import { DialogResponseTypes } from 'src/enums'
-import { ParamsType, OrderItemType, OrderType } from 'src/types'
+import { DialogResponseTypes } from '../enums'
+import { ParamsType, OrderItemType, OrderType } from '../types'
 
 const initialState: {
   pendingOrders: { data: OrderType[]; count: number }

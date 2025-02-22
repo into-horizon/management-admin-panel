@@ -1,36 +1,17 @@
-import React, { useState, useEffect, Fragment } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import {
-  CWidgetStatsF,
-  CRow,
-  CCol,
-  CSpinner,
-  CForm,
-  CFormInput,
-  CFormSelect,
-  CButton,
-  CFormLabel,
-  CModal,
-  CTooltip,
-  CModalHeader,
-  CModalTitle,
-  CModalFooter,
-} from '@coreui/react'
+import { CWidgetStatsF, CRow, CCol } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
-import { cilCheck, cilPaperclip, cilTruck, cilExternalLink, cilX, cilFile } from '@coreui/icons'
+import { cilCheck, cilPaperclip, cilTruck, cilExternalLink } from '@coreui/icons'
 import { getAmounts } from '../../store/finance'
-import {
-  getWithdrawalsHandler,
-  setWithdrawalsParams,
-  updateWithdrawalHandler,
-} from 'src/store/withdrawal'
 import AccountModal from './components/AccountModal'
 import Table from '../../components/Table'
-import { RootState } from 'src/store'
-import { WithdrawalType } from 'src/types'
-import LoadingSpinner from 'src/components/LoadingSpinner'
 import UpdateWithdrawalStatus from './components/UpdateWithdrawalStatus'
-import { updateParamsHelper } from 'src/services/helpers'
+import { RootState } from '../../store'
+import { WithdrawalType } from '../../types'
+import { getWithdrawalsHandler, setWithdrawalsParams } from '../../store/withdrawal'
+import { updateParamsHelper } from '../../services/helpers'
+import LoadingSpinner from '../../components/LoadingSpinner'
 
 const Summary = () => {
   const { commission, delivery, transferred } = useSelector((state: RootState) => state.finance)

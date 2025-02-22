@@ -3,8 +3,8 @@ import Withdrawal from '../services/Withdrawal'
 import { updateWithdrawn } from './finance'
 import { updateToast } from './globalToasts'
 import { AppDispatch, RootState } from '.'
-import { DialogResponseTypes } from 'src/enums'
-import { ParamsType, WithdrawalType } from 'src/types'
+import { DialogResponseTypes } from '../enums'
+import { ParamsType, WithdrawalType } from '../types'
 
 const initialState: {
   loading: boolean

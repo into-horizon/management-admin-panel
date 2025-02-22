@@ -1,4 +1,4 @@
-import { DiscountCodeType, ParamsType } from 'src/types'
+import { DiscountCodeType, ParamsType } from '../types'
 import ApiService from './ApiService'
 
 class DiscountCode extends ApiService {
@@ -17,7 +17,7 @@ class DiscountCode extends ApiService {
   }
   async updateDiscountCode(data: DiscountCodeType) {
     try {
-      let result = await this.update(this.path, data)
+      let result = await this.put(this.path, data)
       return result
     } catch (error) {
       return error

@@ -1,4 +1,4 @@
-import { ParamsType, ProductType } from 'src/types'
+import { ParamsType, ProductType } from '../types'
 import ApiService from './ApiService'
 
 class ProductService extends ApiService {
@@ -89,7 +89,7 @@ class ProductService extends ApiService {
 
   async updateProduct(data: ProductType) {
     try {
-      let res = await this.update(`${this.path}`, data)
+      let res = await this.put(`${this.path}`, data)
       return res
     } catch (error) {
       return error

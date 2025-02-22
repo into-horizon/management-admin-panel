@@ -5,10 +5,10 @@ import Table from '../../components/Table'
 import FilterCard from '../../components/FilterCard'
 import FormButtons from '../../components/FormButtons'
 import { CCol, CForm, CFormInput, CFormLabel, CFormSelect, CRow } from '@coreui/react'
-import { RootState } from 'src/store'
-import { TransactionType } from 'src/types'
-import CopyableText from 'src/components/CopyableText'
-import { updateParamsHelper } from 'src/services/helpers'
+import CopyableText from '../../components/CopyableText'
+import { updateParamsHelper } from '../../services/helpers'
+import { RootState } from '../../store'
+import { TransactionType } from '../../types'
 
 export const Statement = () => {
   const {

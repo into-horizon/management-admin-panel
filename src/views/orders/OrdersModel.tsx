@@ -1,6 +1,5 @@
-import React, { useState, useEffect, useRef, FormEvent, Children } from 'react'
-import { getPendingOrdersHandler, updateOrderItemHandler } from 'src/store/orders'
-import { connect, useDispatch, useSelector } from 'react-redux'
+import React, { useState, FormEvent, Children } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import defaultProductImg from '../../assets/images/default-store-350x350.jpg'
 import {
   CTable,
@@ -17,14 +16,14 @@ import {
   CModal,
   CModalHeader,
   CModalFooter,
-  CModalTitle,
   CForm,
 } from '@coreui/react'
 import Pdf from '../../components/Pdf'
 import CopyableText from '../../components/CopyableText'
-import { RootState } from 'src/store'
-import { OrderType, OrderItemType } from 'src/types'
-import LoadingSpinner from 'src/components/LoadingSpinner'
+import { OrderItemType, OrderType } from '../../types'
+import LoadingSpinner from '../../components/LoadingSpinner'
+import { RootState } from '../../store'
+import { updateOrderItemHandler } from '../../store/orders'
 
 type PropTypes = {
   data: OrderType[]

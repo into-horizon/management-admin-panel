@@ -1,13 +1,13 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
 import cookie from 'react-cookies'
 import Auth from '../services/Auth'
-import Update from 'src/services/Update'
 import { updateDialog } from './globalDialog'
 import { AppDispatch, RootState } from '.'
 import { updateToast } from './globalToasts'
-import { DialogResponseTypes } from 'src/enums'
-import { AuthStateType, StoreType } from 'src/types'
-import { socket } from 'src/socket'
+import { DialogResponseTypes } from '../enums'
+import { AuthStateType, StoreType } from '../types'
+import { socket } from '../socket'
+import Update from '../services/Update'
 
 const NewAuth = new Auth()
 const NewUpdate = new Update()

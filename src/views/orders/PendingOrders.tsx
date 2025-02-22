@@ -1,11 +1,10 @@
 import React, { useEffect } from 'react'
-import { getPendingOrdersHandler, setPendingParams } from 'src/store/orders'
 import { useDispatch, useSelector } from 'react-redux'
 import OrdersModel from './OrdersModel'
-import { CSpinner } from '@coreui/react'
 import Paginator from '../../components/Paginator'
-import { RootState } from 'src/store'
-import LoadingSpinner from 'src/components/LoadingSpinner'
+import LoadingSpinner from '../../components/LoadingSpinner'
+import { RootState } from '../../store'
+import { getPendingOrdersHandler, setPendingParams } from '../../store/orders'
 
 const PendingOrders = () => {
   const {
@@ -22,11 +21,11 @@ const PendingOrders = () => {
   return (
     <>
       <h2>pending orders</h2>
-      {isLoading ? <LoadingSpinner /> : <OrdersModel data={orders} type="pending" />}
+      {isLoading ? <LoadingSpinner /> : <OrdersModel data={orders} type='pending' />}
       <Paginator
         params={pendingParams}
         count={+count}
-        cookieName="pendingOrder"
+        cookieName='pendingOrder'
         onPageChange={(page) =>
           dispatch(setPendingParams({ offset: (page - 1) * pendingParams.limit! }))
         }

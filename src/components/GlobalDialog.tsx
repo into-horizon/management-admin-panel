@@ -2,7 +2,7 @@ import React, { useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { PopupType, usePopup, AnimationType, OutAnimationType } from 'react-custom-popup'
 import { resetState } from '../store/globalDialog'
-import { RootState } from 'src/store'
+import { RootState } from '../store'
 
 export const GlobalDialog = () => {
   const dispatch = useDispatch()

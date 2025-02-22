@@ -1,11 +1,12 @@
-import { io } from 'socket.io-client';
+import { io } from 'socket.io-client'
+import { apiURL } from './environment/index'
 
-export const socket = io(process.env.REACT_APP_API!);
+export const socket = io(apiURL!)
 
-export const notificationsOffers = io(`${process.env.REACT_APP_API}/notificationsOffers`);
-export const notificationsOrders = io(`${process.env.REACT_APP_API}/notificationsOrders`);
-export const productReview = io(`${process.env.REACT_APP_API}/productReview`);
-export const storeReview = io(`${process.env.REACT_APP_API}/storeReview`);
-export const orders = io(`${process.env.REACT_APP_API}/orders`);
-export const products = io(`${process.env.REACT_APP_API}/products`);
-export const notifications = io(`${process.env.REACT_APP_API}/administrationNotifications`);
+export const notificationsOffers = io(`${apiURL}/notificationsOffers`)
+export const notificationsOrders = io(`${apiURL}/notificationsOrders`)
+export const productReview = io(`${apiURL}/productReview`)
+export const storeReview = io(`${apiURL}/storeReview`)
+export const orders = io(`${apiURL}/orders`)
+export const products = io(`${apiURL}/products`)
+export const notifications = io(`${apiURL}/administrationNotifications`)

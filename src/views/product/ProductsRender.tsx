@@ -10,16 +10,24 @@ import {
   CFormInput,
   CFormSelect,
 } from '@coreui/react'
-import {
-  addProductPictureHandler,
-  deleteProductPictureHandler,
-  deleteProductHandler,
-  updateOverviewProductsParams,
-  resetOverviewProductsParams,
-} from 'src/store/product'
+// import {
+//   addProductPictureHandler,
+//   deleteProductPictureHandler,
+//   deleteProductHandler,
+//   updateOverviewProductsParams,
+//   resetOverviewProductsParams,
+// } from '../store/product'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
-import { updateSizeAndQuantity, updateDiscount } from '../../store/product'
+import {
+  updateSizeAndQuantity,
+  updateDiscount,
+  addProductPictureHandler,
+  deleteProductHandler,
+  deleteProductPictureHandler,
+  resetOverviewProductsParams,
+  updateOverviewProductsParams,
+} from '../../store/product'
 import Export from '../../components/Export'
 
 import CIcon from '@coreui/icons-react'
@@ -29,14 +37,22 @@ import DiscountModal from './components/DiscountModal'
 import SizeAndColorModal from './components/SizeAndColorModal'
 import DeleteProductModal from './components/DeleteProductModal'
 import StatusModal from './components/StatusModal'
-import Product from 'src/services/ProductService'
-import FilterCard from 'src/components/FilterCard'
-import FormButtons from 'src/components/FormButtons'
+import FilterCard from '../../components/FilterCard'
+import FormButtons from '../../components/FormButtons'
+import LoadingSpinner from '../../components/LoadingSpinner'
+import { updateParamsHelper } from '../../services/helpers'
+import { RootState } from '../../store'
+import { ParamsType, QuantityDetailsType } from '../../types'
+import ProductService from '../../services/ProductService'
 import FormBody from './components/FormBody'
-import { RootState } from 'src/store'
-import { ParamsType, QuantityDetailsType } from 'src/types'
-import { updateParamsHelper } from 'src/services/helpers'
-import LoadingSpinner from 'src/components/LoadingSpinner'
+// import Product from '../services/ProductService'
+// import FilterCard from '../components/FilterCard'
+// import FormButtons from '../components/FormButtons'
+// import FormBody from './components/FormBody'
+// import { RootState } from '../store'
+// import { ParamsType, QuantityDetailsType } from '../types'
+// import { updateParamsHelper } from '../services/helpers'
+// import LoadingSpinner from '../components/LoadingSpinner'
 
 type PropTypes = {
   addProductPictureHandler: (p: FormData) => Promise<void>
@@ -71,7 +87,7 @@ const ProductsRender = ({
   })
 
   const completeArray = (x: number) => {
-    let arr = []
+    let arr: { product_picture: string | null; id: string }[] = []
     for (let i = 0; i < 5 - x; i++) {
       arr.push({ id: 'i' + 1, product_picture: null })
     }
@@ -122,7 +138,7 @@ const ProductsRender = ({
   const getProducts = async (params?: ParamsType) => {
     let {
       data: { data },
-    } = await Product.getProducts(params)
+    } = await ProductService.getProducts(params)
     return data
   }
   const submitHandler = (e: FormEvent<HTMLFormElement>) => {

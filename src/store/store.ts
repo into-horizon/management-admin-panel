@@ -3,8 +3,8 @@ import { save, load, remove } from 'react-cookies'
 import Store from '../services/Stores'
 import { updateToast } from './globalToasts'
 import { AppDispatch, RootState } from '.'
-import { DialogResponseTypes } from 'src/enums'
-import { ParamsType, StoreType, StoreStateType } from 'src/types'
+import { DialogResponseTypes } from '../enums'
+import { ParamsType, StoreType, StoreStateType } from '../types'
 
 const store = createSlice({
   name: 'store',

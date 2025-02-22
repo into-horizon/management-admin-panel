@@ -1,4 +1,4 @@
-import { EmployeeType, ParamsType } from 'src/types'
+import { EmployeeType, ParamsType } from '../types'
 import ApiService from './ApiService'
 
 class Employees extends ApiService {
@@ -18,7 +18,7 @@ class Employees extends ApiService {
   }
   async updateEmployee(data: EmployeeType) {
     try {
-      return await this.update({ management: this.management, endpoint: this.path }, data)
+      return await this.put({ management: this.management, endpoint: this.path }, data)
     } catch (error) {
       return error
     }

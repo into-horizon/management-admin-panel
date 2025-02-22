@@ -8,37 +8,29 @@ import {
   CButton,
   CTooltip,
 } from '@coreui/react'
-import PropTypes from 'prop-types'
 import React, { FormEvent, Fragment, useEffect, useState } from 'react'
-import { connect, useDispatch, useSelector } from 'react-redux'
-import FilterCard from 'src/components/FilterCard'
-import FormButtons from 'src/components/FormButtons'
-import Table, { ColumnType } from 'src/components/Table'
-import {
-  deleteEmployee,
-  getEmployees,
-  resetEmployeesParams,
-  setEmployeesParams,
-  updateEmployee,
-} from 'src/store/employee'
+import { useDispatch, useSelector } from 'react-redux'
 import AddEmployee from './components/AddEmployee'
 import CIcon from '@coreui/icons-react'
 import { cilTrash } from '@coreui/icons'
-import DeleteModal from 'src/components/DeleteModal'
-import { RootState } from 'src/store'
-import { ParamsType, EmployeeType } from 'src/types'
-import { InputType } from 'src/enums'
-import { updateParamsHelper } from 'src/services/helpers'
+import FilterCard from '../../components/FilterCard'
+import FormButtons from '../../components/FormButtons'
+import Table, { ColumnType } from '../../components/Table'
+import { InputType } from '../../enums'
+import { updateParamsHelper } from '../../services/helpers'
+import { RootState } from '../../store'
+import {
+  getEmployees,
+  setEmployeesParams,
+  resetEmployeesParams,
+  deleteEmployee,
+  updateEmployee,
+} from '../../store/employee'
+import { EmployeeType, ParamsType } from '../../types'
+import DeleteModal from '../../components/DeleteModal'
 
-type PropTypes = {
-  // getEmployees: (p: ParamsType) => Promise<void>
-  // updateEmployee: (p: EmployeeType) => Promise<void>
-  // deleteEmployee: (id: string) => Promise<void>
-}
 export const Overview = () => {
   const { data, count, params, loading } = useSelector((state: RootState) => state.employee)
-  // const [loading, setLoading] = useState(true)
-  // const [params, setParams] = useState<ParamsType>({ offset: 0, limit: 10 })
   const dispatch = useDispatch()
   useEffect(() => {
     dispatch(getEmployees())
