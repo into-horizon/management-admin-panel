@@ -1,5 +1,4 @@
 import React, { useRef, useState } from 'react'
-import Logo from '../assets/images/h.png'
 import jsPDF from 'jspdf'
 import html2canvas from 'html2canvas'
 import {
@@ -18,6 +17,7 @@ import Table from './Table'
 import CIcon from '@coreui/icons-react'
 import { cilCloudDownload, cilDescription } from '@coreui/icons'
 import { OrderType, OrderItemType, ParamsType } from '../types'
+import { logo } from '../environment'
 
 const Pdf = ({ order }: { order: OrderType }) => {
   const template = useRef<HTMLDivElement>(null)
@@ -68,7 +68,7 @@ const Pdf = ({ order }: { order: OrderType }) => {
   ]
   const printDocument = (count: number) => {
     html2canvas(template!.current!).then((canvas) => {
-      const imgData = canvas.toDataURL(Logo)
+      const imgData = canvas.toDataURL(logo)
       const pdf = new jsPDF({
         format: 'a4',
         unit: 'px',
@@ -130,7 +130,7 @@ const Pdf = ({ order }: { order: OrderType }) => {
           >
             <CRow className='justify-content-between' xs={{ gutterY: 5 }}>
               <CCol xs='auto'>
-                <img src={Logo} alt='logo' style={{ width: '5rem' }} /> <br />
+                <img src={logo} alt='logo' style={{ width: '5rem' }} /> <br />
                 <h5 style={{ textAlign: 'center', margin: '0 auto' }}>Horizon</h5>
               </CCol>
               <CCol xs='auto'>

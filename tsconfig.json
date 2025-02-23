@@ -2,6 +2,9 @@
   "include": ["@", "./src/index.d.ts"],
   "compilerOptions": {
     "baseUrl": ".",
+    "paths": {
+      "@/*": ["../"]
+    },
     /* Visit https://aka.ms/tsconfig to read more about this file */
 
     /* Projects */
