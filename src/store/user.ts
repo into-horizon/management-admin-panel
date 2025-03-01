@@ -19,7 +19,7 @@ const user = createSlice({
     addData(state, action) {
       return { ...state, ...action.payload }
     },
-    updateParams(state, action) {
+    updateParams(state, action: PayloadAction<ParamsType>) {
       state.params = action.payload
     },
     resetParams(state) {
