@@ -1,4 +1,4 @@
-import React, { useState, useEffect, FormEvent, memo } from 'react'
+import React, { useState, useEffect, FormEvent } from 'react'
 import {
   CButton,
   CForm,
@@ -13,11 +13,10 @@ import {
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import { cilPlus } from '@coreui/icons'
-import SearchDropdown from '../../../components/SearchDropdown'
-import { connect, useSelector } from 'react-redux'
+import SearchDropdown, { OptionType } from '../../../components/SearchDropdown'
+import { useSelector } from 'react-redux'
 import Category from '../../../services/CategoryService'
 import { RootState } from '../../../store'
-import { getParentCategoriesHandler, getChildCategoriesHandler } from '../../../store/category'
 import { ParentCategoriesType, ChildAndGrandCategoriesType } from '../../../types'
 
 type PropTypes = {
@@ -29,11 +28,11 @@ const AddCategoryModal = ({ action, type }: PropTypes) => {
   const {
     parentCategories: { data: parentCategories },
     childCategories: { data: childCategories },
-    grandChildCategories: { data: grandChildCategories },
   } = useSelector((state: RootState) => state.category)
   const [visible, setVisible] = useState(false)
   const [parentData, setParentData] = useState<ParentCategoriesType[]>([])
   const [parentId, setParentId] = useState<string>('')
+  const [selectedValue, setSelectedValue] = useState<OptionType>()
   const [childData, setChildData] = useState<ChildAndGrandCategoriesType[]>([])
   const [childId, setChildId] = useState<string>('')
   const [loading, setLoading] = useState(false)
@@ -44,11 +43,12 @@ const AddCategoryModal = ({ action, type }: PropTypes) => {
     } = await Category.getAllParentCategoires()
     return data
   }
-  const callChildData = async (id: string) => {
+  const callChildData = async (option: OptionType) => {
+    setSelectedValue(option)
     const {
       data: { data },
-    } = await Category.getAllChildCategoires({ parent_id: id })
-    setParentId(id)
+    } = await Category.getAllChildCategoires({ parent_id: option.id })
+    setParentId(option.id)
     setChildData(data)
     setResetChild(true)
   }
@@ -126,8 +126,13 @@ const AddCategoryModal = ({ action, type }: PropTypes) => {
                   }))}
                   onChange={onChangeParent}
                   placeholder='select parent category'
-                  onSelect={(e) => e && callChildData(e.id)}
+                  onSelect={(e: OptionType | OptionType[] | null) => {
+                    if (e && !Array.isArray(e)) {
+                      callChildData(e)
+                    }
+                  }}
                   loading={loading}
+                  selectedValue={selectedValue}
                 />
               </CCol>
             )}
@@ -154,7 +159,11 @@ const AddCategoryModal = ({ action, type }: PropTypes) => {
                   resetCallback={setResetChild}
                   onChange={onChange}
                   placeholder='select child category'
-                  onSelect={(e) => e && setChildId(e.id)}
+                  onSelect={(e: OptionType | OptionType[] | null) => {
+                    if (e && !Array.isArray(e)) {
+                      setChildId(e.id)
+                    }
+                  }}
                   loading={loading}
                 />
               </CCol>
@@ -178,6 +187,4 @@ const AddCategoryModal = ({ action, type }: PropTypes) => {
   )
 }
 
-export default memo(
-  connect(null, { getParentCategoriesHandler, getChildCategoriesHandler })(AddCategoryModal),
-)
+export default AddCategoryModal

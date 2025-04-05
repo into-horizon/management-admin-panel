@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import { Navigate, Route, Routes, useNavigate } from 'react-router-dom'
+import { Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 import './scss/style.scss'
 import { checkServer } from './store/auth'
 import { useDispatch, useSelector } from 'react-redux'
@@ -16,6 +16,7 @@ import LoadingSpinner from './components/LoadingSpinner'
 import { PopupProvider } from 'react-custom-popup'
 import routes from './routes'
 import AuthLayout from './layout/AuthLayout'
+import { load, remove, save } from 'react-cookies'
 export const events = new EventEmitter()
 
 // Containers
@@ -32,6 +33,7 @@ const ResetPassword = React.lazy(() => import('./views/pages/password/ResetPassw
 const App = () => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
+  const { pathname } = useLocation()
   notificationsOffers.on('welcome', (data) => {
     Notification.requestPermission().then((data) => {
       // console.log({ data });
@@ -57,7 +59,13 @@ const App = () => {
 
   useEffect(() => {
     if (isServerDown) {
+      if (pathname !== '/500') {
+        save('redirect', pathname, { path: '/' })
+      }
       navigate('/500')
+    } else if (!isServerDown && load('redirect')) {
+      navigate(load('redirect'))
+      remove('redirect', { path: '/' })
     }
   }, [isServerDown])
 

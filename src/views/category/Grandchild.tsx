@@ -80,7 +80,8 @@ const Grandchild = () => {
     {
       header: 'parent title',
       field: 'p_artitle',
-      body: (e: ChildAndGrandCategoriesType) => `${e.p_entitle} - ${e.p_artitle}`,
+      body: (e: ChildAndGrandCategoriesType) =>
+        `${e.child_category?.entitle} - ${e.child_category?.artitle}`,
     },
 
     {

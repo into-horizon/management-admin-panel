@@ -20,3 +20,15 @@ export const isTokenValid = (): boolean => {
 export const updateParamsHelper = (currentParams: ParamsType, currentPage: number): ParamsType => {
   return { ...currentParams, offset: currentParams.limit! * (currentPage - 1) }
 }
+
+export function isValidJSON(value: string) {
+  try {
+    if (typeof value !== 'string') {
+      value = JSON.stringify(value) // Optional: convert if it's already an object
+    }
+    JSON.parse(value)
+    return true
+  } catch (e) {
+    return false
+  }
+}

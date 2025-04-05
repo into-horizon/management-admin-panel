@@ -75,7 +75,8 @@ const Child = () => {
     {
       header: 'parent title',
       field: 'p_artitle',
-      body: (e: ChildAndGrandCategoriesType) => `${e.p_entitle} - ${e.p_artitle}`,
+      body: (e: ChildAndGrandCategoriesType) =>
+        `${e.parent_category?.entitle} - ${e.parent_category?.artitle}`,
     },
     {
       header: 'meta title',
@@ -150,7 +151,10 @@ const Child = () => {
   }
   return (
     <>
-      <AddCategoryModal action={addChildCategoryHandler} type='child' />
+      <AddCategoryModal
+        action={(data: ChildAndGrandCategoriesType) => dispatch(addChildCategoryHandler(data))}
+        type='child'
+      />
       <FilterCard>
         <CForm onSubmit={submitHandler} onReset={resetFilter}>
           <CRow className='justify-content-center align-items-end'>

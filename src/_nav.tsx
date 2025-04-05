@@ -163,6 +163,12 @@ const _nav = [
       },
     ],
   },
+  {
+    component: CNavItem,
+    name: "System Log",
+    to: "/log",
+    icon: <CIcon icon={cilShortText} customClassName="nav-icon" />,
+  },
 ];
 
 export default _nav;

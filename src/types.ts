@@ -52,6 +52,8 @@ export type ChildAndGrandCategoriesType = ParentCategoriesType & {
   parent_id: string
   p_entitle: string
   p_artitle: string
+  parent_category?: ParentCategoriesType
+  child_category?: ParentCategoriesType
 }
 export type CategoriesStateType = {
   parentCategories: { data: ParentCategoriesType[]; count: number }
@@ -390,5 +392,23 @@ export type NotificationType = {
 
 export interface UserResponse {
   data: UserType[]
+  count: number
+}
+
+export type RequestLog = {
+  id: string
+  method: string
+  request_body: string
+  response_body: string
+  status: number
+  created_at: string
+  url: string
+  profile: profileType
+  employee: EmployeeType
+  query: ParamsType
+}
+
+export type ListResponse<T> = {
+  data: T[]
   count: number
 }

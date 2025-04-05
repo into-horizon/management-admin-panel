@@ -1,37 +1,35 @@
 // import { createStore } from 'redux'
-import thunk from "redux-thunk";
-import { combineReducers, configureStore } from "@reduxjs/toolkit";
-import login from "./auth";
-import category from "./category";
-import products from "./product";
-import orders from "./orders";
-import finance from "./finance";
-import bankAccount from "./bankAccount";
-import withdrawals from "./withdrawal";
-import globalToasts from "./globalToasts";
-import user from "./user";
-import stores from "./store";
-import discountCode from "./discountCode";
-import filter from "./filter";
-import employee from "./employee";
-import dialog from "./globalDialog";
-import dashboard from "./dashboard";
-import notifications from "./notification";
+import thunk from 'redux-thunk'
+import { combineReducers, configureStore } from '@reduxjs/toolkit'
+import login from './auth'
+import category from './category'
+import products from './product'
+import orders from './orders'
+import finance from './finance'
+import bankAccount from './bankAccount'
+import withdrawals from './withdrawal'
+import globalToasts from './globalToasts'
+import user from './user'
+import stores from './store'
+import discountCode from './discountCode'
+import filter from './filter'
+import employee from './employee'
+import dialog from './globalDialog'
+import dashboard from './dashboard'
+import notifications from './notification'
+import log from './log'
 const initialState = {
   sidebarShow: true,
-};
+}
 
-const changeState = (
-  state = initialState,
-  { type, ...rest }: { type: string }
-) => {
+const changeState = (state = initialState, { type, ...rest }: { type: string }) => {
   switch (type) {
-    case "set":
-      return { ...state, ...rest };
+    case 'set':
+      return { ...state, ...rest }
     default:
-      return state;
+      return state
   }
-};
+}
 
 const reducers = combineReducers({
   changeState,
@@ -51,16 +49,17 @@ const reducers = combineReducers({
   dialog,
   dashboard,
   notifications,
-});
+  log,
+})
 
 const store = configureStore({
   reducer: reducers,
   middleware(getDefaultMiddleware) {
-    return getDefaultMiddleware().concat(thunk);
+    return getDefaultMiddleware().concat(thunk)
   },
-  devTools: process.env.NODE_ENV === 'development'
-});
-export default store;
+  devTools: process.env.NODE_ENV === 'development',
+})
+export default store
 
-export type AppDispatch = typeof store.dispatch;
-export type RootState = ReturnType<typeof store.getState>;
+export type AppDispatch = typeof store.dispatch
+export type RootState = ReturnType<typeof store.getState>
