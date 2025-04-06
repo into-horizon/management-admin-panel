@@ -1,4 +1,4 @@
-import { EmployeeType, ParamsType } from '../types'
+import { EmployeeType, ListResponse, ParamsType } from '../types'
 import ApiService from './ApiService'
 
 class Employees extends ApiService {
@@ -10,11 +10,10 @@ class Employees extends ApiService {
     this.path = 'employee'
   }
   async getEmployees(data: ParamsType) {
-    try {
-      return await this.get({ management: this.management, endpoint: `${this.path}s` }, data)
-    } catch (error) {
-      return error
-    }
+    return await this.get<{ data: ListResponse<EmployeeType> }>(
+      { management: this.management, endpoint: `${this.path}s` },
+      data,
+    )
   }
   async updateEmployee(data: EmployeeType) {
     try {

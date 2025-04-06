@@ -1,5 +1,3 @@
-import cookie from 'react-cookies'
-import { isJwtExpired } from 'jwt-check-expiration'
 import { ParamsType } from '../types'
 
 export const setDate = (days: number = 0): string => {
@@ -10,11 +8,6 @@ export const setDate = (days: number = 0): string => {
     day: '2-digit',
   }).format(date)
   return formattedDate
-}
-
-export const isTokenValid = (): boolean => {
-  let token = cookie.load('access_token')
-  return isJwtExpired(token)
 }
 
 export const updateParamsHelper = (currentParams: ParamsType, currentPage: number): ParamsType => {

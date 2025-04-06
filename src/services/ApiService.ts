@@ -4,8 +4,7 @@ import { ParamsType } from '../types'
 import { isJwtExpired } from 'jwt-check-expiration'
 import { apiURL, managementApiURL } from '../environment'
 
-axios.defaults.headers.common.locale = 'en'
-axios.defaults.timeout = 20000
+// axios.defaults.timeout = 40000
 export default class ApiService {
   constructor() {
     axios.interceptors.request.use(async (config) => {

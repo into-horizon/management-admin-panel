@@ -31,7 +31,6 @@ const Paginator: FC<PropTypes> = ({
   const [selectedPage, setSelectedPage] = useState<number>(
     (cookieName && cookie.load(cookieName) ? +cookie.load(cookieName) : pageNumber ?? 1) ?? 1,
   )
-  console.log('🚀 ~ selectedPage:', selectedPage)
   const siblingCount = 5
   let pagesCount = Math.ceil(count / (params?.limit ?? pageSize ?? 5) || 1)
   useEffect(() => {

@@ -162,8 +162,6 @@ const Grandchild = () => {
                   })}
                   placeholder='select child category'
                   onChange={onChange}
-                  reset={reset}
-                  resetCallback={setReset}
                   onSelect={(e) => setValue(e)}
                   loading={searchLoading}
                 />,

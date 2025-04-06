@@ -172,8 +172,6 @@ const Child = () => {
                 loading={loading}
                 onChange={onChange}
                 placeholder='search for parent category'
-                reset={reset}
-                resetCallback={setReset}
                 delay={1000}
               />
             </CCol>

@@ -1,0 +1,1 @@
+import{j as r}from"./index-48Ud3P6g.js";function t(){return r.jsx("div",{children:"StorePicture"})}function e(){return r.jsx("div",{children:"StoreInformation"})}const o=()=>r.jsxs(r.Fragment,{children:[r.jsx(t,{}),r.jsx(e,{})]});export{o as default};

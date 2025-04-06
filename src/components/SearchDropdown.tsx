@@ -13,37 +13,29 @@ export type OptionType<T = string, P = string> = { title: T; id: P }
 
 type PropTypes = {
   options: OptionType[]
-  onSelect: (d: OptionType) => void
   onChange: (d: string) => void
   loading: boolean
   placeholder?: string
   delay?: number
-  selectedValue?: {} | null
   emptyMessage?: string
 } & (
-  | { reset: boolean; resetCallback: Dispatch<React.SetStateAction<boolean>> }
-  | { reset?: undefined; resetCallback?: undefined }
-) &
-  (
-    | { multiple: true; selectedValue?: OptionType[]; onSelect: (d: OptionType[]) => void }
-    | {
-        multiple?: false
-        selectedValue?: OptionType | null
-        onSelect: (d: OptionType | null) => void
-      }
-  )
+  | { multiple: true; selectedValue?: OptionType[]; onSelect: (d: OptionType[]) => void }
+  | {
+      multiple?: false | undefined
+      selectedValue?: OptionType | null
+      onSelect: (d: OptionType | null) => void
+    }
+)
 const SearchDropdown: FC<PropTypes> = ({
   options,
   onSelect,
   onChange,
   loading,
   placeholder,
-  reset,
   delay,
   multiple,
   selectedValue,
   emptyMessage,
-  ...props
 }) => {
   const [isListOpen, setIsListOpen] = useState(false)
   const [value, setValue] = useState<string | null | number>(null)
@@ -51,8 +43,12 @@ const SearchDropdown: FC<PropTypes> = ({
   const containerRef = useRef<HTMLDivElement | null>(null)
 
   const onSelectValue = (e: OptionType) => {
-    if (multiple && selectedValue) {
-      onSelect(selectedValue?.concat(e))
+    if (multiple) {
+      if (selectedValue) {
+        onSelect(selectedValue?.concat(e))
+      } else {
+        onSelect([e])
+      }
     } else {
       onSelect(e as OptionType)
     }
@@ -62,16 +58,6 @@ const SearchDropdown: FC<PropTypes> = ({
     setValue(e.target.value)
     onChange?.(e.target.value)
   }
-
-  const resetValue = () => {
-    setValue('')
-  }
-  useEffect(() => {
-    if (reset) {
-      resetValue()
-      props.resetCallback?.(false)
-    }
-  }, [reset])
 
   useEffect(() => {
     const listVisibilityHandler = (e: MouseEvent) => {

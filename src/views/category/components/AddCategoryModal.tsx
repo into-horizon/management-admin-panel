@@ -36,7 +36,6 @@ const AddCategoryModal = ({ action, type }: PropTypes) => {
   const [childData, setChildData] = useState<ChildAndGrandCategoriesType[]>([])
   const [childId, setChildId] = useState<string>('')
   const [loading, setLoading] = useState(false)
-  const [resetChild, setResetChild] = useState<boolean>(false)
   const callParentData = async () => {
     const {
       data: { data },
@@ -50,7 +49,6 @@ const AddCategoryModal = ({ action, type }: PropTypes) => {
     } = await Category.getAllChildCategoires({ parent_id: option.id })
     setParentId(option.id)
     setChildData(data)
-    setResetChild(true)
   }
   useEffect(() => {
     callParentData().then((data) => setParentData(data))
@@ -74,7 +72,6 @@ const AddCategoryModal = ({ action, type }: PropTypes) => {
           x.artitle.toLocaleLowerCase().includes(e.toLocaleLowerCase()),
       ),
     )
-    setResetChild(true)
   }
   const submitHandler = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -155,8 +152,6 @@ const AddCategoryModal = ({ action, type }: PropTypes) => {
                     title: `${val.entitle} - ${val.artitle}`,
                     id: val.id,
                   }))}
-                  reset={resetChild}
-                  resetCallback={setResetChild}
                   onChange={onChange}
                   placeholder='select child category'
                   onSelect={(e: OptionType | OptionType[] | null) => {
