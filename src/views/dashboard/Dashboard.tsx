@@ -57,8 +57,15 @@ import { getDashboardData } from '../../store/dashboard'
 import LoadingSpinner from '../../components/LoadingSpinner'
 import { RootState } from '../../store'
 const Dashboard = () => {
-  const { products, stores, users, itemsSold, orderPlaced, ratedStores, isDashboardLoading } =
-    useSelector((state: RootState) => state.dashboard)
+  const {
+    products,
+    stores,
+    users,
+    itemsSold,
+    orderPlaced,
+    ratedStores,
+    isDashboardLoading,
+  } = useSelector((state: RootState) => state.dashboard)
   const { t } = useTranslation('translation', { keyPrefix: 'dashboard' })
   const dispatch = useDispatch()
   const random = (min: number, max: number) => {
@@ -313,7 +320,7 @@ const Dashboard = () => {
                     // color='dark'
                   />
                 </CCol>
-              )),
+              ))
             )}
           </CRow>
         </CCardFooter>
@@ -328,13 +335,17 @@ const Dashboard = () => {
                   <CRow>
                     <CCol sm={6}>
                       <div className='border-start border-start-4 border-start-info py-1 px-3'>
-                        <div className='text-medium-emphasis small'>New Clients</div>
+                        <div className='text-medium-emphasis small'>
+                          New Clients
+                        </div>
                         <div className='fs-5 fw-semibold'>9,123</div>
                       </div>
                     </CCol>
                     <CCol sm={6}>
                       <div className='border-start border-start-4 border-start-danger py-1 px-3 mb-3'>
-                        <div className='text-medium-emphasis small'>Recurring Clients</div>
+                        <div className='text-medium-emphasis small'>
+                          Recurring Clients
+                        </div>
                         <div className='fs-5 fw-semibold'>22,643</div>
                       </div>
                     </CCol>
@@ -344,7 +355,9 @@ const Dashboard = () => {
                   {progressGroupExample1.map((item, index) => (
                     <div className='progress-group mb-4' key={index}>
                       <div className='progress-group-prepend'>
-                        <span className='text-medium-emphasis small'>{item.title}</span>
+                        <span className='text-medium-emphasis small'>
+                          {item.title}
+                        </span>
                       </div>
                       <div className='progress-group-bars'>
                         <CProgress thin color='info' value={item.value1} />
@@ -358,13 +371,17 @@ const Dashboard = () => {
                   <CRow>
                     <CCol sm={6}>
                       <div className='border-start border-start-4 border-start-warning py-1 px-3 mb-3'>
-                        <div className='text-medium-emphasis small'>Pageviews</div>
+                        <div className='text-medium-emphasis small'>
+                          Pageviews
+                        </div>
                         <div className='fs-5 fw-semibold'>78,623</div>
                       </div>
                     </CCol>
                     <CCol sm={6}>
                       <div className='border-start border-start-4 border-start-success py-1 px-3 mb-3'>
-                        <div className='text-medium-emphasis small'>Organic</div>
+                        <div className='text-medium-emphasis small'>
+                          Organic
+                        </div>
                         <div className='fs-5 fw-semibold'>49,123</div>
                       </div>
                     </CCol>
@@ -377,10 +394,16 @@ const Dashboard = () => {
                       <div className='progress-group-header'>
                         <CIcon className='me-2' icon={item.icon} size='lg' />
                         <span>{item.title}</span>
-                        <span className='ms-auto fw-semibold'>{item.value}%</span>
+                        <span className='ms-auto fw-semibold'>
+                          {item.value}%
+                        </span>
                       </div>
                       <div className='progress-group-bars'>
-                        <CProgress thin color='warning' value={Number(item.value)} />
+                        <CProgress
+                          thin
+                          color='warning'
+                          value={Number(item.value)}
+                        />
                       </div>
                     </div>
                   ))}
@@ -394,7 +417,9 @@ const Dashboard = () => {
                         <span>{item.title}</span>
                         <span className='ms-auto fw-semibold'>
                           {item.value}{' '}
-                          <span className='text-medium-emphasis small'>({item.percent}%)</span>
+                          <span className='text-medium-emphasis small'>
+                            ({item.percent}%)
+                          </span>
                         </span>
                       </div>
                       <div className='progress-group-bars'>
@@ -414,9 +439,13 @@ const Dashboard = () => {
                       <CIcon icon={cilPeople} />
                     </CTableHeaderCell>
                     <CTableHeaderCell>User</CTableHeaderCell>
-                    <CTableHeaderCell className='text-center'>Country</CTableHeaderCell>
+                    <CTableHeaderCell className='text-center'>
+                      Country
+                    </CTableHeaderCell>
                     <CTableHeaderCell>Usage</CTableHeaderCell>
-                    <CTableHeaderCell className='text-center'>Payment Method</CTableHeaderCell>
+                    <CTableHeaderCell className='text-center'>
+                      Payment Method
+                    </CTableHeaderCell>
                     <CTableHeaderCell>Activity</CTableHeaderCell>
                   </CTableRow>
                 </CTableHead>
@@ -424,17 +453,25 @@ const Dashboard = () => {
                   {tableExample.map((item, index) => (
                     <CTableRow v-for='item in tableItems' key={index}>
                       <CTableDataCell className='text-center'>
-                        <CAvatar size='md' src={item.avatar.src} status={item.avatar.status} />
+                        <CAvatar
+                          size='md'
+                          src={item.avatar.src}
+                          status={item.avatar.status}
+                        />
                       </CTableDataCell>
                       <CTableDataCell>
                         <div>{item.user.name}</div>
                         <div className='small text-medium-emphasis'>
-                          <span>{item.user.new ? 'New' : 'Recurring'}</span> | Registered:{' '}
-                          {item.user.registered}
+                          <span>{item.user.new ? 'New' : 'Recurring'}</span> |
+                          Registered: {item.user.registered}
                         </div>
                       </CTableDataCell>
                       <CTableDataCell className='text-center'>
-                        <CIcon size='xl' icon={item.country.flag} title={item.country.name} />
+                        <CIcon
+                          size='xl'
+                          icon={item.country.flag}
+                          title={item.country.name}
+                        />
                       </CTableDataCell>
                       <CTableDataCell>
                         <div className='clearfix'>
@@ -442,16 +479,24 @@ const Dashboard = () => {
                             <strong>{item.usage.value}%</strong>
                           </div>
                           <div className='float-end'>
-                            <small className='text-medium-emphasis'>{item.usage.period}</small>
+                            <small className='text-medium-emphasis'>
+                              {item.usage.period}
+                            </small>
                           </div>
                         </div>
-                        <CProgress thin color={item.usage.color} value={item.usage.value} />
+                        <CProgress
+                          thin
+                          color={item.usage.color}
+                          value={item.usage.value}
+                        />
                       </CTableDataCell>
                       <CTableDataCell className='text-center'>
                         <CIcon size='xl' icon={item.payment.icon} />
                       </CTableDataCell>
                       <CTableDataCell>
-                        <div className='small text-medium-emphasis'>Last login</div>
+                        <div className='small text-medium-emphasis'>
+                          Last login
+                        </div>
                         <strong>{item.activity}</strong>
                       </CTableDataCell>
                     </CTableRow>

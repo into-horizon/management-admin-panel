@@ -21,6 +21,61 @@ import { ParentCategoriesType, ChildAndGrandCategoriesType } from '../../types'
 import AddCategoryModal from './components/AddCategoryModal'
 import DeleteModal from '../../components/DeleteModal'
 
+const DeleteButton = ({ id }: { id: string }) => {
+  const [visible, setVisible] = useState(false)
+  const dispatch = useDispatch()
+  const deleteHandler = async () => {
+    dispatch(deleteChildCategoryHandler(id))
+    setVisible(false)
+  }
+  return (
+    <React.Fragment>
+      <DeleteModal
+        visible={visible}
+        onClose={() => setVisible(false)}
+        onDelete={deleteHandler}
+      />
+      <CTooltip content='Delete'>
+        <CButton color='danger' onClick={() => setVisible(true)}>
+          <CIcon icon={cilTrash} />
+        </CButton>
+      </CTooltip>
+    </React.Fragment>
+  )
+}
+const columns: ColumnType[] = [
+  {
+    header: 'english title',
+    field: 'entitle',
+    edit: {
+      inputType: InputType.TEXT,
+    },
+  },
+  {
+    header: 'arabic title',
+    field: 'artitle',
+    edit: {
+      inputType: InputType.TEXT,
+    },
+  },
+  {
+    header: 'parent title',
+    field: 'p_artitle',
+    body: (e: ChildAndGrandCategoriesType) =>
+      `${e.parent_category?.entitle} - ${e.parent_category?.artitle}`,
+  },
+  {
+    header: 'meta title',
+    field: 'metatitle',
+    body: (data: ChildAndGrandCategoriesType) =>
+      data.metatitle ? data.metatitle : '-',
+    edit: {
+      inputType: InputType.TEXT,
+    },
+  },
+  { header: 'products count', field: 'products_count' },
+]
+
 const Child = () => {
   const {
     childCategories: { data, count },
@@ -32,62 +87,12 @@ const Child = () => {
   const [loading, setLoading] = useState(false)
   const [currentPage, setCurrentPage] = useState<number>(1)
   const [selectedValue, setSelectedValue] = useState<OptionType | null>(null)
-  const [reset, setReset] = useState<boolean>(false)
+
   const dispatch = useDispatch()
-  useEffect(() => {
-    !selectedValue?.id && setReset(true)
-  }, [selectedValue?.id])
   useEffect(() => {
     dispatch(getChildCategoriesHandler())
   }, [childParams])
-  const DeleteButton = ({ id }: { id: string }) => {
-    const [visible, setVisible] = useState(false)
-    const deleteHandler = async () => {
-      dispatch(deleteChildCategoryHandler(id))
-      setVisible(false)
-    }
-    return (
-      <React.Fragment>
-        <DeleteModal visible={visible} onClose={() => setVisible(false)} onDelete={deleteHandler} />
-        <CTooltip content='Delete'>
-          <CButton color='danger' onClick={() => setVisible(true)}>
-            <CIcon icon={cilTrash} />
-          </CButton>
-        </CTooltip>
-      </React.Fragment>
-    )
-  }
-  const columns: ColumnType[] = [
-    {
-      header: 'english title',
-      field: 'entitle',
-      edit: {
-        inputType: InputType.TEXT,
-      },
-    },
-    {
-      header: 'arabic title',
-      field: 'artitle',
-      edit: {
-        inputType: InputType.TEXT,
-      },
-    },
-    {
-      header: 'parent title',
-      field: 'p_artitle',
-      body: (e: ChildAndGrandCategoriesType) =>
-        `${e.parent_category?.entitle} - ${e.parent_category?.artitle}`,
-    },
-    {
-      header: 'meta title',
-      field: 'metatitle',
-      body: (data: ChildAndGrandCategoriesType) => (data.metatitle ? data.metatitle : '-'),
-      edit: {
-        inputType: InputType.TEXT,
-      },
-    },
-    { header: 'products count', field: 'products_count' },
-  ]
+
   const onSelect = (e: typeof selectedValue) => {
     setSelectedValue(e)
   }
@@ -146,13 +151,17 @@ const Child = () => {
     )
   }
   const onPageChange = (n: number) => {
-    dispatch(updateChildParams({ offset: (childParams?.limit ?? 10) * (n - 1) }))
+    dispatch(
+      updateChildParams({ offset: (childParams?.limit ?? 10) * (n - 1) }),
+    )
     setCurrentPage(n)
   }
   return (
     <>
       <AddCategoryModal
-        action={(data: ChildAndGrandCategoriesType) => dispatch(addChildCategoryHandler(data))}
+        action={(data: ChildAndGrandCategoriesType) =>
+          dispatch(addChildCategoryHandler(data))
+        }
         type='child'
       />
       <FilterCard>

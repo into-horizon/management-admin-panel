@@ -52,7 +52,7 @@ export const loginHandler = createAsyncThunk(
             message: response.message,
             title: 'incorrect credentials',
             type: DialogResponseTypes.ERROR,
-          }),
+          })
         )
         return initialState
       }
@@ -64,11 +64,11 @@ export const loginHandler = createAsyncThunk(
             message: err.message,
             title: 'Login Error',
             type: DialogResponseTypes.ERROR,
-          }),
+          })
         )
       }
     }
-  },
+  }
 )
 export const getUser = createAsyncThunk(
   'auth/getUser',
@@ -89,11 +89,11 @@ export const getUser = createAsyncThunk(
           updateDialog({
             type: DialogResponseTypes.ERROR,
             message: error.message,
-          }),
+          })
         )
       }
     }
-  },
+  }
 )
 
 export const logout = () => async (dispatch: AppDispatch) => {
@@ -110,17 +110,20 @@ export const endSession = () => async (dispatch: AppDispatch) => {
 }
 
 export const updateInfo =
-  (info: StoreType) => async (dispatch: AppDispatch, state: () => RootState) => {
+  (info: StoreType) =>
+  async (dispatch: AppDispatch, state: () => RootState) => {
     try {
       let response = await NewUpdate.updateInfo(info)
-      dispatch(loginAction({ user: { ...state().login.user, ...response.data } }))
+      dispatch(
+        loginAction({ user: { ...state().login.user, ...response.data } })
+      )
     } catch (error) {
       if (error instanceof Error) {
         dispatch(
           updateDialog({
             type: DialogResponseTypes.ERROR,
             message: error.message,
-          }),
+          })
         )
       }
     }
@@ -130,14 +133,16 @@ export const updateName =
   (name: string) => async (dispatch: AppDispatch, state: () => RootState) => {
     try {
       let response = await NewUpdate.updateStoreName({ store_name: name })
-      dispatch(loginAction({ user: { ...state().login.user, ...response.data } }))
+      dispatch(
+        loginAction({ user: { ...state().login.user, ...response.data } })
+      )
     } catch (error) {
       if (error instanceof Error) {
         dispatch(
           updateDialog({
             type: DialogResponseTypes.ERROR,
             message: error.message,
-          }),
+          })
         )
       }
     }
@@ -155,7 +160,7 @@ export const updateStorePicture =
               ...state().login.user,
               store_picture: response.result.store_picture,
             },
-          }),
+          })
         )
       }
     } catch (error) {
@@ -164,75 +169,78 @@ export const updateStorePicture =
           updateToast({
             type: DialogResponseTypes.ERROR,
             message: error.message,
-          }),
+          })
         )
       }
     }
   }
 
-export const createStoreHandler = (payload: {}) => async (dispatch: AppDispatch) => {
-  try {
-    let res = await NewAuth.createStore(payload)
-    let { result, message, status } = res
-    if (status === 200) {
-      dispatch(loginAction({ user: result, message: message }))
-    } else {
-      dispatch(loginAction({ message: res }))
-    }
-  } catch (error) {
-    if (error instanceof Error) {
-      dispatch(
-        updateDialog({
-          type: DialogResponseTypes.ERROR,
-          message: error.message,
-          title: 'create store error',
-        }),
-      )
+export const createStoreHandler =
+  (payload: {}) => async (dispatch: AppDispatch) => {
+    try {
+      let res = await NewAuth.createStore(payload)
+      let { result, message, status } = res
+      if (status === 200) {
+        dispatch(loginAction({ user: result, message: message }))
+      } else {
+        dispatch(loginAction({ message: res }))
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        dispatch(
+          updateDialog({
+            type: DialogResponseTypes.ERROR,
+            message: error.message,
+            title: 'create store error',
+          })
+        )
+      }
     }
   }
-}
 
-export const provideReferenceHandler = (payload: any) => async (dispatch: AppDispatch) => {
-  try {
-    let { status, message } = await NewAuth.provideReference(payload)
-    if (status === 200) {
-      dispatch(loginAction({ message: message }))
-    } else {
-      dispatch(loginAction({ message: message }))
-    }
-  } catch (error) {
-    if (error instanceof Error) {
-      dispatch(
-        updateDialog({
-          type: DialogResponseTypes.ERROR,
-          message: error.message,
-          title: 'reset password error',
-        }),
-      )
+export const provideReferenceHandler =
+  (payload: any) => async (dispatch: AppDispatch) => {
+    try {
+      let { status, message } = await NewAuth.provideReference(payload)
+      if (status === 200) {
+        dispatch(loginAction({ message: message }))
+      } else {
+        dispatch(loginAction({ message: message }))
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        dispatch(
+          updateDialog({
+            type: DialogResponseTypes.ERROR,
+            message: error.message,
+            title: 'reset password error',
+          })
+        )
+      }
     }
   }
-}
 
-export const validateTokenHandler = (token: string) => async (dispatch: AppDispatch) => {
-  try {
-    const { status, message } = await NewAuth.validateToken(token)
-    if (status === 200) {
-      dispatch(loginAction({ message: 'valid' }))
-    } else {
-      dispatch(loginAction({ message: 'invalid' }))
-    }
-  } catch (error) {
-    if (error instanceof Error) {
-      dispatch(
-        updateDialog({
-          type: DialogResponseTypes.ERROR,
-          message: error.message,
-          title: 'reset password error',
-        }),
-      )
+export const validateTokenHandler =
+  (token: string) => async (dispatch: AppDispatch) => {
+    try {
+      const { status, message } = await NewAuth.validateToken(token)
+      if (status === 200) {
+        dispatch(loginAction({ message: 'valid' }))
+      } else {
+        dispatch(loginAction({ message: 'invalid' }))
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        dispatch(
+          updateDialog({
+            type: DialogResponseTypes.ERROR,
+            message: error.message,
+            title: 'reset password error',
+          })
+        )
+      }
     }
   }
-}
 
 export const resetPasswordHandler =
   (token: string, password: string) => async (dispatch: AppDispatch) => {
@@ -250,7 +258,7 @@ export const resetPasswordHandler =
             type: DialogResponseTypes.ERROR,
             message: error.message,
             title: 'reset password error',
-          }),
+          })
         )
       }
     }
@@ -297,10 +305,13 @@ const login = createSlice({
     builder.addCase(checkServer.pending, (state) => {
       state.loading = true
     })
-    builder.addCase(checkServer.fulfilled, (state, action: PayloadAction<boolean>) => {
-      state.loading = action.payload
-      state.isServerDown = false
-    })
+    builder.addCase(
+      checkServer.fulfilled,
+      (state, action: PayloadAction<boolean>) => {
+        state.loading = action.payload
+        state.isServerDown = false
+      }
+    )
     builder.addCase(checkServer.rejected, (state) => {
       state.loading = false
       state.isServerDown = true
@@ -312,7 +323,11 @@ export const checkServer = createAsyncThunk(
   'auth/checkServer',
   async (_, { dispatch, rejectWithValue }) => {
     try {
-      await Promise.all([Auth.checkAPI(), Auth.checkManagementAPI(), socket.connect()])
+      await Promise.all([
+        Auth.checkAPI(),
+        Auth.checkManagementAPI(),
+        socket.connect(),
+      ])
       if (cookie.load('access_token')) {
         dispatch(getUser())
         return true
@@ -321,7 +336,7 @@ export const checkServer = createAsyncThunk(
     } catch (error) {
       return rejectWithValue((error as Error).message)
     }
-  },
+  }
 )
 
 export default login.reducer

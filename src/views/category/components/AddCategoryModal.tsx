@@ -17,7 +17,10 @@ import SearchDropdown, { OptionType } from '../../../components/SearchDropdown'
 import { useSelector } from 'react-redux'
 import Category from '../../../services/CategoryService'
 import { RootState } from '../../../store'
-import { ParentCategoriesType, ChildAndGrandCategoriesType } from '../../../types'
+import {
+  ParentCategoriesType,
+  ChildAndGrandCategoriesType,
+} from '../../../types'
 
 type PropTypes = {
   action: (d: any) => void
@@ -123,9 +126,11 @@ const AddCategoryModal = ({ action, type }: PropTypes) => {
                   }))}
                   onChange={onChangeParent}
                   placeholder='select parent category'
-                  onSelect={(e: OptionType | OptionType[] | null) => {
-                    if (e && !Array.isArray(e)) {
+                  onSelect={(e) => {
+                    if (e) {
                       callChildData(e)
+                    } else {
+                      setSelectedValue(undefined)
                     }
                   }}
                   loading={loading}
@@ -148,10 +153,12 @@ const AddCategoryModal = ({ action, type }: PropTypes) => {
             {type === 'grand' && (
               <CCol xs='auto'>
                 <SearchDropdown
-                  options={childData.map((val: ChildAndGrandCategoriesType) => ({
-                    title: `${val.entitle} - ${val.artitle}`,
-                    id: val.id,
-                  }))}
+                  options={childData.map(
+                    (val: ChildAndGrandCategoriesType) => ({
+                      title: `${val.entitle} - ${val.artitle}`,
+                      id: val.id,
+                    }),
+                  )}
                   onChange={onChange}
                   placeholder='select child category'
                   onSelect={(e: OptionType | OptionType[] | null) => {

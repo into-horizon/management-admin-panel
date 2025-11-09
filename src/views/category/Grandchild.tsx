@@ -21,6 +21,63 @@ import {
 import { ChildAndGrandCategoriesType } from '../../types'
 import AddCategoryModal from './components/AddCategoryModal'
 
+const DeleteButton = ({ id }: { id: string }) => {
+  const [visible, setVisible] = useState(false)
+  const dispatch = useDispatch()
+  const deleteHandler = () => {
+    dispatch(deleteGrandchildCategoryHandler(id))
+    setVisible(false)
+  }
+  return (
+    <React.Fragment>
+      <DeleteModal
+        visible={visible}
+        onClose={() => setVisible(false)}
+        onDelete={deleteHandler}
+        id={undefined}
+      />
+      <CTooltip content='Delete'>
+        <CButton color='danger' onClick={() => setVisible(true)}>
+          <CIcon icon={cilTrash} />
+        </CButton>
+      </CTooltip>
+    </React.Fragment>
+  )
+}
+const columns: ColumnType[] = [
+  {
+    header: 'english title',
+    field: 'entitle',
+    edit: {
+      inputType: InputType.TEXT,
+    },
+  },
+  {
+    header: 'arabic title',
+    field: 'artitle',
+    edit: {
+      inputType: InputType.TEXT,
+    },
+  },
+
+  {
+    header: 'parent title',
+    field: 'p_artitle',
+    body: (e: ChildAndGrandCategoriesType) =>
+      `${e.child_category?.entitle} - ${e.child_category?.artitle}`,
+  },
+
+  {
+    header: 'meta title',
+    field: 'metatitle',
+    body: (data: ChildAndGrandCategoriesType) =>
+      data.metatitle ? data.metatitle : '-',
+    edit: {
+      inputType: InputType.TEXT,
+    },
+  },
+  { header: 'products count', field: 'products_count' },
+]
 const Grandchild = () => {
   const {
     grandChildCategories: { data, count },
@@ -30,70 +87,12 @@ const Grandchild = () => {
   const [childData, setChildData] = useState<ChildAndGrandCategoriesType[]>([])
   const [value, setValue] = useState<OptionType | null>(null)
   const [searchLoading, setSearchLoading] = useState(false)
-  const [reset, setReset] = useState<boolean>(false)
   const [currentPage, setCurrentPage] = useState(1)
   const dispatch = useDispatch()
-  useEffect(() => {
-    !value?.id && setReset(true)
-  }, [value?.id])
+
   useEffect(() => {
     dispatch(getGrandChildCategoriesHandler())
   }, [grandchildParams])
-  const DeleteButton = ({ id }: { id: string }) => {
-    const [visible, setVisible] = useState(false)
-    const deleteHandler = () => {
-      dispatch(deleteGrandchildCategoryHandler(id))
-      setVisible(false)
-    }
-    return (
-      <React.Fragment>
-        <DeleteModal
-          visible={visible}
-          onClose={() => setVisible(false)}
-          onDelete={deleteHandler}
-          id={undefined}
-        />
-        <CTooltip content='Delete'>
-          <CButton color='danger' onClick={() => setVisible(true)}>
-            <CIcon icon={cilTrash} />
-          </CButton>
-        </CTooltip>
-      </React.Fragment>
-    )
-  }
-  const columns: ColumnType[] = [
-    {
-      header: 'english title',
-      field: 'entitle',
-      edit: {
-        inputType: InputType.TEXT,
-      },
-    },
-    {
-      header: 'arabic title',
-      field: 'artitle',
-      edit: {
-        inputType: InputType.TEXT,
-      },
-    },
-
-    {
-      header: 'parent title',
-      field: 'p_artitle',
-      body: (e: ChildAndGrandCategoriesType) =>
-        `${e.child_category?.entitle} - ${e.child_category?.artitle}`,
-    },
-
-    {
-      header: 'meta title',
-      field: 'metatitle',
-      body: (data: ChildAndGrandCategoriesType) => (data.metatitle ? data.metatitle : '-'),
-      edit: {
-        inputType: InputType.TEXT,
-      },
-    },
-    { header: 'products count', field: 'products_count' },
-  ]
 
   const getChild = async (title: string) => {
     let {
@@ -139,33 +138,33 @@ const Grandchild = () => {
     dispatch(
       updateGrandchildParams({
         offset: (grandchildParams.limit ?? 10) * (n - 1),
-      }),
+      })
     )
   }
   return (
     <>
-      <AddCategoryModal type='grand' action={addCategoryHandler} />
       <div className='card padding mrgn25'>
         <CForm onSubmit={submitHandler} onReset={clearFilter}>
-          <CRow className='justify-content-center align-items-end' xs={{ gutter: 1 }}>
+          <CRow
+            className='justify-content-center align-items-end'
+            xs={{ gutter: 1 }}
+          >
             <CCol xs='auto'>
               <CFormInput id='title' placeholder='title' />
             </CCol>
             <CCol xs='auto'>
-              {Children.toArray(
-                <SearchDropdown
-                  options={childData.map((val) => {
-                    return {
-                      title: `${val.entitle} - ${val.artitle}`,
-                      id: val.id,
-                    }
-                  })}
-                  placeholder='select child category'
-                  onChange={onChange}
-                  onSelect={(e) => setValue(e)}
-                  loading={searchLoading}
-                />,
-              )}
+              <SearchDropdown
+                options={childData.map((val) => {
+                  return {
+                    title: `${val.entitle} - ${val.artitle}`,
+                    id: val.id,
+                  }
+                })}
+                placeholder='select child category'
+                onChange={onChange}
+                onSelect={(e) => setValue(e)}
+                loading={searchLoading}
+              />
             </CCol>
             <CCol xs='auto'>
               <CTooltip content='search'>
@@ -196,6 +195,7 @@ const Grandchild = () => {
         editable
         editFn={updateGrandChildCategory}
       />
+      <AddCategoryModal type='grand' action={addCategoryHandler} />
     </>
   )
 }

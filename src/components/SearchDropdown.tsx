@@ -37,8 +37,10 @@ const SearchDropdown: FC<PropTypes> = ({
   selectedValue,
   emptyMessage,
 }) => {
+  console.log('🚀 ~ SearchDropdown ~ selectedValue:', selectedValue)
   const [isListOpen, setIsListOpen] = useState(false)
   const [value, setValue] = useState<string | null | number>(null)
+  console.log('🚀 ~ SearchDropdown ~ value:', value)
 
   const containerRef = useRef<HTMLDivElement | null>(null)
 
@@ -85,8 +87,16 @@ const SearchDropdown: FC<PropTypes> = ({
           <CSpinner color='secondary' size='sm' />
         ) : (
           <>
-            {!multiple && selectedValue && <CCloseButton onClick={() => onSelect(null)} />}
-
+            {!multiple && selectedValue && (
+              <CCloseButton
+                onClick={(e) => {
+                  e.stopPropagation()
+                  onSelect(null)
+                  console.log('clicked')
+                  setValue(null)
+                }}
+              />
+            )}
             <CIcon icon={cilChevronBottom} color='red' size='sm' />
           </>
         )}

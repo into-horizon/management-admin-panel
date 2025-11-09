@@ -21,15 +21,22 @@ import {
   updatePendingProductsParams,
   updateProductStatus,
 } from '../../store/product'
-import { cilImage, cilLibrary, cilDescription, cilCheck, cilX } from '@coreui/icons'
+import {
+  cilImage,
+  cilLibrary,
+  cilDescription,
+  cilCheck,
+  cilX,
+} from '@coreui/icons'
 import { RootState } from '../../store'
 import { ParamsType, ProductType } from '../../types'
-import { events } from '../../App'
 import { updateParamsHelper } from '../../services/helpers'
+import { useSocket } from '../../context/SocketContext'
 
 const PendingProducts = () => {
   // const [loading, setLoading] = useState(true)
   const dispatch = useDispatch()
+  const { events } = useSocket()
   const [params, setParams] = useState<ParamsType>({ limit: 10, offset: 0 })
   const {
     pending: { data, count },
@@ -39,7 +46,7 @@ const PendingProducts = () => {
   useEffect(() => {
     dispatch(getPendingProducts())
   }, [pendingParams])
-  events.on('pending', () => {})
+  events?.on('pending', () => {})
   const Details = (data: ProductType) => {
     const [visible, setVisible] = useState(false)
     return (
@@ -80,7 +87,11 @@ const PendingProducts = () => {
             <CIcon icon={cilImage} />
           </CButton>
         </CTooltip>
-        <CModal visible={visible} onClose={() => setVisible(false)} alignment='center'>
+        <CModal
+          visible={visible}
+          onClose={() => setVisible(false)}
+          alignment='center'
+        >
           <CModalHeader>
             <CModalTitle>Product Images</CModalTitle>
           </CModalHeader>
@@ -88,9 +99,15 @@ const PendingProducts = () => {
             {Children.toArray(
               data.pictures.map(({ product_picture }) => (
                 <CCol xs={4}>
-                  <CImage rounded thumbnail src={product_picture} width={600} height={600} />
+                  <CImage
+                    rounded
+                    thumbnail
+                    src={product_picture}
+                    width={600}
+                    height={600}
+                  />
                 </CCol>
-              )),
+              ))
             )}
           </CRow>
         </CModal>
@@ -126,19 +143,27 @@ const PendingProducts = () => {
           ...data,
           status: 'rejected',
           rejection_reason: target.rejection_reason.value,
-        }),
+        })
       )
     }
     return (
       <React.Fragment>
-        <CModal visible={visible} alignment='center' onClose={() => setVisible(false)}>
+        <CModal
+          visible={visible}
+          alignment='center'
+          onClose={() => setVisible(false)}
+        >
           <CModalHeader>
             <CModalTitle>Product Rejection</CModalTitle>
           </CModalHeader>
           <CForm onSubmit={submitHandler}>
             <CRow className='justify-content-center align-items-center'>
               <CCol xs={10}>
-                <CFormTextarea label='Rejection Reason' id='rejection_reason' required />
+                <CFormTextarea
+                  label='Rejection Reason'
+                  id='rejection_reason'
+                  required
+                />
               </CCol>
             </CRow>
             <CModalFooter>
@@ -157,7 +182,11 @@ const PendingProducts = () => {
               <CTooltip content='Approve'>
                 <CButton
                   color='success'
-                  onClick={() => dispatch(updateProductStatus({ id: data.id, status: 'approved' }))}
+                  onClick={() =>
+                    dispatch(
+                      updateProductStatus({ id: data.id, status: 'approved' })
+                    )
+                  }
                 >
                   <CIcon icon={cilCheck} />
                 </CButton>
@@ -185,7 +214,9 @@ const PendingProducts = () => {
     { header: 'status', field: 'status', body: StatusBody },
   ]
   function pageChangeHandler(page: number): void {
-    dispatch(updatePendingProductsParams(updateParamsHelper(pendingParams, page)))
+    dispatch(
+      updatePendingProductsParams(updateParamsHelper(pendingParams, page))
+    )
   }
 
   return (

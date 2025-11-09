@@ -1,8 +1,21 @@
-import React, { FormEvent, useState } from 'react'
-import { CButton, CCol, CForm, CFormInput, CFormLabel, CRow, CTooltip } from '@coreui/react'
+import { FormEvent, useState } from 'react'
+import {
+  CButton,
+  CCol,
+  CForm,
+  CFormInput,
+  CFormLabel,
+  CRow,
+  CTooltip,
+} from '@coreui/react'
 import { useDispatch, useSelector } from 'react-redux'
 import Draggable from 'react-draggable'
-import { cilFilterSquare, cilCursorMove, cilFilter, cilFilterX } from '@coreui/icons'
+import {
+  cilFilterSquare,
+  cilCursorMove,
+  cilFilter,
+  cilFilterX,
+} from '@coreui/icons'
 import SearchDropdown, { OptionType } from '../components/SearchDropdown'
 import { searchForStore } from '../store/store'
 import { populateStore } from '../store/filter'
@@ -13,7 +26,9 @@ import CIcon from '@coreui/icons-react'
 
 export function DraggableFilter() {
   const [filterVisible, setVisibleFilter] = useState(false)
-  const [selectedStore, setSelectedStore] = useState<OptionType | undefined | null>(null)
+  const [selectedStore, setSelectedStore] = useState<
+    OptionType | undefined | null
+  >(null)
   const { searched } = useSelector((state: RootState) => state.stores)
   const { duration } = useSelector((state: RootState) => state.filter)
   const dispatch = useDispatch()
@@ -24,7 +39,7 @@ export function DraggableFilter() {
       populateStore({
         store: selectedStore!,
         duration: `${target.from.value}&${target.to.value}`,
-      }),
+      })
     )
   }
   const resetHandler = (e: FormEvent<HTMLFormElement>) => {
@@ -70,7 +85,11 @@ export function DraggableFilter() {
             }}
           >
             <CTooltip content='select seller'>
-              <CButton color='info' size='lg' onClick={() => setVisibleFilter((x) => !x)}>
+              <CButton
+                color='info'
+                size='lg'
+                onClick={() => setVisibleFilter((x) => !x)}
+              >
                 <CIcon icon={cilFilterSquare} size='xl' />
               </CButton>
             </CTooltip>
@@ -97,11 +116,12 @@ export function DraggableFilter() {
                       dispatch(
                         searchForStore({
                           query: e,
-                        }),
+                        })
                       )
                     }
                     onSelect={(e) => setSelectedStore(e)}
                     loading={false}
+                    delay={1000}
                   />
                 </CCol>
                 <CRow className='justify-content-center'>

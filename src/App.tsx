@@ -1,5 +1,11 @@
 import React, { useEffect } from 'react'
-import { Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
+import {
+  Navigate,
+  Route,
+  Routes,
+  useLocation,
+  useNavigate,
+} from 'react-router-dom'
 import './scss/style.scss'
 import { checkServer } from './store/auth'
 import { useDispatch, useSelector } from 'react-redux'
@@ -11,13 +17,11 @@ import GlobalDialog from './components/GlobalDialog'
 import Toaster from './components/Toaster'
 import { CCol, CContainer, CRow } from '@coreui/react'
 import { RootState } from './store'
-import { EventEmitter } from 'events'
 import LoadingSpinner from './components/LoadingSpinner'
 import { PopupProvider } from 'react-custom-popup'
 import routes from './routes'
 import AuthLayout from './layout/AuthLayout'
 import { load, remove, save } from 'react-cookies'
-export const events = new EventEmitter()
 
 // Containers
 const DefaultLayout = React.lazy(() => import('./layout/DefaultLayout'))
@@ -28,24 +32,25 @@ const Page404 = React.lazy(() => import('./views/pages/page404/Page404'))
 const Page500 = React.lazy(() => import('./views/pages/page500/Page500'))
 const Verify = React.lazy(() => import('./views/pages/verify/verify'))
 const Reference = React.lazy(() => import('./views/pages/password/reference'))
-const ResetPassword = React.lazy(() => import('./views/pages/password/ResetPassword'))
+const ResetPassword = React.lazy(
+  () => import('./views/pages/password/ResetPassword')
+)
 
 const App = () => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const { pathname } = useLocation()
   notificationsOffers.on('welcome', (data) => {
-    Notification.requestPermission().then((data) => {
-      // console.log({ data });
-      // new Notification(data)
-    })
+    Notification.requestPermission().then((data) => {})
   })
-  const { loading, isServerDown } = useSelector((state: RootState) => state.login)
+  const { loading, isServerDown } = useSelector(
+    (state: RootState) => state.login
+  )
   const { i18n } = useTranslation()
 
   useEffect(() => {
     dispatch(checkServer())
-  }, [])
+  }, [dispatch])
 
   useEffect(() => {
     if (i18n.language === 'en') {
@@ -99,7 +104,11 @@ const App = () => {
             {routes.map((route, idx) => {
               return (
                 route.component && (
-                  <Route key={idx} path={route.path} element={<route.component />} />
+                  <Route
+                    key={idx}
+                    path={route.path}
+                    element={<route.component />}
+                  />
                 )
               )
             })}
