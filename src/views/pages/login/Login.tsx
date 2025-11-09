@@ -1,4 +1,4 @@
-import React, { FormEvent } from 'react'
+import { FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   CButton,
@@ -17,7 +17,7 @@ import {
 import CIcon from '@coreui/icons-react'
 import { cilLockLocked, cilUser } from '@coreui/icons'
 import { loginHandler } from '../../../store/auth'
-import { connect, useDispatch, useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { RootState } from '../../../store'
 
@@ -40,7 +40,7 @@ const Login = ({}: PropTypes) => {
       loginHandler({
         email: target.email.value,
         password: target.password.value,
-      }),
+      })
     )
   }
   return (
@@ -58,7 +58,11 @@ const Login = ({}: PropTypes) => {
                       <CInputGroupText>
                         <CIcon icon={cilUser} />
                       </CInputGroupText>
-                      <CFormInput placeholder={t('email')} autoComplete='email' name='email' />
+                      <CFormInput
+                        placeholder={t('email')}
+                        autoComplete='email'
+                        name='email'
+                      />
                     </CInputGroup>
                     <CInputGroup className='mb-4'>
                       <CInputGroupText>
@@ -79,7 +83,11 @@ const Login = ({}: PropTypes) => {
                           type='submit'
                           disabled={login.loading}
                         >
-                          {login.loading ? <CSpinner color='light' size='sm' /> : t('login')}
+                          {login.loading ? (
+                            <CSpinner color='light' size='sm' />
+                          ) : (
+                            t('login')
+                          )}
                         </CButton>
                       </CCol>
                       <CCol xs='auto' className='text-right'>
@@ -96,7 +104,11 @@ const Login = ({}: PropTypes) => {
                       <CCol xs='auto'>
                         <CButton
                           color='link'
-                          onClick={() => i18n.changeLanguage(i18n.language === 'en' ? 'ar' : 'en')}
+                          onClick={() =>
+                            i18n.changeLanguage(
+                              i18n.language === 'en' ? 'ar' : 'en'
+                            )
+                          }
                         >
                           {i18n.language === 'en' ? 'عربي' : 'English'}
                         </CButton>
@@ -128,5 +140,4 @@ const Login = ({}: PropTypes) => {
   )
 }
 
-const mapDispatchToProps = { loginHandler }
-export default connect(null, null)(Login)
+export default Login
