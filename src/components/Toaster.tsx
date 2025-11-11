@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import { useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { PopupType, usePopup, ToastPosition } from 'react-custom-popup'
 import { resetState } from '../store/globalToasts'
@@ -6,7 +6,9 @@ import { RootState } from '../store'
 
 export const Toaster = () => {
   const dispatch = useDispatch()
-  const { status, message, type } = useSelector((state: RootState) => state.globalToasts)
+  const { message, type } = useSelector(
+    (state: RootState) => state.globalToasts
+  )
   const { showToast } = usePopup()
   const messages = {
     create: 'created successfully',
@@ -26,7 +28,7 @@ export const Toaster = () => {
     const toastType = type === 'error' ? PopupType.DANGER : PopupType.INFO
     type && toastShow(toastType, message)
     dispatch(resetState())
-  }, [status])
+  }, [message])
   return <></>
 }
 

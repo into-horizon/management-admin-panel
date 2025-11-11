@@ -348,7 +348,7 @@ export type WithdrawalStateType = {
 export type ParamsType = {
   limit?: number
   offset?: number
-} & { [key: string]: any }
+} & Record<string, any>
 
 export type GetFunctionType = (p: ParamsType) => Promise<void>
 
@@ -411,4 +411,14 @@ export type RequestLog = {
 export type ListResponse<T> = {
   data: T[]
   count: number
+}
+
+export interface ConfigurationType {
+  id: string
+  name: string
+  displayName?: string
+  description?: string
+  isActive: boolean
+  createdAt: string
+  updatedAt: string
 }

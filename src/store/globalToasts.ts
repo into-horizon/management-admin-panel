@@ -1,7 +1,11 @@
-import { createSlice } from '@reduxjs/toolkit'
+import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { DialogResponseTypes } from '../enums'
 
-const initialState: { message: string; status: number; type: DialogResponseTypes } = {
+const initialState: {
+  message: string
+  status?: number
+  type: DialogResponseTypes
+} = {
   message: '',
   status: 0,
   type: DialogResponseTypes.DEFAULT,
@@ -10,7 +14,14 @@ const globalToasts = createSlice({
   name: 'global toasts',
   initialState: { ...initialState },
   reducers: {
-    updateToast(state, action) {
+    updateToast(
+      _,
+      action: PayloadAction<{
+        message: string
+        status?: number
+        type: DialogResponseTypes
+      }>
+    ) {
       return { ...action.payload }
     },
 

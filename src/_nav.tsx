@@ -1,174 +1,183 @@
-import React from "react";
-import CIcon from "@coreui/icons-react";
+import CIcon from '@coreui/icons-react'
 import {
-  cilBell,
-  cilCalculator,
-  cilChartPie,
-  cilCursor,
-  cilDrop,
-  cilNotes,
-  cilPencil,
   cilPuzzle,
   cilSpeedometer,
-  cilStar,
   cilCart,
   cilMoney,
   cilShortText,
   cilAddressBook,
   cilUser,
   cilPeople,
-} from "@coreui/icons";
-import { CNavGroup, CNavItem, CNavTitle } from "@coreui/react";
+} from '@coreui/icons'
+import { CNavGroup, CNavItem, CNavTitle } from '@coreui/react'
 
 const _nav = [
   {
     component: CNavItem,
-    name: "Dashboard",
-    to: "/dashboard",
-    icon: <CIcon icon={cilSpeedometer} customClassName="nav-icon" />,
+    name: 'Dashboard',
+    to: '/dashboard',
+    icon: <CIcon icon={cilSpeedometer} customClassName='nav-icon' />,
   },
 
   {
     component: CNavTitle,
-    name: "Components",
+    name: 'Components',
   },
   {
     component: CNavGroup,
-    name: "Categories",
-    to: "/categories",
-    icon: <CIcon icon={cilAddressBook} customClassName="nav-icon" />,
+    name: 'Categories',
+    to: '/categories',
+    icon: <CIcon icon={cilAddressBook} customClassName='nav-icon' />,
     items: [
       {
         component: CNavItem,
-        name: "Parent Category",
-        to: "/category/parent",
+        name: 'Parent Category',
+        to: '/category/parent',
       },
       {
         component: CNavItem,
-        name: "Child Category",
-        to: "/category/child",
+        name: 'Child Category',
+        to: '/category/child',
       },
       {
         component: CNavItem,
-        name: "Grandchild Category",
-        to: "/category/grandchild",
+        name: 'Grandchild Category',
+        to: '/category/grandchild',
       },
     ],
   },
   {
     component: CNavGroup,
-    name: "Users",
-    to: "/users",
-    icon: <CIcon icon={cilUser} customClassName="nav-icon" />,
+    name: 'Users',
+    to: '/users',
+    icon: <CIcon icon={cilUser} customClassName='nav-icon' />,
     items: [
       {
         component: CNavItem,
-        name: "Users Overview",
-        to: "/users/overview",
+        name: 'Users Overview',
+        to: '/users/overview',
       },
     ],
   },
   {
     component: CNavGroup,
-    name: "Sellers",
-    to: "/seller",
-    icon: <CIcon icon={cilPeople} customClassName="nav-icon" />,
+    name: 'Sellers',
+    to: '/seller',
+    icon: <CIcon icon={cilPeople} customClassName='nav-icon' />,
     items: [
       {
         component: CNavItem,
-        name: "New Sellers",
-        to: "/seller/new",
+        name: 'New Sellers',
+        to: '/seller/new',
       },
       {
         component: CNavItem,
-        name: "Sellers Overview",
-        to: "/seller/overview",
+        name: 'Sellers Overview',
+        to: '/seller/overview',
       },
     ],
   },
   {
     component: CNavItem,
-    name: "Promo Codes",
-    to: "/promo",
-    icon: <CIcon icon={cilShortText} customClassName="nav-icon" />,
+    name: 'Promo Codes',
+    to: '/promo',
+    icon: <CIcon icon={cilShortText} customClassName='nav-icon' />,
   },
   {
     component: CNavItem,
-    name: "Employees",
-    to: "/employees",
-    icon: <CIcon icon={cilAddressBook} customClassName="nav-icon" />,
+    name: 'Employees',
+    to: '/employees',
+    icon: <CIcon icon={cilAddressBook} customClassName='nav-icon' />,
   },
   {
     component: CNavGroup,
-    name: "Products",
-    to: "/product",
-    icon: <CIcon icon={cilPuzzle} customClassName="nav-icon" />,
+    name: 'Products',
+    to: '/product',
+    icon: <CIcon icon={cilPuzzle} customClassName='nav-icon' />,
     items: [
       {
         component: CNavItem,
-        name: "Pending Products",
-        to: "/product/pending",
+        name: 'Pending Products',
+        to: '/product/pending',
         badge: {
-          color: "info",
+          color: 'info',
         },
       },
       {
         component: CNavItem,
-        name: "Add Product",
-        to: "/product/add",
+        name: 'Add Product',
+        to: '/product/add',
       },
       {
         component: CNavItem,
-        name: "Products",
-        to: "/product/products",
+        name: 'Products',
+        to: '/product/products',
       },
     ],
   },
   {
     component: CNavGroup,
-    name: "Orders",
-    to: "/order",
-    icon: <CIcon icon={cilCart} customClassName="nav-icon" />,
+    name: 'Orders',
+    to: '/order',
+    icon: <CIcon icon={cilCart} customClassName='nav-icon' />,
     items: [
       {
         component: CNavItem,
-        name: "Pending Orders",
-        to: "/order/pendingOrders",
+        name: 'Pending Orders',
+        to: '/order/pendingOrders',
         badge: {
-          color: "info",
+          color: 'info',
         },
       },
       {
         component: CNavItem,
-        name: "Orders Overview",
-        to: "/order/overview",
+        name: 'Orders Overview',
+        to: '/order/overview',
       },
     ],
   },
   {
     component: CNavGroup,
-    name: "Finance",
-    to: "/finance",
-    icon: <CIcon icon={cilMoney} customClassName="nav-icon" />,
+    name: 'Finance',
+    to: '/finance',
+    icon: <CIcon icon={cilMoney} customClassName='nav-icon' />,
     items: [
       {
         component: CNavItem,
-        name: "Statement",
-        to: "/finance/statement",
+        name: 'Statement',
+        to: '/finance/statement',
       },
       {
         component: CNavItem,
-        name: "Amounts Summary",
-        to: "/finance/summary",
+        name: 'Amounts Summary',
+        to: '/finance/summary',
+      },
+    ],
+  },
+  {
+    component: CNavGroup,
+    name: 'System Configuration',
+    to: '/system',
+    icon: <CIcon icon={cilSpeedometer} customClassName='nav-icon' />,
+    items: [
+      {
+        component: CNavItem,
+        name: 'Configuration Types',
+        to: '/system/config/types',
+      },
+      {
+        component: CNavItem,
+        name: 'Configuration Values',
+        to: '/system/config/values',
       },
     ],
   },
   {
     component: CNavItem,
-    name: "System Log",
-    to: "/log",
-    icon: <CIcon icon={cilShortText} customClassName="nav-icon" />,
+    name: 'System Log',
+    to: '/log',
+    icon: <CIcon icon={cilShortText} customClassName='nav-icon' />,
   },
-];
+]
 
-export default _nav;
+export default _nav

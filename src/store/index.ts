@@ -18,11 +18,15 @@ import dialog from './globalDialog'
 import dashboard from './dashboard'
 import notifications from './notification'
 import log from './log'
+import configureTypes from './configurationTypes.slice'
 const initialState = {
   sidebarShow: true,
 }
 
-const changeState = (state = initialState, { type, ...rest }: { type: string }) => {
+const changeState = (
+  state = initialState,
+  { type, ...rest }: { type: string }
+) => {
   switch (type) {
     case 'set':
       return { ...state, ...rest }
@@ -50,6 +54,7 @@ const reducers = combineReducers({
   dashboard,
   notifications,
   log,
+  configureTypes,
 })
 
 const store = configureStore({

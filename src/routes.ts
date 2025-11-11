@@ -24,6 +24,18 @@ const PendingProducts = lazy(() => import('./views/product/PendingProducts'))
 const ProductReviews = lazy(() => import('./views/product/ProductReviews'))
 const Employees = lazy(() => import('./views/employees/Overview'))
 const Log = lazy(() => import('./views/log/Log'))
+const ConfigurationTypes = lazy(
+  () =>
+    import(
+      './views/system-configuration/configuration-types/ConfigurationTypes'
+    )
+)
+const ConfigurationValues = lazy(
+  () =>
+    import(
+      './views/system-configuration/configuration-values/ConfigurationValues'
+    )
+)
 
 const routes: {
   path: string
@@ -44,12 +56,28 @@ const routes: {
     component: UpdateProduct,
     role: 'storeOwner',
   },
-  { path: 'product/pending', name: 'Pending Products', component: PendingProducts },
-  { path: 'product/reviews/:id', name: 'Products Reviews', component: ProductReviews },
+  {
+    path: 'product/pending',
+    name: 'Pending Products',
+    component: PendingProducts,
+  },
+  {
+    path: 'product/reviews/:id',
+    name: 'Products Reviews',
+    component: ProductReviews,
+  },
   { path: 'settings', name: 'Settings', component: Settings, exact: true },
   { path: 'order', name: 'Order', component: PendingOrders, exact: true },
-  { path: 'order/pendingOrders', name: 'Pending Orders', component: PendingOrders },
-  { path: 'order/overview', name: 'Orders Overview', component: OrdersOverview },
+  {
+    path: 'order/pendingOrders',
+    name: 'Pending Orders',
+    component: PendingOrders,
+  },
+  {
+    path: 'order/overview',
+    name: 'Orders Overview',
+    component: OrdersOverview,
+  },
   { path: 'pdf/:locale/:id', name: 'pdf', component: Pdf },
   { path: 'finance', name: 'Finance', component: Statement },
   { path: 'finance/statement', name: 'Statements', component: Statement },
@@ -60,12 +88,26 @@ const routes: {
   { path: 'category/grandchild', name: 'Grandchild', component: Grandchild },
   { path: 'users', name: 'Users', component: UsersOverview },
   { path: 'users/overview', name: 'Users Overview', component: UsersOverview },
-  { path: 'seller/overview', name: 'Sellers Overview', component: SellersOverview },
+  {
+    path: 'seller/overview',
+    name: 'Sellers Overview',
+    component: SellersOverview,
+  },
   { path: 'seller/new', name: 'Users Overview', component: NewSellers },
   { path: 'seller', name: 'Sellers', component: SellersOverview },
   { path: 'promo', name: 'Promo Codes', component: PromoCodes },
   { path: 'employees', name: 'Employees', component: Employees },
   { path: 'log', name: 'System Log', component: Log },
+  {
+    path: 'system/config/types',
+    name: 'Configuration Types',
+    component: ConfigurationTypes,
+  },
+  {
+    path: 'system/config/values',
+    name: 'Configuration Values',
+    component: ConfigurationValues,
+  },
   { path: '*', name: 'Error 404', component: Error404 },
 ]
 
