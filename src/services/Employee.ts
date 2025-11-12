@@ -10,21 +10,27 @@ class Employees extends ApiService {
     this.path = 'employee'
   }
   async getEmployees(data: ParamsType) {
-    return await this.get<{ data: ListResponse<EmployeeType> }>(
+    return await this.get<{ data: ListResponse<EmployeeType>; status: number }>(
       { management: this.management, endpoint: `${this.path}s` },
-      data,
+      data
     )
   }
   async updateEmployee(data: EmployeeType) {
     try {
-      return await this.put({ management: this.management, endpoint: this.path }, data)
+      return await this.put(
+        { management: this.management, endpoint: this.path },
+        data
+      )
     } catch (error) {
       return error
     }
   }
   async addEmployee(data: Omit<EmployeeType, 'verified'>) {
     try {
-      return await this.post({ management: this.management, endpoint: this.path }, data)
+      return await this.post(
+        { management: this.management, endpoint: this.path },
+        data
+      )
     } catch (error) {
       return error
     }

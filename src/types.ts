@@ -422,3 +422,8 @@ export interface ConfigurationType {
   createdAt: string
   updatedAt: string
 }
+
+export type PostConfigurationType = Omit<
+  ConfigurationType,
+  'id' | 'createdAt' | 'updateAt' | 'isActive'
+>

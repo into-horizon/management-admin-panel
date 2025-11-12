@@ -3,7 +3,12 @@ import { updateToast } from './globalToasts'
 import Employee from '../services/Employee'
 import { AppDispatch, RootState } from '.'
 import { DialogResponseTypes } from '../enums'
-import { EmployeeStateType, ParamsType, EmployeeType } from '../types'
+import {
+  EmployeeStateType,
+  ParamsType,
+  EmployeeType,
+  ListResponse,
+} from '../types'
 
 const initialState: EmployeeStateType = {
   data: [],
@@ -40,27 +45,37 @@ const employee = createSlice({
   },
 })
 
-export const getEmployees = createAsyncThunk<{ data: EmployeeType[]; count: number }, void>(
+export const getEmployees = createAsyncThunk<ListResponse<EmployeeType>, void>(
   'employees/getAll',
   async (_, { dispatch, rejectWithValue, getState }) => {
     try {
       const { params } = (getState() as RootState).employee
-      let { data, status, message } = await Employee.getEmployees(params)
+      let { data, status } = await Employee.getEmployees(params)
       if (status === 200) {
         return data
       } else {
-        dispatch(updateToast({ type: DialogResponseTypes.ERROR, message }))
-        return rejectWithValue(message)
+        dispatch(
+          updateToast({
+            type: DialogResponseTypes.ERROR,
+            message: 'Failed to fetch employees',
+            status,
+          })
+        )
+        return rejectWithValue('Failed to fetch employees')
       }
     } catch (error) {
       if (error instanceof Error) {
         dispatch(
-          updateToast({ status: 403, message: error.message, type: DialogResponseTypes.ERROR }),
+          updateToast({
+            status: 403,
+            message: (error as Error).message,
+            type: DialogResponseTypes.ERROR,
+          })
         )
-        return rejectWithValue(error.message)
       }
+      return rejectWithValue((error as Error).message)
     }
-  },
+  }
 )
 
 export const updateEmployee = createAsyncThunk<void, EmployeeType>(
@@ -70,36 +85,53 @@ export const updateEmployee = createAsyncThunk<void, EmployeeType>(
       let { status, message } = await Employee.updateEmployee(payload)
       if (status === 200) {
         dispatch(getEmployees())
-        dispatch(updateToast({ status, type: 'update' }))
-      } else dispatch(updateToast({ type: 'error', message: message, status }))
+        dispatch(
+          updateToast({ status, type: DialogResponseTypes.SUCCESS, message })
+        )
+      } else
+        dispatch(
+          updateToast({
+            type: DialogResponseTypes.ERROR,
+            message: message,
+            status,
+          })
+        )
     } catch (error) {
       if (error instanceof Error) {
         dispatch(
-          updateToast({ status: 403, message: error.message, type: DialogResponseTypes.ERROR }),
+          updateToast({
+            status: 403,
+            message: error.message,
+            type: DialogResponseTypes.ERROR,
+          })
         )
       }
     }
-  },
+  }
 )
 
-export const addEmployee = createAsyncThunk<void, Omit<EmployeeType, 'verified'>>(
-  'employee/add',
-  async (payload, { dispatch, getState }) => {
-    try {
-      const { status, message, data } = await Employee.addEmployee(payload)
-      if (status === 200) {
-        dispatch(updateToast({ type: 'create', message }))
-        dispatch(getEmployees())
-      } else dispatch(updateToast({ type: 'error', message }))
-    } catch (error) {
-      if (error instanceof Error) {
-        dispatch(
-          updateToast({ status: 403, message: error.message, type: DialogResponseTypes.ERROR }),
-        )
-      }
+export const addEmployee = createAsyncThunk<
+  void,
+  Omit<EmployeeType, 'verified'>
+>('employee/add', async (payload, { dispatch, getState }) => {
+  try {
+    const { status, message, data } = await Employee.addEmployee(payload)
+    if (status === 200) {
+      dispatch(updateToast({ type: DialogResponseTypes.SUCCESS, message }))
+      dispatch(getEmployees())
+    } else dispatch(updateToast({ type: DialogResponseTypes.ERROR, message }))
+  } catch (error) {
+    if (error instanceof Error) {
+      dispatch(
+        updateToast({
+          status: 403,
+          message: error.message,
+          type: DialogResponseTypes.ERROR,
+        })
+      )
     }
-  },
-)
+  }
+})
 
 export const deleteEmployee = createAsyncThunk<void, string>(
   'employees/delete',
@@ -107,17 +139,21 @@ export const deleteEmployee = createAsyncThunk<void, string>(
     try {
       const { status, message } = await Employee.deleteEmployee(payload)
       if (status === 200) {
-        dispatch(updateToast({ type: 'delete', message }))
+        dispatch(updateToast({ type: DialogResponseTypes.SUCCESS, message }))
         dispatch(getEmployees())
-      } else dispatch(updateToast({ type: 'error', message }))
+      } else dispatch(updateToast({ type: DialogResponseTypes.ERROR, message }))
     } catch (error) {
       if (error instanceof Error) {
         dispatch(
-          updateToast({ status: 403, message: error.message, type: DialogResponseTypes.ERROR }),
+          updateToast({
+            status: 403,
+            message: error.message,
+            type: DialogResponseTypes.ERROR,
+          })
         )
       }
     }
-  },
+  }
 )
 export const {
   setData,

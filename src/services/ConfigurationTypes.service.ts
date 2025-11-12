@@ -1,24 +1,26 @@
-import { ConfigurationType, ListResponse, ParamsType } from '../types'
+import {
+  ConfigurationType,
+  ListResponse,
+  ParamsType,
+  PostConfigurationType,
+} from '../types'
 import ApiService from './ApiService'
 
 class ConfigurationTypesService extends ApiService {
   private path: string
   constructor() {
     super()
-    this.path = 'configuration-types'
+    this.path = 'api/admin/configuration-type'
   }
   async getConfigurationTypes(params?: ParamsType) {
     return this.get<ListResponse<ConfigurationType>>(this.path, params)
   }
-  async createConfigurationType(data: Record<string, any>) {
+  async createConfigurationType(data: PostConfigurationType) {
     return this.post<{
-      data: Omit<
-        ConfigurationType,
-        'id' | 'createdAt' | 'updateAt' | 'isActive'
-      >
+      message: string
     }>(this.path, data)
   }
-  async updateConfigurationType(id: string, data: Record<string, any>) {
+  async updateConfigurationType(id: string, data: ConfigurationType) {
     return this.put<{ message: string }>(`${this.path}/${id}`, data)
   }
   async deleteConfigurationType(id: string) {

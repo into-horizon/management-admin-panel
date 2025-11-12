@@ -81,29 +81,37 @@ const orders = createSlice({
   },
 })
 
-export const getPendingOrdersHandler = createAsyncThunk<{ data: OrderType[]; count: number }, void>(
-  'orders/pending',
-  async (_, { dispatch, getState, rejectWithValue }) => {
-    try {
-      const { pendingParams } = (getState() as RootState).orders
-      let { status, data, message } = await Orders.getStorePendingOrders(pendingParams)
-      if (status === 200) {
-        dispatch(addPendingOrders(data))
-        return data
-      } else {
-        dispatch(updateToast({ status, message, type: DialogResponseTypes.ERROR }))
-        return rejectWithValue(message)
-      }
-    } catch (error) {
-      if (error instanceof Error) {
-        dispatch(
-          updateToast({ status: 403, message: error.message, type: DialogResponseTypes.ERROR }),
-        )
-        return rejectWithValue(error.message)
-      }
+export const getPendingOrdersHandler = createAsyncThunk<
+  { data: OrderType[]; count: number },
+  void
+>('orders/pending', async (_, { dispatch, getState, rejectWithValue }) => {
+  try {
+    const { pendingParams } = (getState() as RootState).orders
+    let { status, data, message } = await Orders.getStorePendingOrders(
+      pendingParams
+    )
+    if (status === 200) {
+      dispatch(addPendingOrders(data))
+      return data
+    } else {
+      dispatch(
+        updateToast({ status, message, type: DialogResponseTypes.ERROR })
+      )
+      return rejectWithValue(message)
     }
-  },
-)
+  } catch (error) {
+    if (error instanceof Error) {
+      dispatch(
+        updateToast({
+          status: 403,
+          message: error.message,
+          type: DialogResponseTypes.ERROR,
+        })
+      )
+      return rejectWithValue(error.message)
+    }
+  }
+})
 
 export const getOverviewOrdersHandler = createAsyncThunk<
   { data: OrderType[]; count: number },
@@ -112,18 +120,26 @@ export const getOverviewOrdersHandler = createAsyncThunk<
   try {
     const { overviewParams } = (getState() as RootState).orders
 
-    let { status, data, message } = await Orders.getStoreNotPendingOrders(overviewParams)
+    let { status, data, message } = await Orders.getStoreNotPendingOrders(
+      overviewParams
+    )
     if (status === 200) {
       dispatch(addOverviewOrders(data))
       return data
     } else {
-      dispatch(updateToast({ status, message, type: DialogResponseTypes.ERROR }))
+      dispatch(
+        updateToast({ status, message, type: DialogResponseTypes.ERROR })
+      )
       return rejectWithValue(message)
     }
   } catch (error) {
     if (error instanceof Error) {
       dispatch(
-        updateToast({ status: 403, message: error.message, type: DialogResponseTypes.ERROR }),
+        updateToast({
+          status: 403,
+          message: error.message,
+          type: DialogResponseTypes.ERROR,
+        })
       )
       return rejectWithValue(error.message)
     }
@@ -138,20 +154,28 @@ export const updateOrderItemHandler = createAsyncThunk<void, OrderItemType>(
       if (status === 200) {
         // dispatch(getOverviewOrdersHandler())
         dispatch(getPendingOrdersHandler())
-        dispatch(updateToast({ status, message, type: DialogResponseTypes.SUCCESS }))
+        dispatch(
+          updateToast({ status, message, type: DialogResponseTypes.SUCCESS })
+        )
       } else {
-        dispatch(updateToast({ status, message, type: DialogResponseTypes.ERROR }))
+        dispatch(
+          updateToast({ status, message, type: DialogResponseTypes.ERROR })
+        )
         return rejectWithValue(message)
       }
     } catch (error) {
       if (error instanceof Error) {
         dispatch(
-          updateToast({ status: 403, message: error.message, type: DialogResponseTypes.ERROR }),
+          updateToast({
+            status: 403,
+            message: error.message,
+            type: DialogResponseTypes.ERROR,
+          })
         )
         return rejectWithValue(error.message)
       }
     }
-  },
+  }
 )
 
 export const getStatuesHandler = () => async (dispatch: AppDispatch) => {
@@ -163,33 +187,47 @@ export const getStatuesHandler = () => async (dispatch: AppDispatch) => {
   } catch (error) {
     if (error instanceof Error) {
       dispatch(
-        updateToast({ status: 403, message: error.message, type: DialogResponseTypes.ERROR }),
+        updateToast({
+          status: 403,
+          message: error.message,
+          type: DialogResponseTypes.ERROR,
+        })
       )
     }
   }
 }
 
-export const bulkStatusUpdate = createAsyncThunk<void, { status: string; id: string }>(
-  'orders/bulkUpdate',
-  async (payload, { dispatch, rejectWithValue }) => {
-    try {
-      const { status, message } = await Orders.bulkStatusUpdate(payload)
-      if (status === 200) {
-        dispatch(getOverviewOrdersHandler())
-        dispatch(updateToast({ status, type: 'update', message }))
-      } else {
-        dispatch(updateToast({ status: status, message: message, type: DialogResponseTypes.ERROR }))
-        return rejectWithValue(message)
-      }
-    } catch (error) {
-      if (error instanceof Error) {
-        dispatch(
-          updateToast({ status: 403, message: error.message, type: DialogResponseTypes.ERROR }),
-        )
-      }
+export const bulkStatusUpdate = createAsyncThunk<
+  void,
+  { status: string; id: string }
+>('orders/bulkUpdate', async (payload, { dispatch, rejectWithValue }) => {
+  try {
+    const { status, message } = await Orders.bulkStatusUpdate(payload)
+    if (status === 200) {
+      dispatch(getOverviewOrdersHandler())
+      dispatch(updateToast({ status, type: DialogResponseTypes.INFO, message }))
+    } else {
+      dispatch(
+        updateToast({
+          status: status,
+          message: message,
+          type: DialogResponseTypes.ERROR,
+        })
+      )
+      return rejectWithValue(message)
     }
-  },
-)
+  } catch (error) {
+    if (error instanceof Error) {
+      dispatch(
+        updateToast({
+          status: 403,
+          message: error.message,
+          type: DialogResponseTypes.ERROR,
+        })
+      )
+    }
+  }
+})
 
 export default orders.reducer
 export const {

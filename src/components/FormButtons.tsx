@@ -1,4 +1,3 @@
-import React from 'react'
 import { CTooltip, CButton, CRow, CCol } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import { cilSearch, cilFilterX } from '@coreui/icons'

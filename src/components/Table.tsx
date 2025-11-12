@@ -112,7 +112,9 @@ export const Table = ({
     })
   }
 
-  const updateItem = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>): void => {
+  const updateItem = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ): void => {
     setItem((x) => {
       return { ...x, [e.target.id]: e.target.value }
     })
@@ -132,15 +134,20 @@ export const Table = ({
               <CTableRow>
                 {checkbox && (
                   <CTableDataCell>
-                    <CFormCheck onChange={selectAll} checked={selected.length === data.length} />
+                    <CFormCheck
+                      onChange={selectAll}
+                      checked={selected.length === data.length}
+                    />
                   </CTableDataCell>
                 )}
                 {Children.toArray(
                   columns.map(({ header }) => (
                     <CTableHeaderCell scope='col'>{header}</CTableHeaderCell>
-                  )),
+                  ))
                 )}
-                {(editable || Actions) && <CTableHeaderCell>Actions</CTableHeaderCell>}
+                {(editable || Actions) && (
+                  <CTableHeaderCell>Actions</CTableHeaderCell>
+                )}
               </CTableRow>
             </CTableHead>
             <CTableBody>
@@ -159,6 +166,14 @@ export const Table = ({
                     {Children.toArray(
                       columns.map(({ field, body: Body, edit }) => {
                         if (i === onEdit) {
+                          const itemField = field as keyof typeof item
+                          let itemValue = item?.[itemField] as string | boolean
+                          if (
+                            typeof itemValue === 'boolean' ||
+                            typeof itemValue === 'number'
+                          ) {
+                            itemValue = itemValue?.toString() as string
+                          }
                           return (
                             <CTableDataCell>
                               {edit && edit.inputType ? (
@@ -166,13 +181,11 @@ export const Table = ({
                                   type={edit.inputType}
                                   id={field ? field : ''}
                                   onChange={updateItem}
-                                  value={
-                                    field && item[field as keyof typeof item]
-                                      ? item[field as keyof typeof item]
-                                      : ''
-                                  }
+                                  value={itemValue}
                                   options={
-                                    edit.inputType === InputType.DROPDOWN ? edit.options : []
+                                    edit.inputType === InputType.DROPDOWN
+                                      ? edit.options
+                                      : []
                                   }
                                 />
                               ) : (
@@ -190,11 +203,11 @@ export const Table = ({
                             {String(
                               field && d[field as keyof typeof d]
                                 ? d[field as keyof typeof d]
-                                : '-',
+                                : '-'
                             )}
                           </CTableDataCell>
                         )
-                      }),
+                      })
                     )}
                     {editable && (
                       <CTableDataCell>
@@ -206,7 +219,10 @@ export const Table = ({
                               </CButton>
                             </CTooltip>
                             <CTooltip content='cancel'>
-                              <CButton color='danger' onClick={() => setOnEdit('')}>
+                              <CButton
+                                color='danger'
+                                onClick={() => setOnEdit('')}
+                              >
                                 <CIcon icon={cilX} />
                               </CButton>
                             </CTooltip>
@@ -216,6 +232,7 @@ export const Table = ({
                             <CTooltip content='edit'>
                               <CButton
                                 color='secondary'
+                                size='sm'
                                 onClick={() => {
                                   setOnEdit(i)
                                   setItem(d)
@@ -230,7 +247,7 @@ export const Table = ({
                       </CTableDataCell>
                     )}
                   </CTableRow>
-                )),
+                ))
               )}
             </CTableBody>
           </CTable>
@@ -258,12 +275,20 @@ export const Table = ({
                   <CCol xs='auto'>
                     <CRow className='align-items-center'>
                       <CCol xs='auto'>
-                        <CFormLabel htmlFor='display'>Displayed Items</CFormLabel>
+                        <CFormLabel htmlFor='display'>
+                          Displayed Items
+                        </CFormLabel>
                       </CCol>
                       <CCol xs='auto'>
-                        <CFormSelect name='display' onChange={changeHandler} value={params?.limit}>
+                        <CFormSelect
+                          name='display'
+                          onChange={changeHandler}
+                          value={params?.limit}
+                        >
                           {Children.toArray(
-                            displayItems.map((val) => <option value={val}>{val}</option>),
+                            displayItems.map((val) => (
+                              <option value={val}>{val}</option>
+                            ))
                           )}
                         </CFormSelect>
                       </CCol>

@@ -19,6 +19,7 @@ import dashboard from './dashboard'
 import notifications from './notification'
 import log from './log'
 import configureTypes from './configurationTypes.slice'
+import { useSelector } from 'react-redux'
 const initialState = {
   sidebarShow: true,
 }
@@ -68,3 +69,6 @@ export default store
 
 export type AppDispatch = typeof store.dispatch
 export type RootState = ReturnType<typeof store.getState>
+export const useSelectorWithType: <TSelected>(
+  selector: (state: RootState) => TSelected
+) => TSelected = useSelector

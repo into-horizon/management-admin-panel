@@ -10,15 +10,23 @@ type PropTypes = {
   value: string
   id: string
 }
-const TableEditCell: FC<PropTypes> = ({ type = 'text', options = [], onChange, value, id }) => {
+const TableEditCell: FC<PropTypes> = ({
+  type = 'text',
+  options = [],
+  onChange,
+  value,
+  id,
+}) => {
   return (
     <React.Fragment>
-      <CRow className='align-items-center justify-content-center'>
+      <CRow className='align-items-center '>
         <CCol xs='auto'>
           {type === 'dropdown' ? (
-            <CFormSelect value={value} onChange={onChange} id={id}>
+            <CFormSelect value={value.toString()} onChange={onChange} id={id}>
               {Children.toArray(
-                options.map((option) => <option value={option.value}>{option.name}</option>),
+                options.map((option) => (
+                  <option value={option.value}>{option.name}</option>
+                ))
               )}
             </CFormSelect>
           ) : (
