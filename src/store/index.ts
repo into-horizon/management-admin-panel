@@ -19,6 +19,7 @@ import dashboard from './dashboard'
 import notifications from './notification'
 import log from './log'
 import configureTypes from './configurationTypes.slice'
+import configurationValue from './configurationValue.slice'
 import { useSelector } from 'react-redux'
 const initialState = {
   sidebarShow: true,
@@ -56,6 +57,7 @@ const reducers = combineReducers({
   notifications,
   log,
   configureTypes,
+  configurationValue,
 })
 
 const store = configureStore({

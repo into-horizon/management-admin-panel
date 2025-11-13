@@ -427,3 +427,22 @@ export type PostConfigurationType = Omit<
   ConfigurationType,
   'id' | 'createdAt' | 'updateAt' | 'isActive'
 >
+
+export type ConfigurationValueType = {
+  id?: string
+  typeId: string
+  key: string
+  valueEn: string
+  valueAr: string
+  colorCode?: string
+  orderIndex?: number
+  parentId?: string
+  isActive?: boolean
+  createdAt?: string
+  updatedAt?: string
+}
+
+export type PostConfigurationValueType = Omit<
+  ConfigurationValueType,
+  'id' | 'createdAt' | 'updatedAt' | 'isActive'
+>
