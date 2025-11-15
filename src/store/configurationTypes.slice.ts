@@ -33,7 +33,7 @@ const configurationTypesSlice = createSlice({
     setParams(
       state,
       action: PayloadAction<
-        Partial<{ page: number; displayName: string; typeId: string }>
+        Partial<{ page: number; search: string; typeId: string }>
       >
     ) {
       state.params = updateParamsHelper(

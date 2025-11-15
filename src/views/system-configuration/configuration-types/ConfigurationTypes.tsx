@@ -19,10 +19,9 @@ import FilterCard from '../../../components/FilterCard'
 import FormButtons from '../../../components/FormButtons'
 
 const ConfigurationTypes = () => {
-  const { data, count, params, loading } = useSelectorWithType(
+  const { data, count, loading } = useSelectorWithType(
     (state) => state.configureTypes
   )
-  // const []
   const [deleteModal, setDeleteModal] = useState({ visible: false, id: '' })
   const dispatch = useDispatch()
 
@@ -53,9 +52,7 @@ const ConfigurationTypes = () => {
           <CFormInput
             placeholder='name'
             onChange={(e) =>
-              dispatch(
-                setConfigurationParamsTypes({ displayName: e.target.value })
-              )
+              dispatch(setConfigurationParamsTypes({ search: e.target.value }))
             }
             delay={500}
           />

@@ -1,4 +1,12 @@
-import React, { useState, useEffect, Children, ChangeEvent, Dispatch, useRef, FC } from 'react'
+import React, {
+  useState,
+  useEffect,
+  Children,
+  ChangeEvent,
+  Dispatch,
+  useRef,
+  FC,
+} from 'react'
 import {
   CCloseButton,
   CFormCheck,
@@ -9,7 +17,10 @@ import {
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import { cilChevronBottom } from '@coreui/icons'
-export type OptionType<T = string, P = string> = { title: T; id: P }
+export type OptionType<T = string, P = string> = { title: T; id: P } & Record<
+  string,
+  any
+>
 
 type PropTypes = {
   options: OptionType[]
@@ -19,7 +30,11 @@ type PropTypes = {
   delay?: number
   emptyMessage?: string
 } & (
-  | { multiple: true; selectedValue?: OptionType[]; onSelect: (d: OptionType[]) => void }
+  | {
+      multiple: true
+      selectedValue?: OptionType[]
+      onSelect: (d: OptionType[]) => void
+    }
   | {
       multiple?: false | undefined
       selectedValue?: OptionType | null
@@ -37,10 +52,8 @@ const SearchDropdown: FC<PropTypes> = ({
   selectedValue,
   emptyMessage,
 }) => {
-  console.log('🚀 ~ SearchDropdown ~ selectedValue:', selectedValue)
   const [isListOpen, setIsListOpen] = useState(false)
   const [value, setValue] = useState<string | null | number>(null)
-  console.log('🚀 ~ SearchDropdown ~ value:', value)
 
   const containerRef = useRef<HTMLDivElement | null>(null)
 
@@ -74,7 +87,9 @@ const SearchDropdown: FC<PropTypes> = ({
       window.removeEventListener('click', listVisibilityHandler)
     }
   }, [])
-  function getSelected(option: OptionType<string, string>): boolean | undefined {
+  function getSelected(
+    option: OptionType<string, string>
+  ): boolean | undefined {
     if (Array.isArray(selectedValue)) {
       return !!selectedValue.find((item) => item.id === option.id)
     }
@@ -158,8 +173,8 @@ const SearchDropdown: FC<PropTypes> = ({
                             ? onSelectValue(option)
                             : onSelect(
                                 (selectedValue as Array<OptionType>).filter(
-                                  (i) => i.id !== option.id,
-                                ),
+                                  (i) => i.id !== option.id
+                                )
                               )
                         }
                       />
@@ -177,7 +192,7 @@ const SearchDropdown: FC<PropTypes> = ({
                   >
                     {emptyMessage ?? ' no results found'}
                   </CListGroupItem>
-                ),
+                )
           )}
         </CListGroup>
       )}

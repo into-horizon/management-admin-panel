@@ -122,11 +122,9 @@ export const Table = ({
   const editClick = () => {
     editFn && Promise.all([editFn(item)]).then(() => setOnEdit(''))
   }
-  if (loading) {
-    return <LoadingSpinner />
-  }
   return (
     <>
+      {loading && <LoadingSpinner />}
       <CRow className=' overflow-x-auto '>
         <CCol xs={12}>
           <CTable style={style} striped>
@@ -212,9 +210,13 @@ export const Table = ({
                     {editable && (
                       <CTableDataCell>
                         {i === onEdit ? (
-                          <>
+                          <div className=' d-flex gap-1'>
                             <CTooltip content='confirm'>
-                              <CButton color='success' onClick={editClick}>
+                              <CButton
+                                color='success'
+                                onClick={editClick}
+                                size='sm'
+                              >
                                 <CIcon icon={cilCheck} />
                               </CButton>
                             </CTooltip>
@@ -222,11 +224,12 @@ export const Table = ({
                               <CButton
                                 color='danger'
                                 onClick={() => setOnEdit('')}
+                                size='sm'
                               >
                                 <CIcon icon={cilX} />
                               </CButton>
                             </CTooltip>
-                          </>
+                          </div>
                         ) : (
                           <div className=' d-flex gap-1'>
                             <CTooltip content='edit'>

@@ -5,21 +5,25 @@ import {
   ListResponse,
   ParamsType,
   PostConfigurationType,
+  PostConfigurationValueType,
 } from '../types'
 import { RootState } from '.'
 import { updateToast } from './globalToasts'
 import { DialogResponseTypes } from '../enums'
+import { updateParamsHelper } from '../services/helpers'
 
 const initialState: {
   data: ConfigurationValueType[]
   count: number
   params: ParamsType
   loading: boolean
+  isModalOpen?: boolean
 } = {
   data: [],
   count: 0,
   params: { limit: 10, offset: 0 },
   loading: false,
+  isModalOpen: false,
 }
 
 const configurationValueSlice = createSlice({
@@ -27,7 +31,16 @@ const configurationValueSlice = createSlice({
   initialState,
   reducers: {
     setParams: (state, action: PayloadAction<ParamsType>) => {
-      state.params = action.payload
+      state.params = updateParamsHelper(
+        action.payload,
+        action.payload.page || 1
+      )
+    },
+    resetParams: (state) => {
+      state.params = initialState.params
+    },
+    toggleModal: (state, action: PayloadAction<boolean>) => {
+      state.isModalOpen = action.payload
     },
     setLoading: (state, action: PayloadAction<boolean>) => {
       state.loading = action.payload
@@ -44,6 +57,15 @@ const configurationValueSlice = createSlice({
         state.count = action.payload.count
       })
       .addCase(getConfigurationValues.rejected, (state) => {
+        state.loading = false
+      })
+      .addCase(createConfigurationValue.pending, (state) => {
+        state.loading = true
+      })
+      .addCase(createConfigurationValue.fulfilled, (state) => {
+        state.isModalOpen = false
+      })
+      .addCase(createConfigurationValue.rejected, (state) => {
         state.loading = false
       })
   },
@@ -69,10 +91,10 @@ export const getConfigurationValues = createAsyncThunk<
 
 export const createConfigurationValue = createAsyncThunk<
   void,
-  PostConfigurationType
+  PostConfigurationValueType
 >(
   'configurationValue/createConfigurationValue',
-  async (payload, { dispatch, getState, rejectWithValue }) => {
+  async (payload, { dispatch, rejectWithValue }) => {
     try {
       const { message } =
         await ConfigurationValueService.createConfigurationValue(payload)
@@ -130,12 +152,17 @@ export const updateConfigurationValue = createAsyncThunk<
 
 export const deleteConfigurationValue = createAsyncThunk<void, string>(
   'configurationValue/deleteConfigurationValue',
-  async (payload, { dispatch, getState, rejectWithValue }) => {
+  async (payload, { dispatch, rejectWithValue }) => {
     try {
       const { message } =
         await ConfigurationValueService.deleteConfigurationValue(payload)
       dispatch(getConfigurationValues())
-      return message
+      dispatch(
+        updateToast({
+          type: DialogResponseTypes.SUCCESS,
+          message,
+        })
+      )
     } catch (error) {
       dispatch(
         updateToast({
@@ -148,5 +175,11 @@ export const deleteConfigurationValue = createAsyncThunk<void, string>(
   }
 )
 
-export const { setParams, setLoading } = configurationValueSlice.actions
+export const {
+  setParams: setConfigurationParamsValue,
+  setLoading,
+  resetParams: resetConfigurationParams,
+  toggleModal,
+} = configurationValueSlice.actions
+
 export default configurationValueSlice.reducer

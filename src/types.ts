@@ -429,7 +429,7 @@ export type PostConfigurationType = Omit<
 >
 
 export type ConfigurationValueType = {
-  id?: string
+  id: string
   typeId: string
   key: string
   valueEn: string
@@ -440,9 +440,11 @@ export type ConfigurationValueType = {
   isActive?: boolean
   createdAt?: string
   updatedAt?: string
+  type: ConfigurationType
+  parent: ConfigurationValueType | null
 }
 
 export type PostConfigurationValueType = Omit<
   ConfigurationValueType,
-  'id' | 'createdAt' | 'updatedAt' | 'isActive'
+  'id' | 'createdAt' | 'updatedAt' | 'isActive' | 'parent' | 'type'
 >
