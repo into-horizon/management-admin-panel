@@ -1,6 +1,6 @@
 import { CRow, CCol, CSpinner, CContainer } from '@coreui/react'
 import { createPortal } from 'react-dom'
-function LoadingSpinner() {
+function LoadingSpinner({ children }: { children?: React.ReactNode }) {
   return createPortal(
     <CContainer
       fluid
@@ -15,8 +15,8 @@ function LoadingSpinner() {
       }}
     >
       <CRow className='align-items-center justify-content-center my-3 w-100 h-100'>
-        <CCol xs={12} className='text-center'>
-          <CSpinner color='primary' className='lg-spinner' />
+        <CCol xs={12} className='text-center d-flex justify-content-center'>
+          {children ?? <CSpinner color='primary' className='lg-spinner' />}
         </CCol>
       </CRow>
     </CContainer>,

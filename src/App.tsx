@@ -74,21 +74,13 @@ const App = () => {
     }
   }, [isServerDown])
 
-  if (loading) {
-    return (
-      <div className='bg-light min-vh-100 d-flex flex-row align-items-center'>
-        <CContainer>
-          <CRow className='justify-content-center'>
-            <CCol xs='auto'>
-              <Rings height='35rem' width='150' color='blue' />
-            </CCol>
-          </CRow>
-        </CContainer>
-      </div>
-    )
-  }
   return (
     <PopupProvider>
+      {loading && (
+        <LoadingSpinner>
+          <Rings height='35rem' width='150' color='blue' />
+        </LoadingSpinner>
+      )}
       <React.Suspense fallback={<LoadingSpinner />}>
         <Toaster />
         <GlobalDialog />

@@ -1,5 +1,6 @@
 import {
   CButton,
+  CForm,
   CFormInput,
   CModal,
   CModalBody,
@@ -8,8 +9,7 @@ import {
   CModalTitle,
 } from '@coreui/react'
 import ConfigurationTypeAutocomplete from './ConfigurationTypeAutocomplete'
-import ConfigurationValueAutocomplete from './ConfigudationValueAutocomplete'
-import { useReducer } from 'react'
+import ConfigurationValueAutocomplete from './ConfigurationValueAutocomplete'
 import { PostConfigurationValueType } from '../../../../types'
 import { useSelectorWithType } from '../../../../store'
 import CIcon from '@coreui/icons-react'
@@ -19,44 +19,53 @@ import {
   toggleModal,
 } from '../../../../store/configurationValue.slice'
 import { useDispatch } from 'react-redux'
-const reducer = (
-  state: PostConfigurationValueType,
-  action: { type: string; payload: string }
-) => {
-  switch (action.type) {
-    case 'SET_KEY':
-      return { ...state, key: action.payload }
-    case 'SET_VALUE_EN':
-      return { ...state, valueEn: action.payload }
-    case 'SET_VALUE_AR':
-      return { ...state, valueAr: action.payload }
-    case 'SET_TYPE_ID':
-      return { ...state, typeId: action.payload }
-    case 'SET_PARENT_ID':
-      return { ...state, parentId: action.payload }
-    default:
-      return state
-  }
-}
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
 
+const validationSchema = z.object({
+  key: z.string().min(1, 'Key is required'),
+  valueEn: z.string().min(1, 'Value En is required'),
+  valueAr: z.string().min(1, 'Value Ar is required'),
+  typeId: z.string().min(1, 'Type is required'),
+  parentId: z.uuidv4().optional(),
+  colorCode: z.string().optional(),
+  orderIndex: z.number().optional(),
+})
 const AddConfigurationValue = () => {
+  const {
+    register,
+    handleSubmit,
+    reset,
+    setValue,
+    watch,
+    formState: { errors },
+  } = useForm({
+    resolver: zodResolver(validationSchema),
+    defaultValues: {
+      key: '',
+      valueEn: '',
+      valueAr: '',
+      typeId: '',
+    },
+  })
   const { isModalOpen } = useSelectorWithType(
     (state) => state.configurationValue
   )
   const appDispatch = useDispatch()
-  const [configurationValue, dispatch] = useReducer(reducer, {
-    key: '',
-    valueEn: '',
-    valueAr: '',
-    typeId: '',
-    // parentId: '',
-  })
   const toggleModelHandler = (value: boolean) => {
     appDispatch(toggleModal(value))
+    reset()
   }
-  const onSaveHandler = () => {
-    appDispatch(createConfigurationValue(configurationValue))
+
+  const onSubmit = async (data: PostConfigurationValueType) => {
+    appDispatch(createConfigurationValue(data))
   }
+
+  const onError = (errors: any) => {
+    console.log('Validation errors:', errors)
+  }
+
   return (
     <div>
       <CButton color='primary' onClick={() => toggleModelHandler(true)}>
@@ -67,47 +76,64 @@ const AddConfigurationValue = () => {
         <CModalHeader>
           <CModalTitle>Add Configuration Value</CModalTitle>
         </CModalHeader>
-        <CModalBody className='d-flex gap-2 flex-wrap'>
-          <CFormInput
-            placeholder='key'
-            value={configurationValue.key}
-            onChange={(e) =>
-              dispatch({ type: 'SET_KEY', payload: e.target.value })
-            }
-          />
-          <CFormInput
-            placeholder='english value'
-            value={configurationValue.valueEn}
-            onChange={(e) =>
-              dispatch({ type: 'SET_VALUE_EN', payload: e.target.value })
-            }
-          />
-          <CFormInput
-            placeholder='arabic value'
-            value={configurationValue.valueAr}
-            onChange={(e) =>
-              dispatch({ type: 'SET_VALUE_AR', payload: e.target.value })
-            }
-          />
-          <ConfigurationTypeAutocomplete
-            onSelect={(value) =>
-              dispatch({ type: 'SET_TYPE_ID', payload: value?.id ?? '' })
-            }
-          />
-          <ConfigurationValueAutocomplete
-            onSelect={(value) =>
-              dispatch({ type: 'SET_PARENT_ID', payload: value?.id ?? '' })
-            }
-          />
-        </CModalBody>
-        <CModalFooter>
-          <CButton color='secondary' onClick={() => toggleModelHandler(false)}>
-            Close
-          </CButton>
-          <CButton color='primary' onClick={onSaveHandler}>
-            Save
-          </CButton>
-        </CModalFooter>
+        <CForm onSubmit={handleSubmit(onSubmit, onError)}>
+          <CModalBody className='d-flex gap-2 flex-wrap'>
+            <CFormInput
+              placeholder='key'
+              {...register('key')}
+            />
+            <CFormInput
+              placeholder='english value'
+              {...register('valueEn')}
+              invalid={!!errors.valueEn}
+              feedbackInvalid={errors.valueEn?.message}
+            />
+            <CFormInput
+              placeholder='arabic value'
+              {...register('valueAr')}
+              invalid={!!errors.valueAr}
+              feedbackInvalid={errors.valueAr?.message}
+            />
+            <div className='d-flex gap-2 flex-column border-1 border w-100 border-black py-4 px-1'>
+              {
+                <ConfigurationTypeAutocomplete
+                  onSelect={(value) => {
+                    setValue('typeId', value?.id ?? '')
+                  }}
+                  invalid={!!errors.typeId}
+                  feedbackInvalid={errors.typeId?.message}
+                  disabled={!!watch('parentId')}
+                />
+              }
+              <div className='d-flex align-items-center flex-column position-relative'>
+                <hr className='w-100' />
+                <span className='text-center position-absolute bg-white py-1 px-2'>
+                  OR
+                </span>
+              </div>
+              <ConfigurationValueAutocomplete
+                onSelect={(value) => {
+                  setValue('parentId', value?.id)
+                  setValue('typeId', value?.typeId ?? '')
+                }}
+                invalid={!!errors.parentId}
+                feedbackInvalid={errors.parentId?.message}
+              />
+            </div>
+          </CModalBody>
+          <CModalFooter>
+            <CButton
+              color='secondary'
+              type='button'
+              onClick={() => toggleModelHandler(false)}
+            >
+              Close
+            </CButton>
+            <CButton type='submit' color='primary'>
+              Save
+            </CButton>
+          </CModalFooter>
+        </CForm>
       </CModal>
     </div>
   )

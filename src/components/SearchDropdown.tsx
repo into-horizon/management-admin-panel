@@ -1,12 +1,4 @@
-import React, {
-  useState,
-  useEffect,
-  Children,
-  ChangeEvent,
-  Dispatch,
-  useRef,
-  FC,
-} from 'react'
+import { useState, useEffect, Children, ChangeEvent, useRef, FC } from 'react'
 import {
   CCloseButton,
   CFormCheck,
@@ -29,16 +21,21 @@ type PropTypes = {
   placeholder?: string
   delay?: number
   emptyMessage?: string
+  invalid?: boolean
+  feedbackInvalid?: string
+  valid?: boolean
+  feedbackValid?: string
+  disabled?: boolean
 } & (
   | {
       multiple: true
       selectedValue?: OptionType[]
-      onSelect: (d: OptionType[]) => void
+      onSelect<T = OptionType>(d: T[]): void
     }
   | {
       multiple?: false | undefined
       selectedValue?: OptionType | null
-      onSelect: (d: OptionType | null) => void
+      onSelect<T = OptionType>(d: T): void
     }
 )
 const SearchDropdown: FC<PropTypes> = ({
@@ -51,6 +48,11 @@ const SearchDropdown: FC<PropTypes> = ({
   multiple,
   selectedValue,
   emptyMessage,
+  invalid,
+  feedbackInvalid,
+  valid,
+  feedbackValid,
+  disabled,
 }) => {
   const [isListOpen, setIsListOpen] = useState(false)
   const [value, setValue] = useState<string | null | number>(null)
@@ -65,7 +67,7 @@ const SearchDropdown: FC<PropTypes> = ({
         onSelect([e])
       }
     } else {
-      onSelect(e as OptionType)
+      onSelect(e)
     }
   }
   const onChangeValue = (e: ChangeEvent<HTMLInputElement>) => {
@@ -76,6 +78,7 @@ const SearchDropdown: FC<PropTypes> = ({
 
   useEffect(() => {
     const listVisibilityHandler = (e: MouseEvent) => {
+      if (disabled) return
       if (containerRef.current?.contains(e.target as Node)) {
         setIsListOpen((visibility) => !visibility)
       } else {
@@ -86,7 +89,7 @@ const SearchDropdown: FC<PropTypes> = ({
     return () => {
       window.removeEventListener('click', listVisibilityHandler)
     }
-  }, [])
+  }, [disabled])
   function getSelected(
     option: OptionType<string, string>
   ): boolean | undefined {
@@ -107,7 +110,6 @@ const SearchDropdown: FC<PropTypes> = ({
                 onClick={(e) => {
                   e.stopPropagation()
                   onSelect(null)
-                  console.log('clicked')
                   setValue(null)
                 }}
               />
@@ -141,6 +143,11 @@ const SearchDropdown: FC<PropTypes> = ({
           onChange={onChangeValue}
           placeholder={placeholder ?? 'search for title'}
           delay={delay}
+          invalid={invalid}
+          feedbackInvalid={feedbackInvalid}
+          valid={valid}
+          feedbackValid={feedbackValid}
+          disabled={disabled}
         />
       )}
 
@@ -156,8 +163,9 @@ const SearchDropdown: FC<PropTypes> = ({
                     onClick={(e) => {
                       if (multiple) {
                         e.stopPropagation()
+                      } else {
+                        onSelectValue(option)
                       }
-                      !multiple && onSelectValue(option)
                     }}
                   >
                     {multiple ? (
