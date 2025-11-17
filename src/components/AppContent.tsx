@@ -1,5 +1,5 @@
 import React, { useEffect, Suspense } from 'react'
-import { Route, Routes, useNavigate } from 'react-router-dom'
+import { Outlet, Route, Routes, useNavigate } from 'react-router-dom'
 import { CContainer, CSpinner } from '@coreui/react'
 import cookie from 'react-cookies'
 // routes config
@@ -20,13 +20,14 @@ const AppContent = () => {
   return (
     <CContainer lg>
       <Suspense fallback={<CSpinner color='primary' />}>
-        <Routes>
+        {/* <Routes>
           {routes.map((route, idx) => {
             return (
               route.component && <Route key={idx} path={route.path} element={<route.component />} />
             )
           })}
-        </Routes>
+        </Routes> */}
+        <Outlet />
       </Suspense>
     </CContainer>
   )

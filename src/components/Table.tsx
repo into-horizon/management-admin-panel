@@ -194,7 +194,7 @@ export const Table = ({
                         }
                         return Body ? (
                           <CTableDataCell>
-                            <Body {...d} />
+                            <Body {...d} key={d.id} />
                           </CTableDataCell>
                         ) : (
                           <CTableDataCell>
@@ -244,7 +244,7 @@ export const Table = ({
                                 <CIcon icon={cilPen} />
                               </CButton>
                             </CTooltip>
-                            {Actions && <Actions {...d} />}
+                            {Actions && <Actions {...d} key={d.id} />}
                           </div>
                         )}
                       </CTableDataCell>

@@ -5,12 +5,9 @@ import {
   CButton,
   CCol,
   CModal,
-  CModalFooter,
   CModalHeader,
-  CModalTitle,
   CRow,
   CButtonGroup,
-  CFormCheck,
   CTooltip,
 } from '@coreui/react'
 import Table from './Table'

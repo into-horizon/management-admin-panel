@@ -1,27 +1,30 @@
-import React, { useEffect } from 'react'
+import React, { Suspense, useEffect } from 'react'
 import {
+  createBrowserRouter,
   Navigate,
+  Outlet,
   Route,
+  RouterProvider,
   Routes,
   useLocation,
   useNavigate,
 } from 'react-router-dom'
 import './scss/style.scss'
 import { checkServer } from './store/auth'
-import { useDispatch, useSelector } from 'react-redux'
+import { Provider, useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { Rings } from 'react-loader-spinner'
 import 'react-select-search/style.css'
 import { notificationsOffers } from './socket'
 import GlobalDialog from './components/GlobalDialog'
 import Toaster from './components/Toaster'
-import { CCol, CContainer, CRow } from '@coreui/react'
 import { RootState } from './store'
 import LoadingSpinner from './components/LoadingSpinner'
 import { PopupProvider } from 'react-custom-popup'
 import routes from './routes'
 import AuthLayout from './layout/AuthLayout'
 import { load, remove, save } from 'react-cookies'
+import store from './store/index'
 
 // Containers
 const DefaultLayout = React.lazy(() => import('./layout/DefaultLayout'))
@@ -34,6 +37,11 @@ const Verify = React.lazy(() => import('./views/pages/verify/verify'))
 const Reference = React.lazy(() => import('./views/pages/password/reference'))
 const ResetPassword = React.lazy(
   () => import('./views/pages/password/ResetPassword')
+)
+const Loading = (
+  <div className='pt-3 text-center'>
+    <div className='sk-spinner sk-spinner-pulse'></div>
+  </div>
 )
 
 const App = () => {
@@ -73,25 +81,41 @@ const App = () => {
       remove('redirect', { path: '/' })
     }
   }, [isServerDown])
+  
+  if (loading) {
+    return (
+      <LoadingSpinner>
+        <Rings height='35rem' width='150' color='blue' />
+      </LoadingSpinner>
+    )
+  }
 
   return (
-    <PopupProvider>
-      {loading && (
+    <Suspense
+      fallback={
         <LoadingSpinner>
           <Rings height='35rem' width='150' color='blue' />
         </LoadingSpinner>
-      )}
-      <React.Suspense fallback={<LoadingSpinner />}>
-        <Toaster />
-        <GlobalDialog />
-        <Routes>
-          <Route path='/' element={<AuthLayout />}>
+      }
+    >
+      <PopupProvider>
+        {loading && (
+          <LoadingSpinner>
+            <Rings height='35rem' width='150' color='blue' />
+          </LoadingSpinner>
+        )}
+        <React.Suspense fallback={<LoadingSpinner />}>
+          <Toaster />
+          <GlobalDialog />
+          <Outlet />
+
+          {/* <Route path='/' element={<AuthLayout />}>
             <Route index element={<Navigate to={'login'} />} />
             <Route path='login' element={<Login />} />
             <Route path='reference' element={<Reference />} />
             <Route path='resetPassword/:token' element={<ResetPassword />} />
-          </Route>
-          <Route path='/' element={<DefaultLayout />}>
+          </Route> */}
+          {/* <Route path='/' element={<DefaultLayout />}>
             <Route index element={<Navigate to={'dashboard'} />} />
             {routes.map((route, idx) => {
               return (
@@ -104,13 +128,15 @@ const App = () => {
                 )
               )
             })}
-          </Route>
-          <Route path='/verify' element={<Verify />} />
-          <Route path='/500' element={<Page500 />} />
-          <Route path='*' element={<Page404 />} />
-        </Routes>
-      </React.Suspense>
-    </PopupProvider>
+          </Route> */}
+          {/* <Route path='/verify' element={<Verify />} /> */}
+          {/* <Route path='/500' element={<Page500 />} /> */}
+          {/* <Route path='*' element={<Page404 />} /> */}
+          {/* </Routes> */}
+        </React.Suspense>
+      </PopupProvider>
+    </Suspense>
+    // </Provider>
   )
 }
 

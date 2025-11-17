@@ -1,21 +1,21 @@
 import React from 'react'
-import { useLocation } from 'react-router-dom'
+import { RouteObject, useLocation } from 'react-router-dom'
 
 import routes from '../routes'
 
 import { CBreadcrumb, CBreadcrumbItem } from '@coreui/react'
+import { flatNav } from '../_nav'
 
 const AppBreadcrumb = () => {
   const currentLocation = useLocation().pathname.slice(1)
 
-  const getRouteName = (
-    pathname: string,
-    routes: { path: string; name: string }[]
-  ) => {
+  const getRouteName = (pathname: string, routes: RouteObject[]) => {
     const currentRoute =
-      routes.find((route) => route.path === pathname) ??
-      routes.find((route) => route.path.startsWith(pathname)) ??
-      routes.find((route) => route.path === '*')
+      flatNav.find((route) => route.to?.replace('/', '') === pathname) ??
+      flatNav.find((route) =>
+        route.to?.replace('/', '')?.startsWith(pathname)
+      ) ??
+      flatNav.find((route) => route?.to.replace('/', '') === '*')
     return currentRoute?.name
   }
 

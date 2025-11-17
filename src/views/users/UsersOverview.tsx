@@ -8,8 +8,8 @@ import {
   CFormSelect,
   CFormLabel,
 } from '@coreui/react'
-import React, { useState, FormEvent, useEffect } from 'react'
-import { connect, useDispatch, useSelector } from 'react-redux'
+import { FormEvent, useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import {
   getUsersHandler,
   updateProfileHandler,
@@ -24,16 +24,13 @@ import FilterCard from '../../components/FilterCard'
 import Table, { ColumnType } from '../../components/Table'
 import { InputType } from '../../enums'
 import { RootState } from '../../store'
-import { GetFunctionType, UserType, ParamsType } from '../../types'
+import { UserType, ParamsType } from '../../types'
 import { updateParamsHelper } from '../../services/helpers'
 
-type PropTypes = {
-  getUsersHandler: GetFunctionType
-  updateProfileHandler: (payload: UserType) => Promise<void>
-  updateUserHandler: (payload: UserType) => Promise<void>
-}
-export const UsersOverview = ({ updateProfileHandler, updateUserHandler }: PropTypes) => {
-  const { count, data, isLoading, params } = useSelector((state: RootState) => state.user)
+const UsersOverview = () => {
+  const { count, data, isLoading, params } = useSelector(
+    (state: RootState) => state.user
+  )
   const dispatch = useDispatch()
 
   const columns: ColumnType[] = [
@@ -41,14 +38,22 @@ export const UsersOverview = ({ updateProfileHandler, updateUserHandler }: PropT
       header: 'first name',
       field: 'first_name',
       body: (data: UserType) => (
-        <EditableCell data={data.profile} field='first_name' action={updateProfileHandler} />
+        <EditableCell
+          data={data.profile}
+          field='first_name'
+          action={(data: UserType) => dispatch(updateProfileHandler(data))}
+        />
       ),
     },
     {
       header: 'last name',
       field: 'last_name',
       body: (data: UserType) => (
-        <EditableCell data={data.profile} field='last_name' action={updateProfileHandler} />
+        <EditableCell
+          data={data.profile}
+          field='last_name'
+          action={(data: UserType) => dispatch(updateProfileHandler(data))}
+        />
       ),
     },
     {
@@ -186,10 +191,4 @@ export const UsersOverview = ({ updateProfileHandler, updateUserHandler }: PropT
     </>
   )
 }
-
-const mapDispatchToProps = {
-  updateProfileHandler,
-  updateUserHandler,
-}
-
-export default connect(null, mapDispatchToProps)(UsersOverview)
+export default UsersOverview
