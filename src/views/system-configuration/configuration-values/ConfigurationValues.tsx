@@ -5,16 +5,20 @@ import { useDispatch } from 'react-redux'
 import {
   deleteConfigurationValue,
   getConfigurationValues,
+  setConfigurationParamsValue,
 } from '../../../store/configurationValue.slice'
 import { ConfigurationValueType } from '../../../types'
 import AddConfigurationValue from './components/AddConfigurationValue'
-import { CButton } from '@coreui/react'
+import { CButton, CCol, CForm, CFormInput, CRow } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import { cilTrash } from '@coreui/icons'
 import DeleteModal from '../../../components/DeleteModal'
 import FilterCard from '../../../components/FilterCard'
 import FormButtons from '../../../components/FormButtons'
 import { InputType } from '../../../enums'
+import ConfigurationTypeAutocomplete from './components/ConfigurationTypeAutocomplete'
+import ConfigurationValueAutocomplete from './components/ConfigurationValueAutocomplete'
+import { set } from 'lodash'
 
 const ConfigurationValues = () => {
   const { data, loading, count, params } = useSelectorWithType(
@@ -22,6 +26,11 @@ const ConfigurationValues = () => {
   )
   const [deleteModal, setDeleteModal] = useState({ visible: false, id: '' })
   const dispatch = useDispatch()
+
+  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    dispatch(getConfigurationValues())
+  }
 
   useEffect(() => {
     dispatch(getConfigurationValues())
@@ -31,7 +40,35 @@ const ConfigurationValues = () => {
     <div className='d-flex flex-column gap-3'>
       <AddConfigurationValue />
       <FilterCard>
-        <FormButtons />
+        <CForm onSubmit={onSubmit}>
+          <CRow>
+            <CCol>
+              <CFormInput
+                placeholder='search name'
+                onChange={(e) =>
+                  dispatch(
+                    setConfigurationParamsValue({ search: e.target.value })
+                  )
+                }
+              />
+            </CCol>
+            <CCol>
+              <ConfigurationTypeAutocomplete
+                onSelect={(value) =>
+                  dispatch(setConfigurationParamsValue({ typeId: value?.id }))
+                }
+              />
+            </CCol>
+            <CCol>
+              <ConfigurationValueAutocomplete
+                onSelect={(value) =>
+                  dispatch(setConfigurationParamsValue({ parentId: value?.id }))
+                }
+              />
+            </CCol>
+          </CRow>
+          <FormButtons />
+        </CForm>
       </FilterCard>
       <Table
         data={data}

@@ -32,7 +32,7 @@ const configurationValueSlice = createSlice({
   reducers: {
     setParams: (state, action: PayloadAction<ParamsType>) => {
       state.params = updateParamsHelper(
-        action.payload,
+        {...state.params, ...action.payload},
         action.payload.page || 1
       )
     },
