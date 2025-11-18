@@ -18,10 +18,9 @@ import FormButtons from '../../../components/FormButtons'
 import { InputType } from '../../../enums'
 import ConfigurationTypeAutocomplete from './components/ConfigurationTypeAutocomplete'
 import ConfigurationValueAutocomplete from './components/ConfigurationValueAutocomplete'
-import { set } from 'lodash'
 
 const ConfigurationValues = () => {
-  const { data, loading, count, params } = useSelectorWithType(
+  const { data, loading, count } = useSelectorWithType(
     (state) => state.configurationValue
   )
   const [deleteModal, setDeleteModal] = useState({ visible: false, id: '' })
@@ -40,7 +39,7 @@ const ConfigurationValues = () => {
     <div className='d-flex flex-column gap-3'>
       <AddConfigurationValue />
       <FilterCard>
-        <CForm onSubmit={onSubmit}>
+        <CForm onSubmit={onSubmit} className='d-flex flex-column gap-3'>
           <CRow>
             <CCol>
               <CFormInput

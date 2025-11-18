@@ -62,9 +62,9 @@ const AddConfigurationValue = () => {
     appDispatch(createConfigurationValue(data))
   }
 
-  const onError = (errors: any) => {
-    console.log('Validation errors:', errors)
-  }
+  // const onError = (errors: any) => {
+  //   console.log('Validation errors:', errors)
+  // }
 
   return (
     <div>
@@ -76,11 +76,13 @@ const AddConfigurationValue = () => {
         <CModalHeader>
           <CModalTitle>Add Configuration Value</CModalTitle>
         </CModalHeader>
-        <CForm onSubmit={handleSubmit(onSubmit, onError)}>
+        <CForm onSubmit={handleSubmit(onSubmit)}>
           <CModalBody className='d-flex gap-2 flex-wrap'>
             <CFormInput
               placeholder='key'
               {...register('key')}
+              invalid={!!errors.key}
+              feedbackInvalid={errors.key?.message}
             />
             <CFormInput
               placeholder='english value'
@@ -94,7 +96,7 @@ const AddConfigurationValue = () => {
               invalid={!!errors.valueAr}
               feedbackInvalid={errors.valueAr?.message}
             />
-            <div className='d-flex gap-2 flex-column border-1 border w-100 border-black py-4 px-1'>
+            <div className='d-flex gap-2 flex-column border-1 border w-100 border-black py-4 px-1 rounded-1'>
               {
                 <ConfigurationTypeAutocomplete
                   onSelect={(value) => {
