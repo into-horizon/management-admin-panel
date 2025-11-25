@@ -36,6 +36,13 @@ export type ColumnType = {
         inputType: InputType.DROPDOWN
         options: { value: string; name: string }[]
       }
+    | (<T = unknown>(
+        row: T
+      ) =>
+        | {
+            inputType: Exclude<InputType, 'dropdown'>
+          }
+        | undefined)
 }
 type PropTypes = {
   updateLoading?: React.Dispatch<React.SetStateAction<boolean>>
@@ -115,18 +122,15 @@ export const Table = ({
   const updateItem = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ): void => {
-    setItem((x) => {
-      return { ...x, [e.target.id]: e.target.value }
-    })
+    setItem((x) => ({ ...x, [e.target.id]: e.target.value }))
   }
-  const editClick = () => {
-    editFn && Promise.all([editFn(item)]).then(() => setOnEdit(''))
-  }
-  if (loading) {
-    return <LoadingSpinner />
+  const editClick = async () => {
+    await editFn?.(item)
+    setOnEdit('')
   }
   return (
     <>
+      {loading && <LoadingSpinner />}
       <CRow className=' overflow-x-auto '>
         <CCol xs={12}>
           <CTable style={style} striped>
@@ -165,7 +169,7 @@ export const Table = ({
                     )}
                     {Children.toArray(
                       columns.map(({ field, body: Body, edit }) => {
-                        if (i === onEdit) {
+                        if (i === onEdit && typeof edit !== 'function') {
                           const itemField = field as keyof typeof item
                           let itemValue = item?.[itemField] as string | boolean
                           if (
@@ -176,10 +180,10 @@ export const Table = ({
                           }
                           return (
                             <CTableDataCell>
-                              {edit && edit.inputType ? (
+                              {edit?.inputType ? (
                                 <TableEditCell
                                   type={edit.inputType}
-                                  id={field ? field : ''}
+                                  id={field ?? ''}
                                   onChange={updateItem}
                                   value={itemValue}
                                   options={
@@ -193,10 +197,31 @@ export const Table = ({
                               )}
                             </CTableDataCell>
                           )
+                        } else if (i === onEdit && typeof edit === 'function') {
+                          const editOutput = edit(d)
+                          return (
+                            <CTableDataCell>
+                              {editOutput?.inputType ? (
+                                <TableEditCell
+                                  type={editOutput?.inputType}
+                                  id={field ?? ''}
+                                  onChange={updateItem}
+                                  value={item[field as keyof typeof item]}
+                                  // options={
+                                  //   edit(d).inputType === InputType.DROPDOWN
+                                  //     ? edit(d).options
+                                  //     : []
+                                  // }
+                                />
+                              ) : (
+                                item[field as keyof typeof item] ?? '-'
+                              )}
+                            </CTableDataCell>
+                          )
                         }
                         return Body ? (
                           <CTableDataCell>
-                            <Body {...d} />
+                            <Body {...d} key={d.id} />
                           </CTableDataCell>
                         ) : (
                           <CTableDataCell>
@@ -212,9 +237,13 @@ export const Table = ({
                     {editable && (
                       <CTableDataCell>
                         {i === onEdit ? (
-                          <>
+                          <div className=' d-flex gap-1'>
                             <CTooltip content='confirm'>
-                              <CButton color='success' onClick={editClick}>
+                              <CButton
+                                color='success'
+                                onClick={editClick}
+                                size='sm'
+                              >
                                 <CIcon icon={cilCheck} />
                               </CButton>
                             </CTooltip>
@@ -222,11 +251,12 @@ export const Table = ({
                               <CButton
                                 color='danger'
                                 onClick={() => setOnEdit('')}
+                                size='sm'
                               >
                                 <CIcon icon={cilX} />
                               </CButton>
                             </CTooltip>
-                          </>
+                          </div>
                         ) : (
                           <div className=' d-flex gap-1'>
                             <CTooltip content='edit'>
@@ -241,7 +271,7 @@ export const Table = ({
                                 <CIcon icon={cilPen} />
                               </CButton>
                             </CTooltip>
-                            {Actions && <Actions {...d} />}
+                            {Actions && <Actions {...d} key={d.id} />}
                           </div>
                         )}
                       </CTableDataCell>

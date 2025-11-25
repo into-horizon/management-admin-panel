@@ -10,8 +10,28 @@ import {
   cilPeople,
 } from '@coreui/icons'
 import { CNavGroup, CNavItem, CNavTitle } from '@coreui/react'
+import {
+  Component,
+  FC,
+  ForwardRefExoticComponent,
+  ReactNode,
+  RefAttributes,
+} from 'react'
+import { CNavLinkProps } from '@coreui/react/dist/components/nav/CNavLink'
+import { CNavTitleProps } from '@coreui/react/dist/components/nav/CNavTitle'
+import { CNavGroupProps } from '@coreui/react/dist/components/nav/CNavGroup'
 
-const _nav = [
+const _nav: {
+  component:
+    | ForwardRefExoticComponent<CNavTitleProps & RefAttributes<HTMLLIElement>>
+    | ForwardRefExoticComponent<CNavLinkProps & RefAttributes<HTMLLIElement>>
+    | ForwardRefExoticComponent<CNavGroupProps & RefAttributes<HTMLLIElement>>
+  name: string
+  to?: string
+  icon?: any
+  badge?: ReactNode
+  items?: any
+}[] = [
   {
     component: CNavItem,
     name: 'Dashboard',
@@ -179,5 +199,9 @@ const _nav = [
     icon: <CIcon icon={cilShortText} customClassName='nav-icon' />,
   },
 ]
+
+export const flatNav: { to: string; name: string }[] = _nav.flatMap(
+  (item: any) => [item, ...(item.items ?? [])]
+)
 
 export default _nav

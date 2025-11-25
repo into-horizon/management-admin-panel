@@ -1,4 +1,4 @@
-import React, { useState, useEffect, Children, ChangeEvent, Dispatch, useRef, FC } from 'react'
+import { useState, useEffect, Children, ChangeEvent, useRef, FC } from 'react'
 import {
   CCloseButton,
   CFormCheck,
@@ -9,7 +9,10 @@ import {
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import { cilChevronBottom } from '@coreui/icons'
-export type OptionType<T = string, P = string> = { title: T; id: P }
+export type OptionType<T = string, P = string> = { title: T; id: P } & Record<
+  string,
+  any
+>
 
 type PropTypes = {
   options: OptionType[]
@@ -18,12 +21,21 @@ type PropTypes = {
   placeholder?: string
   delay?: number
   emptyMessage?: string
+  invalid?: boolean
+  feedbackInvalid?: string
+  valid?: boolean
+  feedbackValid?: string
+  disabled?: boolean
 } & (
-  | { multiple: true; selectedValue?: OptionType[]; onSelect: (d: OptionType[]) => void }
+  | {
+      multiple: true
+      selectedValue?: OptionType[]
+      onSelect(d: OptionType[]): void
+    }
   | {
       multiple?: false | undefined
       selectedValue?: OptionType | null
-      onSelect: (d: OptionType | null) => void
+      onSelect(d: OptionType | null): void
     }
 )
 const SearchDropdown: FC<PropTypes> = ({
@@ -36,11 +48,14 @@ const SearchDropdown: FC<PropTypes> = ({
   multiple,
   selectedValue,
   emptyMessage,
+  invalid,
+  feedbackInvalid,
+  valid,
+  feedbackValid,
+  disabled,
 }) => {
-  console.log('🚀 ~ SearchDropdown ~ selectedValue:', selectedValue)
   const [isListOpen, setIsListOpen] = useState(false)
   const [value, setValue] = useState<string | null | number>(null)
-  console.log('🚀 ~ SearchDropdown ~ value:', value)
 
   const containerRef = useRef<HTMLDivElement | null>(null)
 
@@ -52,7 +67,7 @@ const SearchDropdown: FC<PropTypes> = ({
         onSelect([e])
       }
     } else {
-      onSelect(e as OptionType)
+      onSelect(e)
     }
   }
   const onChangeValue = (e: ChangeEvent<HTMLInputElement>) => {
@@ -63,6 +78,7 @@ const SearchDropdown: FC<PropTypes> = ({
 
   useEffect(() => {
     const listVisibilityHandler = (e: MouseEvent) => {
+      if (disabled) return
       if (containerRef.current?.contains(e.target as Node)) {
         setIsListOpen((visibility) => !visibility)
       } else {
@@ -73,8 +89,10 @@ const SearchDropdown: FC<PropTypes> = ({
     return () => {
       window.removeEventListener('click', listVisibilityHandler)
     }
-  }, [])
-  function getSelected(option: OptionType<string, string>): boolean | undefined {
+  }, [disabled])
+  function getSelected(
+    option: OptionType<string, string>
+  ): boolean | undefined {
     if (Array.isArray(selectedValue)) {
       return !!selectedValue.find((item) => item.id === option.id)
     }
@@ -92,7 +110,6 @@ const SearchDropdown: FC<PropTypes> = ({
                 onClick={(e) => {
                   e.stopPropagation()
                   onSelect(null)
-                  console.log('clicked')
                   setValue(null)
                 }}
               />
@@ -126,6 +143,11 @@ const SearchDropdown: FC<PropTypes> = ({
           onChange={onChangeValue}
           placeholder={placeholder ?? 'search for title'}
           delay={delay}
+          invalid={invalid}
+          feedbackInvalid={feedbackInvalid}
+          valid={valid}
+          feedbackValid={feedbackValid}
+          disabled={disabled}
         />
       )}
 
@@ -141,8 +163,9 @@ const SearchDropdown: FC<PropTypes> = ({
                     onClick={(e) => {
                       if (multiple) {
                         e.stopPropagation()
+                      } else {
+                        onSelectValue(option)
                       }
-                      !multiple && onSelectValue(option)
                     }}
                   >
                     {multiple ? (
@@ -158,8 +181,8 @@ const SearchDropdown: FC<PropTypes> = ({
                             ? onSelectValue(option)
                             : onSelect(
                                 (selectedValue as Array<OptionType>).filter(
-                                  (i) => i.id !== option.id,
-                                ),
+                                  (i) => i.id !== option.id
+                                )
                               )
                         }
                       />
@@ -177,7 +200,7 @@ const SearchDropdown: FC<PropTypes> = ({
                   >
                     {emptyMessage ?? ' no results found'}
                   </CListGroupItem>
-                ),
+                )
           )}
         </CListGroup>
       )}

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import SearchDropdown, { OptionType } from '../../../components/SearchDropdown'
 import Employee from '../../../services/Employee'
 import { useDispatch, useSelector } from 'react-redux'
@@ -15,7 +15,11 @@ const EmployeeSearch = () => {
   const onEmployeeSearch = async (e: string) => {
     try {
       setIsLoading(true)
-      const { data } = await Employee.getEmployees({ limit: 10, offset: 0, key: e })
+      const { data } = await Employee.getEmployees({
+        limit: 10,
+        offset: 0,
+        key: e,
+      })
       setEmployees(data.data.map((e) => ({ title: e.name!, id: e.id! })))
     } finally {
       setIsLoading(false)

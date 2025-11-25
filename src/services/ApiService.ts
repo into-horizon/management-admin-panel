@@ -204,7 +204,6 @@ export default class ApiService {
   }
 
   static async refresh(): Promise<string | undefined> {
-    // Prevent multiple simultaneous refresh requests
     if (ApiService.isRefreshing && ApiService.refreshPromise) {
       return ApiService.refreshPromise
     }
@@ -231,7 +230,6 @@ export default class ApiService {
     }
 
     try {
-      // Use separate axios instance without interceptors to avoid infinite loop
       const response = await ApiService.refreshAxiosInstance!.post(
         `${managementApiURL}/refresh`,
         null,
@@ -240,7 +238,12 @@ export default class ApiService {
         }
       )
 
-      const { refresh_token, access_token, status, message } = response.data
+      const {
+        refreshToken: refresh_token,
+        accessToken: access_token,
+        status,
+        message,
+      } = response.data
 
       if (status === 200 && access_token) {
         cookie.save('access_token', access_token, { path: '/' })

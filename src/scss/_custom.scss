@@ -1,1 +1,47 @@
-// Here you can add other styles
+// Helper function to extract RGB values
+@function get-rgb($color) {
+    @return red($color), green($color), blue($color);
+}
+
+// Overwrite btn-primary
+.btn-primary {
+    --cui-btn-color: rgba(255, 255, 255, 0.87);
+    --cui-btn-bg: #{$primary-base};
+    --cui-btn-border-color: #{$primary-base};
+    --cui-btn-hover-color: rgba(255, 255, 255, 0.87);
+    --cui-btn-hover-bg: #{darken($primary-base, 20%)};
+    --cui-btn-hover-border-color: #{darken($primary-base, 8%)};
+    --cui-btn-focus-shadow-rgb: #{get-rgb($primary-base)};
+    --cui-btn-active-color: rgba(255, 255, 255, 0.87);
+    --cui-btn-active-bg: #{darken($primary-base, 3%)};
+    --cui-btn-active-border-color: #{darken($primary-base, 8%)};
+    --cui-btn-active-shadow: inset 0 3px 5px rgba(0, 0, 21, 0.125);
+    --cui-btn-disabled-color: rgba(255, 255, 255, 0.87);
+    --cui-btn-disabled-bg: #{$primary-base};
+    --cui-btn-disabled-border-color: #{$primary-base};
+}
+
+.pagination {
+    --cui-pagination-padding-x: 0.75rem;
+    --cui-pagination-padding-y: 0.375rem;
+    --cui-pagination-font-size: 1rem;
+    --cui-pagination-color: #{$mono-base};
+    --cui-pagination-bg: var(--cui-body-bg);
+    --cui-pagination-border-width: var(--cui-border-width);
+    --cui-pagination-border-color: var(--cui-border-color);
+    --cui-pagination-border-radius: var(--cui-border-radius);
+    --cui-pagination-hover-color: #{$mono-dark};
+    --cui-pagination-hover-bg: #{rgba-color($mono-base, 0.1)};
+    --cui-pagination-hover-border-color: #{lighten($mono-light, 40%)};
+    --cui-pagination-focus-color: #{$mono-dark};
+    --cui-pagination-focus-bg: #{rgba-color($mono-base, 0.15)};
+    --cui-pagination-focus-box-shadow: 0 0 0 0.25rem #{rgba-color($mono-base, 0.25)};
+    --cui-pagination-active-color: rgba(255, 255, 255, 0.87);
+    --cui-pagination-active-bg: #{$mono-base};
+    --cui-pagination-active-border-color: #{$mono-base};
+    --cui-pagination-disabled-color: #{$mono-lightest};
+    --cui-pagination-disabled-bg: var(--cui-secondary-bg);
+    --cui-pagination-disabled-border-color: var(--cui-border-color);
+    display: flex;
+    list-style: none;
+}
