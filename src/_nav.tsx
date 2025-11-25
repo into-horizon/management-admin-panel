@@ -203,6 +203,5 @@ const _nav: {
 export const flatNav: { to: string; name: string }[] = _nav.flatMap(
   (item: any) => [item, ...(item.items ?? [])]
 )
-console.log('🚀 ~ flatNav:', flatNav)
 
 export default _nav

@@ -6,7 +6,7 @@ import configurationTypesService from '../../../../services/ConfigurationTypes.s
 import { ConfigurationType } from '../../../../types'
 
 type PropTypes = {
-  onSelect: (d: { title: string; id: string } | null) => void
+  onSelect: (d: (OptionType & ConfigurationType) | null) => void
   invalid?: boolean
   feedbackInvalid?: string
   disabled?: boolean

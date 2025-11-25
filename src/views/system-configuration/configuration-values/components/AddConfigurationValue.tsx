@@ -2,6 +2,7 @@ import {
   CButton,
   CForm,
   CFormInput,
+  CFormLabel,
   CModal,
   CModalBody,
   CModalFooter,
@@ -10,7 +11,11 @@ import {
 } from '@coreui/react'
 import ConfigurationTypeAutocomplete from './ConfigurationTypeAutocomplete'
 import ConfigurationValueAutocomplete from './ConfigurationValueAutocomplete'
-import { PostConfigurationValueType } from '../../../../types'
+import {
+  ConfigurationType,
+  ConfigurationValueType,
+  PostConfigurationValueType,
+} from '../../../../types'
 import { useSelectorWithType } from '../../../../store'
 import CIcon from '@coreui/icons-react'
 import { cilPlus } from '@coreui/icons'
@@ -22,17 +27,22 @@ import { useDispatch } from 'react-redux'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
+import { useState } from 'react'
 
-const validationSchema = z.object({
-  key: z.string().min(1, 'Key is required'),
-  valueEn: z.string().min(1, 'Value En is required'),
-  valueAr: z.string().min(1, 'Value Ar is required'),
-  typeId: z.string().min(1, 'Type is required'),
-  parentId: z.uuidv4().optional(),
-  colorCode: z.string().optional(),
-  orderIndex: z.number().optional(),
-})
+const validationSchema = (withColors?: boolean) =>
+  z.object({
+    key: z.string().min(1, 'Key is required'),
+    valueEn: z.string().min(1, 'Value En is required'),
+    valueAr: z.string().min(1, 'Value Ar is required'),
+    typeId: z.string().min(1, 'Type is required'),
+    parentId: z.uuidv4().optional(),
+    colorCode: withColors
+      ? z.string().min(1, 'Color is required')
+      : z.string().optional(),
+    orderIndex: z.number().optional(),
+  })
 const AddConfigurationValue = () => {
+  const [withColors, setWithColors] = useState(false)
   const {
     register,
     handleSubmit,
@@ -41,7 +51,7 @@ const AddConfigurationValue = () => {
     watch,
     formState: { errors },
   } = useForm({
-    resolver: zodResolver(validationSchema),
+    resolver: zodResolver(validationSchema(withColors)),
     defaultValues: {
       key: '',
       valueEn: '',
@@ -62,10 +72,6 @@ const AddConfigurationValue = () => {
     appDispatch(createConfigurationValue(data))
   }
 
-  // const onError = (errors: any) => {
-  //   console.log('Validation errors:', errors)
-  // }
-
   return (
     <div>
       <CButton color='primary' onClick={() => toggleModelHandler(true)}>
@@ -77,30 +83,45 @@ const AddConfigurationValue = () => {
           <CModalTitle>Add Configuration Value</CModalTitle>
         </CModalHeader>
         <CForm onSubmit={handleSubmit(onSubmit)}>
-          <CModalBody className='d-flex gap-2 flex-wrap'>
+          <CModalBody className='d-flex gap-3 flex-wrap justify-content-between flex-column'>
             <CFormInput
               placeholder='key'
+              floatingLabel='key'
               {...register('key')}
               invalid={!!errors.key}
               feedbackInvalid={errors.key?.message}
             />
             <CFormInput
               placeholder='english value'
+              floatingLabel='english value'
               {...register('valueEn')}
               invalid={!!errors.valueEn}
               feedbackInvalid={errors.valueEn?.message}
             />
             <CFormInput
               placeholder='arabic value'
+              floatingLabel='arabic value'
               {...register('valueAr')}
               invalid={!!errors.valueAr}
               feedbackInvalid={errors.valueAr?.message}
             />
+            {withColors && (
+              <>
+                <CFormInput
+                  className='w-100 m-1'
+                  label={'color code'}
+                  floatingLabel={'color code'}
+                  type='color'
+                  {...register('colorCode')}
+                />
+              </>
+            )}
             <div className='d-flex gap-2 flex-column border-1 border w-100 border-black py-4 px-1 rounded-1'>
               {
                 <ConfigurationTypeAutocomplete
                   onSelect={(value) => {
                     setValue('typeId', value?.id ?? '')
+                    setWithColors(value?.name === 'colors')
                   }}
                   invalid={!!errors.typeId}
                   feedbackInvalid={errors.typeId?.message}
@@ -117,6 +138,7 @@ const AddConfigurationValue = () => {
                 onSelect={(value) => {
                   setValue('parentId', value?.id)
                   setValue('typeId', value?.typeId ?? '')
+                  setWithColors(value?.type.name === 'colors')
                 }}
                 invalid={!!errors.parentId}
                 feedbackInvalid={errors.parentId?.message}

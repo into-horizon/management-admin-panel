@@ -29,6 +29,7 @@ const PendingProducts = lazy(() => import('./views/product/PendingProducts'))
 const ProductReviews = lazy(() => import('./views/product/ProductReviews'))
 const Employees = lazy(() => import('./views/employees/Overview'))
 const Log = lazy(() => import('./views/log/Log'))
+const ErrorBoundary = lazy(() => import('./views/pages/Error/ErrorBoundary'))
 const ConfigurationTypes = lazy(
   () =>
     import(
@@ -54,6 +55,7 @@ const routes: RouteObject[] = [
       {
         path: '/',
         Component: DefaultLayout,
+        ErrorBoundary: ErrorBoundary,
         children: [
           { index: true, Component: () => <Navigate to='dashboard' /> },
           { path: 'dashboard', Component: Dashboard },

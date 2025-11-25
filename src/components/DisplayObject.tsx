@@ -4,11 +4,12 @@ type DisplayObjectProps = {
   data: Record<string, string | number | boolean | null | object>
 }
 const DisplayObject: FC<DisplayObjectProps> = ({ data }) => {
+  if (!data) return null
   return (
     <div>
       <ul>
         {Object.entries(data).map(([key, value]) => {
-          if (typeof value === 'object' && value !== null) {
+          if (!!value && typeof value === 'object') {
             return (
               <li key={key}>
                 <strong>{key}:</strong>

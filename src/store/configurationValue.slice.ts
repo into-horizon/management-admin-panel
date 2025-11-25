@@ -32,7 +32,7 @@ const configurationValueSlice = createSlice({
   reducers: {
     setParams: (state, action: PayloadAction<ParamsType>) => {
       state.params = updateParamsHelper(
-        {...state.params, ...action.payload},
+        { ...state.params, ...action.payload },
         action.payload.page || 1
       )
     },
@@ -120,7 +120,7 @@ export const createConfigurationValue = createAsyncThunk<
 
 export const updateConfigurationValue = createAsyncThunk<
   void,
-  { id: string; data: ConfigurationValueType }
+  { id: string; data: Partial<ConfigurationValueType> }
 >(
   'configurationValue/updateConfigurationValue',
   async (payload, { dispatch, rejectWithValue }) => {
@@ -178,7 +178,7 @@ export const deleteConfigurationValue = createAsyncThunk<void, string>(
 export const {
   setParams: setConfigurationParamsValue,
   setLoading,
-  resetParams: resetConfigurationParams,
+  resetParams: resetConfigurationValueParams,
   toggleModal,
 } = configurationValueSlice.actions
 

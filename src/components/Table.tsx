@@ -36,6 +36,13 @@ export type ColumnType = {
         inputType: InputType.DROPDOWN
         options: { value: string; name: string }[]
       }
+    | (<T = unknown>(
+        row: T
+      ) =>
+        | {
+            inputType: Exclude<InputType, 'dropdown'>
+          }
+        | undefined)
 }
 type PropTypes = {
   updateLoading?: React.Dispatch<React.SetStateAction<boolean>>
@@ -115,12 +122,11 @@ export const Table = ({
   const updateItem = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ): void => {
-    setItem((x) => {
-      return { ...x, [e.target.id]: e.target.value }
-    })
+    setItem((x) => ({ ...x, [e.target.id]: e.target.value }))
   }
-  const editClick = () => {
-    editFn && Promise.all([editFn(item)]).then(() => setOnEdit(''))
+  const editClick = async () => {
+    await editFn?.(item)
+    setOnEdit('')
   }
   return (
     <>
@@ -163,7 +169,7 @@ export const Table = ({
                     )}
                     {Children.toArray(
                       columns.map(({ field, body: Body, edit }) => {
-                        if (i === onEdit) {
+                        if (i === onEdit && typeof edit !== 'function') {
                           const itemField = field as keyof typeof item
                           let itemValue = item?.[itemField] as string | boolean
                           if (
@@ -174,10 +180,10 @@ export const Table = ({
                           }
                           return (
                             <CTableDataCell>
-                              {edit && edit.inputType ? (
+                              {edit?.inputType ? (
                                 <TableEditCell
                                   type={edit.inputType}
-                                  id={field ? field : ''}
+                                  id={field ?? ''}
                                   onChange={updateItem}
                                   value={itemValue}
                                   options={
@@ -185,6 +191,27 @@ export const Table = ({
                                       ? edit.options
                                       : []
                                   }
+                                />
+                              ) : (
+                                item[field as keyof typeof item] ?? '-'
+                              )}
+                            </CTableDataCell>
+                          )
+                        } else if (i === onEdit && typeof edit === 'function') {
+                          const editOutput = edit(d)
+                          return (
+                            <CTableDataCell>
+                              {editOutput?.inputType ? (
+                                <TableEditCell
+                                  type={editOutput?.inputType}
+                                  id={field ?? ''}
+                                  onChange={updateItem}
+                                  value={item[field as keyof typeof item]}
+                                  // options={
+                                  //   edit(d).inputType === InputType.DROPDOWN
+                                  //     ? edit(d).options
+                                  //     : []
+                                  // }
                                 />
                               ) : (
                                 item[field as keyof typeof item] ?? '-'

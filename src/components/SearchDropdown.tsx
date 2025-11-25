@@ -30,12 +30,12 @@ type PropTypes = {
   | {
       multiple: true
       selectedValue?: OptionType[]
-      onSelect<T = OptionType>(d: T[]): void
+      onSelect(d: OptionType[]): void
     }
   | {
       multiple?: false | undefined
       selectedValue?: OptionType | null
-      onSelect<T = OptionType>(d: T): void
+      onSelect(d: OptionType | null): void
     }
 )
 const SearchDropdown: FC<PropTypes> = ({

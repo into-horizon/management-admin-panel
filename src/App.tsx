@@ -1,17 +1,8 @@
 import React, { Suspense, useEffect } from 'react'
-import {
-  createBrowserRouter,
-  Navigate,
-  Outlet,
-  Route,
-  RouterProvider,
-  Routes,
-  useLocation,
-  useNavigate,
-} from 'react-router-dom'
+import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import './scss/style.scss'
 import { checkServer } from './store/auth'
-import { Provider, useDispatch, useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { Rings } from 'react-loader-spinner'
 import 'react-select-search/style.css'
@@ -21,28 +12,7 @@ import Toaster from './components/Toaster'
 import { RootState } from './store'
 import LoadingSpinner from './components/LoadingSpinner'
 import { PopupProvider } from 'react-custom-popup'
-import routes from './routes'
-import AuthLayout from './layout/AuthLayout'
 import { load, remove, save } from 'react-cookies'
-import store from './store/index'
-
-// Containers
-const DefaultLayout = React.lazy(() => import('./layout/DefaultLayout'))
-
-// Pages
-const Login = React.lazy(() => import('./views/pages/login/Login'))
-const Page404 = React.lazy(() => import('./views/pages/page404/Page404'))
-const Page500 = React.lazy(() => import('./views/pages/page500/Page500'))
-const Verify = React.lazy(() => import('./views/pages/verify/verify'))
-const Reference = React.lazy(() => import('./views/pages/password/reference'))
-const ResetPassword = React.lazy(
-  () => import('./views/pages/password/ResetPassword')
-)
-const Loading = (
-  <div className='pt-3 text-center'>
-    <div className='sk-spinner sk-spinner-pulse'></div>
-  </div>
-)
 
 const App = () => {
   const dispatch = useDispatch()
@@ -81,7 +51,7 @@ const App = () => {
       remove('redirect', { path: '/' })
     }
   }, [isServerDown])
-  
+
   if (loading) {
     return (
       <LoadingSpinner>
@@ -108,35 +78,9 @@ const App = () => {
           <Toaster />
           <GlobalDialog />
           <Outlet />
-
-          {/* <Route path='/' element={<AuthLayout />}>
-            <Route index element={<Navigate to={'login'} />} />
-            <Route path='login' element={<Login />} />
-            <Route path='reference' element={<Reference />} />
-            <Route path='resetPassword/:token' element={<ResetPassword />} />
-          </Route> */}
-          {/* <Route path='/' element={<DefaultLayout />}>
-            <Route index element={<Navigate to={'dashboard'} />} />
-            {routes.map((route, idx) => {
-              return (
-                route.component && (
-                  <Route
-                    key={idx}
-                    path={route.path}
-                    element={<route.component />}
-                  />
-                )
-              )
-            })}
-          </Route> */}
-          {/* <Route path='/verify' element={<Verify />} /> */}
-          {/* <Route path='/500' element={<Page500 />} /> */}
-          {/* <Route path='*' element={<Page404 />} /> */}
-          {/* </Routes> */}
         </React.Suspense>
       </PopupProvider>
     </Suspense>
-    // </Provider>
   )
 }
 
